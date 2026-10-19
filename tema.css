@@ -1,23 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Public+Sans:wght@400;500;600;700&family=Gloock&family=Instrument+Sans:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
-/* Temas do Escrevente (data-skin no <html>, escolhido em tema.js). Cada tema troca cores, letras e forma
-   sem mexer no layout herdado do projeto da OAB. */
-
-/* ── autos: capa de processo, etiqueta e carimbo azul ── */
-html[data-skin="autos"] {
-  --rose-50: #EEF2FA !important; --rose-100: #DCE4F5 !important; --rose-300: #8FA4D6 !important; --rose-500: #3A5DB0 !important; --rose-600: #2B4C9B !important; --rose-700: #1F3A7A !important; --rose-900: #0F1D3D !important;
-  --bg: #E7ECF2 !important; --bg-soft: #DCE3EC !important; --bg-deep: #CED7E3 !important;
-  --paper: #FBFCFD !important; --paper-tint: #F4F7FA !important;
-  --ink: #17223B !important; --ink-soft: #46536E !important; --ink-faded: #7C879D !important; --ink-ghost: #B9C2D2 !important;
-  --line: #C9D2DF !important; --line-soft: #DAE1EA !important;
-  --rose: #2B4C9B !important; --rose-deep: #1F3A7A !important; --rose-soft: #DCE4F5 !important; --blush: #EEF2FA !important; --nude: #F2C94C !important;
-  --font-display: 'Spectral', Georgia, serif; --font-body: 'Public Sans', system-ui, sans-serif; --font-brand: 'Spectral', serif;
-  --radius-sm: 4px; --radius: 6px; --radius-lg: 8px;
-  --shadow-sm: none; --shadow: 0 1px 0 #C9D2DF; --shadow-lg: 0 2px 0 #B9C2D2;
-  --skin-marca: #F2C94C;
-}
-html[data-skin="autos"] .tn-brand .seal { transform: rotate(-8deg); color: var(--rose); }
-html[data-skin="autos"] .ss-bloco, html[data-skin="autos"] .side-card, html[data-skin="autos"] .today-card { border: 1.5px solid var(--line) !important; box-shadow: none !important; }
-html[data-skin="autos"] .tn-ink { background: var(--skin-marca) !important; height: 4px; }
+@import url('https://fonts.googleapis.com/css2?family=Gloock&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+/* Identidade do Escrevente: Palácio da Justiça — verde-mármore, bronze e cartões em arco.
+   Vale para todas as páginas (data-skin="palacio" no <html>, posto em cores-early.js) e redesenha o layout
+   herdado do projeto da OAB: barra e faixa verdes no topo, títulos em Gloock, cartões subindo sobre a faixa. */
 
 /* ── palacio: Palácio da Justiça — mármore verde, bronze e arcos ── */
 html[data-skin="palacio"] {
@@ -36,24 +20,6 @@ html[data-skin="palacio"] .tn-brand .seal { color: var(--skin-marca); }
 html[data-skin="palacio"] .ss-bloco, html[data-skin="palacio"] .side-card, html[data-skin="palacio"] .today-card { border-top: 2px solid var(--skin-marca) !important; }
 html[data-skin="palacio"] .tn-ink { background: var(--skin-marca) !important; }
 
-/* ── grifo: caderno de estudo — ameixa e marca-texto amarelo ── */
-html[data-skin="grifo"] {
-  --rose-50: #F3EEFB !important; --rose-100: #E6DCF7 !important; --rose-300: #BBA2E6 !important; --rose-500: #7E52C4 !important; --rose-600: #6D3FB5 !important; --rose-700: #552E93 !important; --rose-900: #2A1749 !important;
-  --bg: #F4F2FA !important; --bg-soft: #EBE7F5 !important; --bg-deep: #DED8EE !important;
-  --paper: #FFFFFF !important; --paper-tint: #FAF9FD !important;
-  --ink: #241B35 !important; --ink-soft: #544A68 !important; --ink-faded: #8E86A0 !important; --ink-ghost: #C9C3D8 !important;
-  --line: #DCD6EA !important; --line-soft: #E9E5F3 !important;
-  --rose: #6D3FB5 !important; --rose-deep: #552E93 !important; --rose-soft: #E6DCF7 !important; --blush: #F3EEFB !important; --nude: #FFE45C !important;
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif; --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif; --font-brand: 'Bricolage Grotesque', sans-serif;
-  --radius-sm: 10px; --radius: 18px; --radius-lg: 24px;
-  --skin-marca: #FFE45C;
-}
-html[data-skin="grifo"] .page-title h1 {
-  background: linear-gradient(transparent 58%, var(--skin-marca) 58%, var(--skin-marca) 92%, transparent 92%);
-  display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 .12em;
-}
-html[data-skin="grifo"] .tn-ink { background: var(--skin-marca) !important; height: 6px; border-radius: 3px; }
-
 /* ── modo escuro dos três ── */
 html[data-skin][data-theme="dark"] {
   --bg: #12161D !important; --bg-soft: #181D26 !important; --bg-deep: #1F2530 !important;
@@ -61,9 +27,7 @@ html[data-skin][data-theme="dark"] {
   --ink: #EEF1F6 !important; --ink-soft: #B6BECC !important; --ink-faded: #808A9B !important; --ink-ghost: #3D4553 !important;
   --line: #2A313D !important; --line-soft: #222833 !important;
 }
-html[data-skin="autos"][data-theme="dark"] { --rose: #8FA9F0 !important; --rose-deep: #A9BDF5 !important; --rose-soft: #23305A !important; --blush: #1A2240 !important; }
 html[data-skin="palacio"][data-theme="dark"] { --rose: #7CC3A6 !important; --rose-deep: #98D3BA !important; --rose-soft: #1C3A30 !important; --blush: #152A23 !important; }
-html[data-skin="grifo"][data-theme="dark"] { --rose: #B79AF0 !important; --rose-deep: #C9B2F5 !important; --rose-soft: #33254F !important; --blush: #251C3A !important; }
 
 /* ── letras: troca as famílias fixas herdadas (Fraunces, Inter, MagicalFeather) pelas do tema ── */
 html[data-skin] body { font-family: var(--font-body) !important; }
@@ -300,3 +264,115 @@ html[data-skin] textarea.handwritten { font-family: var(--font-body) !important;
 /* o fundo "aurora" herdado é rosado: some nos temas */
 html[data-skin] .aurora-bg { display: none !important; }
 html[data-skin] body { background: var(--bg) !important; }
+
+/* ═══ Estrutura Palácio ═══ */
+html[data-skin="palacio"] { --verde-noite: #163F32; --bronze-claro: #E9D9B5; }
+
+/* barra do topo verde */
+html[data-skin] .tn, html[data-skin] .tn.scrolled { background: var(--verde-noite) !important; border-bottom: 0 !important; box-shadow: none !important; }
+html[data-skin] .tn-word { color: #fff !important; font-size: 1.45rem; }
+html[data-skin] .tn-brand .seal { width: 34px; height: 34px; transform: none !important; }
+html[data-skin] .tn-rule { background: rgba(255,255,255,.12) !important; }
+@media (min-width: 901px) {
+  html[data-skin] .tn-item > a { color: #CFE0D7 !important; border-radius: 999px; padding-left: 1rem; padding-right: 1rem; }
+  html[data-skin] .tn-item > a:hover, html[data-skin] .tn-item.open > a { color: #fff !important; }
+  html[data-skin] .tn-item > a.on { background: var(--bronze-claro); color: var(--verde-noite) !important; }
+  html[data-skin] .tn-ink { display: none !important; }
+}
+html[data-skin] .tn-count .lbl { color: #A9C4B7 !important; }
+html[data-skin] .tn-count .val, html[data-skin] .tn-count b { color: #fff !important; }
+html[data-skin] .tn-icon { color: #CFE0D7 !important; }
+html[data-skin] .tn-av { background: var(--bronze-claro) !important; color: var(--verde-noite) !important; }
+
+/* faixa verde com o título de cada página; o conteúdo sobe sobre ela */
+html[data-skin] main { position: relative; isolation: isolate; padding-top: 0 !important; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { position: relative; padding: 2.4rem 0 6.5rem; margin-bottom: 0; align-items: flex-end; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar)::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) + * { position: relative; margin-top: -4.5rem; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1, html[data-skin] .hub h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1.05; letter-spacing: -.01em; max-width: 22ch; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1 em { color: var(--bronze-claro) !important; font-style: normal; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .breadcrumb { color: #A9C4B7 !important; letter-spacing: .02em; text-transform: none; font-size: .86rem; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .rv-sub, html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) p { color: #C8DAD0 !important; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .topbar-actions { color: #fff; }
+html[data-skin] .hub > .topbar + p.lead { color: #C8DAD0; margin-top: -6rem !important; margin-bottom: 4.6rem; position: relative; }
+html[data-skin] .hub-grid { position: relative; }
+
+/* contagem grande no canto da faixa (Início e Hoje) */
+.pl-cont { text-align: right; color: var(--bronze-claro); line-height: 1; }
+.pl-cont b { display: block; font: 400 clamp(4rem, 9vw, 7.5rem)/.85 'Gloock', serif; color: #fff; }
+.pl-cont span { font-weight: 600; font-size: .9rem; }
+
+/* cartões: branco, topo em arco, fio de bronze */
+html[data-skin] .ss-bloco, html[data-skin] .side-card, html[data-skin] .today-card, html[data-skin] .hub-card,
+html[data-skin] .day-hero, html[data-skin] .rv-quadro, html[data-skin] .mat-card, html[data-skin] .rf-card {
+  background: var(--paper) !important; border: 1px solid var(--line) !important; border-top: 2px solid var(--skin-marca) !important;
+  border-radius: 26px 26px 10px 10px !important; box-shadow: 0 12px 30px rgba(20,38,30,.08) !important;
+}
+html[data-skin] .hub-card { border-radius: 120px 120px 14px 14px !important; padding-top: 3.2rem !important; text-align: center; align-items: center; }
+html[data-skin] .hub-card .hub-ico { margin-left: auto; margin-right: auto; }
+html[data-skin] .day-hero { border-radius: 160px 160px 14px 14px !important; padding-top: 2.6rem !important; }
+
+/* botões principais em pílula verde */
+html[data-skin] .btn-primary, html[data-skin] .btn-estudei, html[data-skin] .btn.btn-primary {
+  background: var(--rose) !important; border-color: var(--rose) !important; color: #fff !important; border-radius: 999px !important;
+}
+html[data-skin] .btn { border-radius: 999px; }
+
+/* abas do Hoje */
+html[data-skin] .tabs-bar .tab.active { color: var(--rose-deep) !important; }
+html[data-skin] .tabs-bar .tab.active::after, html[data-skin] .tabs-bar .tab.active:after { background: var(--skin-marca) !important; }
+
+/* faixa de atalhos do Hoje (flashcards, questões, erros) */
+.pl-faixa { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.4rem 0 1.6rem; }
+.pl-peca { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.2rem; display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--ink); cursor: pointer; }
+.pl-peca:hover { border-color: var(--rose); }
+.pl-peca:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+.pl-peca b { font: 400 2.4rem/1 'Gloock', serif; color: var(--rose); min-width: 2.6rem; }
+.pl-peca h4 { margin: 0; font: 600 1rem 'Instrument Sans', sans-serif; }
+.pl-peca p { margin: .1rem 0 0; color: var(--ink-soft); font-size: .86rem; }
+.pl-peca i { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex-shrink: 0; }
+.pl-peca i.v { background: var(--rose); border-color: var(--rose); }
+@media (max-width: 700px) {
+  .pl-faixa { grid-template-columns: 1fr; }
+  html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { padding-bottom: 5.5rem; flex-wrap: wrap; }
+  html[data-skin] .day-hero { border-radius: 60px 60px 12px 12px !important; }
+  .pl-cont { text-align: left; }
+}
+
+/* pílula do menu com altura própria (o link herdado ocupa a barra toda) */
+@media (min-width: 901px) {
+  html[data-skin] .tn-links { align-items: center; }
+  html[data-skin] .tn-item { display: flex; align-items: center; }
+  html[data-skin] .tn-item > a { height: auto !important; padding-top: .55rem !important; padding-bottom: .55rem !important; }
+}
+
+/* Início: a linha do tempo fica dentro da faixa verde, o resto sobe sobre ela */
+html[data-skin] body.home main > .topbar { padding-bottom: 1.4rem; }
+html[data-skin] body.home main > .topbar + * { margin-top: 0; }
+html[data-skin] body.home .tl { position: relative; padding: .4rem 0 6.5rem; margin: 0; }
+html[data-skin] body.home .tl::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
+html[data-skin] body.home .tl + * { position: relative; margin-top: -4.5rem; }
+html[data-skin] body.home .tl-now, html[data-skin] body.home .tl-left { color: #fff !important; }
+html[data-skin] body.home .tl-now b { color: var(--bronze-claro) !important; }
+html[data-skin] body.home .tl-marks { color: #A9C4B7 !important; }
+html[data-skin] body.home .tl-track { background: rgba(255,255,255,.18) !important; }
+html[data-skin] body.home .tl-fill, html[data-skin] body.home .tl-dot { background: var(--bronze-claro) !important; }
+html[data-skin] body.home .tl-dot { box-shadow: 0 0 0 4px var(--verde-noite) !important; }
+html[data-skin] .home-quote, html[data-skin] .home-quote .quote-author { color: #C8DAD0 !important; }
+html[data-skin] body.home .section-label { color: var(--ink-soft); }
+
+html[data-skin] main > .bq-cab .topbar { padding: 0; margin: 0 0 .5rem; }
+html[data-skin] main > .bq-cab .topbar .page-title h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); }
+html[data-skin] main > .bq-cab .breadcrumb { color: #A9C4B7 !important; }
+html[data-skin] .ca-sub, html[data-skin] .rv-sub { color: #C8DAD0 !important; }
+html[data-skin] .ca-sub b, html[data-skin] .rv-sub b { color: #fff !important; }
+html[data-skin] body.home main > .topbar { margin-bottom: 0 !important; }
+html[data-skin] body.home .tl + .section-label { color: #A9C4B7 !important; }
+html[data-skin] body.home .tl + .section-label::after { background: rgba(255,255,255,.18) !important; }
+@media (max-width: 700px) {
+  .pl-cont { display: flex; align-items: baseline; gap: .5rem; margin-top: .6rem; }
+  .pl-cont b { font-size: 2.6rem; }
+  .pl-faixa { grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+  .pl-peca { flex-direction: column; align-items: flex-start; gap: .3rem; padding: .8rem; }
+  .pl-peca b { font-size: 1.8rem; } .pl-peca p { display: none; } .pl-peca i { display: none; }
+}

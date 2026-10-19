@@ -228,7 +228,7 @@
     var resp = E.lerRespostas();
     var pesos = E.pesosRecentes(BANCO, 41);
     if (modo === 'fracas') {
-      // mesmo critério do painel Rumo aos 40: pontos a ganhar até 75%; só as 5 que mais rendem
+      // mesmo critério do painel Rumo à vaga: pontos a ganhar até 75%; só as 5 que mais rendem
       var st = E.statsPorDisciplina(BANCO, resp);
       Object.keys(pesos).forEach(function (d) { pesos[d] = pesos[d] * Math.max(0, 0.75 - E.acertoEstimado(st[d])); });
       var top5 = Object.keys(pesos).sort(function (a, b) { return pesos[b] - pesos[a]; }).slice(0, 5);
@@ -276,7 +276,7 @@
   }
 
   // Cada questão feita no simulado entra no histórico do banco (tj_bq_respostas),
-  // que é de onde o painel Rumo aos 40 tira o acerto por matéria. Em branco conta como erro.
+  // que é de onde o painel Rumo à vaga tira o acerto por matéria. Em branco conta como erro.
   function gravarNoHistorico() {
     if (S.historicoGravado) return;
     var hist = lerLocal('tj_bq_respostas', {});

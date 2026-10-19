@@ -85,20 +85,9 @@
   } catch (e) {}
 })();
 
-// Tema visual do Escrevente (tema.css): ?tema=autos|palacio|grifo escolhe e guarda; troca também o ícone da aba.
+// Identidade visual do Escrevente (tema.css), em todas as páginas.
 (function () {
-  var TEMAS = ['autos', 'palacio', 'grifo'], t = null;
-  try {
-    var q = new URLSearchParams(location.search).get('tema');
-    if (TEMAS.indexOf(q) >= 0) localStorage.setItem('tj_tema', q);
-    t = localStorage.getItem('tj_tema');
-  } catch (e) {}
-  if (TEMAS.indexOf(t) < 0) t = 'autos';
   var root = document.documentElement, h = document.head || root;
-  root.setAttribute('data-skin', t);
-  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'tema.css?v=1'; h.appendChild(css);
-  function icone() {
-    document.querySelectorAll('link[rel="icon"]').forEach(function (l) { l.href = 'favicon-' + t + '.svg'; });
-  }
-  icone(); document.addEventListener('DOMContentLoaded', icone);
+  root.setAttribute('data-skin', 'palacio');
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'tema.css?v=2'; h.appendChild(css);
 })();

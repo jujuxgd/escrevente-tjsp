@@ -66,7 +66,17 @@ Materiais extras (provas anteriores, apostilas de questões NEAF, simulados, edi
 - Domínio novo do Vercel precisa entrar em Firebase Auth → domínios autorizados; o leitor de PDF usa a chave da
   API do Drive restrita a `*.vercel.app`.
 
-## 5. Regras
+## 5. Visual (escolha de Julia em 19/10/2026: modelo "Palácio")
+
+Diferente do site da OAB de propósito. Tudo em `tema.css` (carregado por `cores-early.js`, que põe
+`data-skin="palacio"` no `<html>`): verde-noite `#163F32` e verde `#1F5A46`, bronze `#A77B2F`/`#E9D9B5`,
+fundo mármore `#EDF1EE`; títulos em **Gloock**, texto em **Instrument Sans**. Barra do topo verde com o item
+ativo em pílula bronze; cada página abre com uma faixa verde e título grande, e o primeiro bloco sobe sobre
+ela; cartões brancos com topo em arco e fio de bronze; botões em pílula. No Hoje, o título é a matéria do dia,
+a contagem grande fica à direita e há a faixa Flashcards · Questões · Erros. Favicon e ícones = arco com colunas.
+Não voltar ao rosa da OAB nem redesenhar sem perguntar.
+
+## 6. Regras
 
 - Seguir as regras de desenvolvimento do CLAUDE.md da OAB (editar direto, sem scope creep, sem flip-cards,
   comentários só para o "porquê").
