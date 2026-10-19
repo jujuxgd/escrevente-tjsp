@@ -1,0 +1,302 @@
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Public+Sans:wght@400;500;600;700&family=Gloock&family=Instrument+Sans:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+/* Temas do Escrevente (data-skin no <html>, escolhido em tema.js). Cada tema troca cores, letras e forma
+   sem mexer no layout herdado do projeto da OAB. */
+
+/* ── autos: capa de processo, etiqueta e carimbo azul ── */
+html[data-skin="autos"] {
+  --rose-50: #EEF2FA !important; --rose-100: #DCE4F5 !important; --rose-300: #8FA4D6 !important; --rose-500: #3A5DB0 !important; --rose-600: #2B4C9B !important; --rose-700: #1F3A7A !important; --rose-900: #0F1D3D !important;
+  --bg: #E7ECF2 !important; --bg-soft: #DCE3EC !important; --bg-deep: #CED7E3 !important;
+  --paper: #FBFCFD !important; --paper-tint: #F4F7FA !important;
+  --ink: #17223B !important; --ink-soft: #46536E !important; --ink-faded: #7C879D !important; --ink-ghost: #B9C2D2 !important;
+  --line: #C9D2DF !important; --line-soft: #DAE1EA !important;
+  --rose: #2B4C9B !important; --rose-deep: #1F3A7A !important; --rose-soft: #DCE4F5 !important; --blush: #EEF2FA !important; --nude: #F2C94C !important;
+  --font-display: 'Spectral', Georgia, serif; --font-body: 'Public Sans', system-ui, sans-serif; --font-brand: 'Spectral', serif;
+  --radius-sm: 4px; --radius: 6px; --radius-lg: 8px;
+  --shadow-sm: none; --shadow: 0 1px 0 #C9D2DF; --shadow-lg: 0 2px 0 #B9C2D2;
+  --skin-marca: #F2C94C;
+}
+html[data-skin="autos"] .tn-brand .seal { transform: rotate(-8deg); color: var(--rose); }
+html[data-skin="autos"] .ss-bloco, html[data-skin="autos"] .side-card, html[data-skin="autos"] .today-card { border: 1.5px solid var(--line) !important; box-shadow: none !important; }
+html[data-skin="autos"] .tn-ink { background: var(--skin-marca) !important; height: 4px; }
+
+/* ── palacio: Palácio da Justiça — mármore verde, bronze e arcos ── */
+html[data-skin="palacio"] {
+  --rose-50: #EAF2EE !important; --rose-100: #D6E6DE !important; --rose-300: #8DB8A5 !important; --rose-500: #2C6E57 !important; --rose-600: #1F5A46 !important; --rose-700: #17463A !important; --rose-900: #0B2219 !important;
+  --bg: #EDF1EE !important; --bg-soft: #E2E9E4 !important; --bg-deep: #D3DDD6 !important;
+  --paper: #FFFFFF !important; --paper-tint: #F7F9F7 !important;
+  --ink: #14261E !important; --ink-soft: #3F5449 !important; --ink-faded: #78897F !important; --ink-ghost: #B7C4BC !important;
+  --line: #CFDAD3 !important; --line-soft: #E0E7E2 !important;
+  --rose: #1F5A46 !important; --rose-deep: #17463A !important; --rose-soft: #D6E6DE !important; --blush: #EAF2EE !important; --nude: #EFE3CB !important;
+  --font-display: 'Gloock', Georgia, serif; --font-body: 'Instrument Sans', system-ui, sans-serif; --font-brand: 'Gloock', serif;
+  --radius-sm: 10px; --radius: 22px 22px 6px 6px; --radius-lg: 28px 28px 8px 8px;
+  --shadow-sm: 0 1px 2px rgba(20,38,30,.06); --shadow: 0 2px 10px rgba(20,38,30,.07); --shadow-lg: 0 10px 30px rgba(20,38,30,.10);
+  --skin-marca: #A77B2F;
+}
+html[data-skin="palacio"] .tn-brand .seal { color: var(--skin-marca); }
+html[data-skin="palacio"] .ss-bloco, html[data-skin="palacio"] .side-card, html[data-skin="palacio"] .today-card { border-top: 2px solid var(--skin-marca) !important; }
+html[data-skin="palacio"] .tn-ink { background: var(--skin-marca) !important; }
+
+/* ── grifo: caderno de estudo — ameixa e marca-texto amarelo ── */
+html[data-skin="grifo"] {
+  --rose-50: #F3EEFB !important; --rose-100: #E6DCF7 !important; --rose-300: #BBA2E6 !important; --rose-500: #7E52C4 !important; --rose-600: #6D3FB5 !important; --rose-700: #552E93 !important; --rose-900: #2A1749 !important;
+  --bg: #F4F2FA !important; --bg-soft: #EBE7F5 !important; --bg-deep: #DED8EE !important;
+  --paper: #FFFFFF !important; --paper-tint: #FAF9FD !important;
+  --ink: #241B35 !important; --ink-soft: #544A68 !important; --ink-faded: #8E86A0 !important; --ink-ghost: #C9C3D8 !important;
+  --line: #DCD6EA !important; --line-soft: #E9E5F3 !important;
+  --rose: #6D3FB5 !important; --rose-deep: #552E93 !important; --rose-soft: #E6DCF7 !important; --blush: #F3EEFB !important; --nude: #FFE45C !important;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif; --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif; --font-brand: 'Bricolage Grotesque', sans-serif;
+  --radius-sm: 10px; --radius: 18px; --radius-lg: 24px;
+  --skin-marca: #FFE45C;
+}
+html[data-skin="grifo"] .page-title h1 {
+  background: linear-gradient(transparent 58%, var(--skin-marca) 58%, var(--skin-marca) 92%, transparent 92%);
+  display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 .12em;
+}
+html[data-skin="grifo"] .tn-ink { background: var(--skin-marca) !important; height: 6px; border-radius: 3px; }
+
+/* ── modo escuro dos três ── */
+html[data-skin][data-theme="dark"] {
+  --bg: #12161D !important; --bg-soft: #181D26 !important; --bg-deep: #1F2530 !important;
+  --paper: #171C24 !important; --paper-tint: #1B212A !important;
+  --ink: #EEF1F6 !important; --ink-soft: #B6BECC !important; --ink-faded: #808A9B !important; --ink-ghost: #3D4553 !important;
+  --line: #2A313D !important; --line-soft: #222833 !important;
+}
+html[data-skin="autos"][data-theme="dark"] { --rose: #8FA9F0 !important; --rose-deep: #A9BDF5 !important; --rose-soft: #23305A !important; --blush: #1A2240 !important; }
+html[data-skin="palacio"][data-theme="dark"] { --rose: #7CC3A6 !important; --rose-deep: #98D3BA !important; --rose-soft: #1C3A30 !important; --blush: #152A23 !important; }
+html[data-skin="grifo"][data-theme="dark"] { --rose: #B79AF0 !important; --rose-deep: #C9B2F5 !important; --rose-soft: #33254F !important; --blush: #251C3A !important; }
+
+/* ── letras: troca as famílias fixas herdadas (Fraunces, Inter, MagicalFeather) pelas do tema ── */
+html[data-skin] body { font-family: var(--font-body) !important; }
+html[data-skin] .tn-word, html[data-skin] .logo h1 { font-family: var(--font-brand) !important; font-size: 1.35rem; letter-spacing: -.01em; }
+html[data-skin] [style*="Fraunces"] { font-family: var(--font-display) !important; }
+html[data-skin] [style*="Inter"] { font-family: var(--font-body) !important; }
+html[data-skin] .alternativa .letra,
+html[data-skin] .app-toast .app-toast-text strong,
+html[data-skin] .bq h1,
+html[data-skin] .bq-t,
+html[data-skin] .ca-det .data,
+html[data-skin] .ca-it .tx,
+html[data-skin] .ca-mesnav h2,
+html[data-skin] .ca-n,
+html[data-skin] .cai-card .freq,
+html[data-skin] .card-title,
+html[data-skin] .chart-title,
+html[data-skin] .checklist-subgroup-header,
+html[data-skin] .cl-empty-msg,
+html[data-skin] .cl-native-content .cl-art-num,
+html[data-skin] .cl-toolbar .title,
+html[data-skin] .conq-head .txt b,
+html[data-skin] .countdown .date,
+html[data-skin] .countdown .number,
+html[data-skin] .day-info h2,
+html[data-skin] .day-number-big .num,
+html[data-skin] .day-toast-parabens,
+html[data-skin] .display,
+html[data-skin] .donut-inner .pct,
+html[data-skin] .donut-legend .item strong,
+html[data-skin] .empty-state h3,
+html[data-skin] .error-stat-card .num,
+html[data-skin] .est-sec h2,
+html[data-skin] .fact-card .fact,
+html[data-skin] .fact-card .year,
+html[data-skin] .favorita-card .badge .pct,
+html[data-skin] .favorita-card h3,
+html[data-skin] .fc-frente,
+html[data-skin] .hero .quote,
+html[data-skin] .hero h2,
+html[data-skin] .home-ring-c b,
+html[data-skin] .hub h1,
+html[data-skin] .hub-card h3,
+html[data-skin] .in-fato b,
+html[data-skin] .insight-card .ic-title,
+html[data-skin] .ju-modal-title,
+html[data-skin] .logo h1,
+html[data-skin] .mat-nome,
+html[data-skin] .mat-pct,
+html[data-skin] .mat-q-num,
+html[data-skin] .materia-bar .pct,
+html[data-skin] .meta-pct,
+html[data-skin] .mr-render h1,
+html[data-skin] .mr-render h2,
+html[data-skin] .mr-render h3,
+html[data-skin] .mt-date,
+html[data-skin] .novo-form-wrap h3,
+html[data-skin] .page-title h1,
+html[data-skin] .perfil-header-nome,
+html[data-skin] .playlist-card .pl-title,
+html[data-skin] .pn-details>summary,
+html[data-skin] .pomodoro-time,
+html[data-skin] .profile-avatar,
+html[data-skin] .prog-const strong,
+html[data-skin] .r40-card h3,
+html[data-skin] .r40-ganho,
+html[data-skin] .r40-nota,
+html[data-skin] .r40-sec h2,
+html[data-skin] .rank-pos,
+html[data-skin] .rank-val,
+html[data-skin] .res-nota,
+html[data-skin] .resultado-pct,
+html[data-skin] .resumo-prev-nome,
+html[data-skin] .resumo-tile .num,
+html[data-skin] .rf-card .nome,
+html[data-skin] .rf-hero h2,
+html[data-skin] .rf-modal-title,
+html[data-skin] .rf-section-title,
+html[data-skin] .rv-continuar strong,
+html[data-skin] .rv-cron b,
+html[data-skin] .rv-fase2-dias b,
+html[data-skin] .rv-grupo-cab h4,
+html[data-skin] .rv-no-tit,
+html[data-skin] .rv-ov-tit h3,
+html[data-skin] .rv-q-nome,
+html[data-skin] .rv-resumo-num b,
+html[data-skin] .rv-tr-form h3,
+html[data-skin] .rv-tr-item-top strong,
+html[data-skin] .rv-tr-num b,
+html[data-skin] .rv-tr-sec,
+html[data-skin] .serif,
+html[data-skin] .side-block h4,
+html[data-skin] .side-card h4,
+html[data-skin] .sim-card-nome,
+html[data-skin] .sim-card-pct,
+html[data-skin] .sim-num,
+html[data-skin] .sm h1,
+html[data-skin] .ss-bloco h3,
+html[data-skin] .ss-hero h2,
+html[data-skin] .ss-nums b,
+html[data-skin] .stat-big .num,
+html[data-skin] .stat-big .sub,
+html[data-skin] .stat-number,
+html[data-skin] .stats-hero::before,
+html[data-skin] .streak-pill .count,
+html[data-skin] .subject-panel-header .sp-nome,
+html[data-skin] .teoria .drop-cap::first-letter,
+html[data-skin] .teoria h3,
+html[data-skin] .tl-now,
+html[data-skin] .tn-av,
+html[data-skin] .tn-count .val,
+html[data-skin] .tn-word,
+html[data-skin] .toast-text strong,
+html[data-skin] .today-card h3,
+html[data-skin] .today-stat .num,
+html[data-skin] .totais-num,
+html[data-skin] .wrapped-card h3,
+html[data-skin] .wrapped-stat .v,
+html[data-skin] :root,
+html[data-skin] body.home .side-card h4,
+html[data-skin] body.home .today-card h3,
+html[data-skin] body.home .today-stat .num,
+html[data-skin] body.perfil .chart-card h4,
+html[data-skin] body.perfil .config-card h4,
+html[data-skin] body.perfil .resumo-tile .num { font-family: var(--font-display) !important; }
+html[data-skin] #meta-texto,
+html[data-skin] .adi-eb,
+html[data-skin] .alt,
+html[data-skin] .alt .l,
+html[data-skin] .b,
+html[data-skin] .bt-marcar,
+html[data-skin] .bt-principal,
+html[data-skin] .bt-secundario,
+html[data-skin] .btn-lim,
+html[data-skin] .busca input,
+html[data-skin] .ca-chip,
+html[data-skin] .ca-det .tag,
+html[data-skin] .ca-mesnav button,
+html[data-skin] .ca-n .at,
+html[data-skin] .ca-n .ok,
+html[data-skin] .ca-sem,
+html[data-skin] .cal-sem h4,
+html[data-skin] .cf-rot,
+html[data-skin] .cfg-bloco h2,
+html[data-skin] .chip,
+html[data-skin] .cl-native-content,
+html[data-skin] .cl-native-content .cl-inc-num,
+html[data-skin] .cl-native-content .cl-part,
+html[data-skin] .cl-native-content .cl-section,
+html[data-skin] .cl-oab-badge,
+html[data-skin] .comment .body,
+html[data-skin] .conq-btn,
+html[data-skin] .cron,
+html[data-skin] .cron-rot,
+html[data-skin] .ctl select,
+html[data-skin] .ex-bloco p,
+html[data-skin] .ex-l,
+html[data-skin] .ex-v,
+html[data-skin] .expl h4,
+html[data-skin] .fc-filtros button,
+html[data-skin] .fc-tag,
+html[data-skin] .form-group input,
+html[data-skin] .form-group select,
+html[data-skin] .form-group textarea,
+html[data-skin] .fp-check,
+html[data-skin] .fq,
+html[data-skin] .hand,
+html[data-skin] .hub-card .go,
+html[data-skin] .logo .subtitle,
+html[data-skin] .lp-apagar,
+html[data-skin] .lp-b,
+html[data-skin] .lp-lt,
+html[data-skin] .lp-num,
+html[data-skin] .lp-parte,
+html[data-skin] .lp-zoom,
+html[data-skin] .ms-bt,
+html[data-skin] .ms-busca input,
+html[data-skin] .ms-n,
+html[data-skin] .ms-op,
+html[data-skin] .ms-pe button,
+html[data-skin] .nav-section-label,
+html[data-skin] .pag button,
+html[data-skin] .page-title .breadcrumb,
+html[data-skin] .pill,
+html[data-skin] .pn-details>summary span,
+html[data-skin] .pn-lin.cab,
+html[data-skin] .prog-col h4,
+html[data-skin] .prova-bt,
+html[data-skin] .ql-container.ql-snow,
+html[data-skin] .ql-toolbar.ql-snow,
+html[data-skin] .r40-eb,
+html[data-skin] .r40-ganho small,
+html[data-skin] .r40-lin.cab,
+html[data-skin] .r40-selo,
+html[data-skin] .r40-tag,
+html[data-skin] .res-selo,
+html[data-skin] .res-tabela h2,
+html[data-skin] .resumo-text,
+html[data-skin] .rt-code-btn,
+html[data-skin] .rt-code-textarea,
+html[data-skin] .rv-chip,
+html[data-skin] .rv-conf-btn,
+html[data-skin] .rv-cron button,
+html[data-skin] .rv-fase2 label,
+html[data-skin] .rv-ic,
+html[data-skin] .rv-marca,
+html[data-skin] .rv-q-c,
+html[data-skin] .rv-q-nome small,
+html[data-skin] .rv-seg button,
+html[data-skin] .rv-tab,
+html[data-skin] .rv-tipo-btn,
+html[data-skin] .rv-tr-campo input,
+html[data-skin] .rv-tr-campo textarea,
+html[data-skin] .ss-bloco h3 .n,
+html[data-skin] .ss-eb,
+html[data-skin] .ss-tabs button,
+html[data-skin] .ss-top-cab .mat,
+html[data-skin] .stats-link,
+html[data-skin] .tl-left,
+html[data-skin] .tl-marks,
+html[data-skin] .tn-count .lbl,
+html[data-skin] .tn-fase button,
+html[data-skin] .tn-item > a,
+html[data-skin] .tn-sub a,
+html[data-skin] .vazio .t,
+html[data-skin] body,
+html[data-skin] body.home .mood-strip h4,
+html[data-skin] body.perfil .badge-tile .b-title,
+html[data-skin] body.perfil .resumo-tile .lbl,
+html[data-skin] body.perfil .section-label,
+html[data-skin] select,
+html[data-skin] textarea.handwritten { font-family: var(--font-body) !important; }
+
+/* o fundo "aurora" herdado é rosado: some nos temas */
+html[data-skin] .aurora-bg { display: none !important; }
+html[data-skin] body { background: var(--bg) !important; }
