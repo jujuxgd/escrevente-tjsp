@@ -9,9 +9,11 @@ preparatório da OAB de Julia (`jujuxgd/preparatorio-oab`): HTML estático + JS 
 
 - **Edital 02/2026:** publicado em 19/10/2026; inscrições 28/10 a 10/12/2026; **prova em 14/03/2027**
   (objetiva + redação). Cadastro de reserva, 2ª a 10ª RAJ.
-- **Estrutura da prova usada no plano:** a do edital de 2025 (planilha "EDITAL ESQUEMATIZADO" do Drive):
-  70 questões — Português 16 (eliminatória); Direito 30 (divisão não divulgada); Informática 9, Raciocínio
-  Lógico 7, Matemática 4, Atualidades + Estatuto PcD 4. **Conferir com o edital 02/2026** e ajustar.
+- **Prova (edital 02/2026, conferido em sites de concurso):** 70 questões A–E em 5 horas, junto com a redação —
+  Português 16 e Direito 30 (eliminatórios), Conhecimentos Gerais 24 (classificatório). A divisão dentro dos
+  blocos não foi divulgada; o plano usa a do edital esquematizado de 2025 (Informática 9, RLM 7, Matemática 4,
+  Atualidades + PcD 4). **Nota mínima de habilitação ainda não conferida no PDF oficial**: Rumo à vaga e Simulado
+  usam "metade da prova" como referência.
 - Julia estuda a OAB ao mesmo tempo: 1ª fase em 10/01/2027 e 2ª fase em 28/02/2027.
 
 ## 2. Calendário (`calendario-ativo.js` + `aulas-dias.js`)
@@ -44,12 +46,18 @@ Biblioteca (`revisao-biblioteca.js`: Tabelas NEAF, Bizus, Apostila NEAF por mat�
 Materiais extras (provas anteriores, apostilas de questões NEAF, simulados, editais), Edital verticalizado
 (`materias.html`, itens do edital esquematizado com checkbox), Caderno de Erros, Estatísticas, Perfil.
 
+**Banco de questões (`questoes-banco.js`, 700 questões):** provas de 2017, 2018 (Interior, v4), 2021, 2023 Capital
+(v3), 2023 Grande SP (v3), 2024 Interior e 2024 Capital (v1). `exam_number` = ano + aplicação (20241…);
+`exam` = nome exibido. Gabarito **oficial definitivo** da versão do caderno (versão conferida resolvendo questões de
+cálculo); anuladas (definitivo ou resultado dos recursos) ficam com `correct_answer: null` — no Simulado valem o
+ponto, no Hoje não aparecem. Texto-base em `window.TEXTOS_BASE[support_id]`; `figure` = recorte do caderno em
+`img/q/` (traz o enunciado, que aparece no lugar do texto); `window.enunciadoQuestao(q)` monta o enunciado em
+todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto. Gerado por scripts fora do repo
+(PyMuPDF: leitura em 2 colunas, faixas de largura total, cabeçalhos "Leia…/Para responder…").
+`ESTUDO.pesosRecentes` usa as provas desde 2021, redistribuídas nos blocos 16/30/24.
+
 **A alimentar (aos poucos):**
-1. `questoes-banco.js` — está vazio. Fonte: provas 2017, 2018, 2021, 2023 (Capital e Interior), 2024 e
-   reaplicação 2024 + gabaritos oficiais (pasta "4. Provas anteriores"). As provas têm **5 alternativas (A–E)**:
-   Banco, Simulado e sessão do dia ainda usam a–d — estender junto com a carga. `exam_number`/`exam` devem
-   virar o ano/aplicação. Rumo à vaga (`rumo40.html`) e `ESTUDO.pesosRecentes` dependem disso.
-   Extração: baixar o PDF pelo Drive e ler com PyMuPDF (blocos em 2 colunas); questões com imagem ficam marcadas.
+1. `topic` das questões (hoje null; o Hoje usa `q: ["*"]`, a matéria inteira) — classificar pelo edital.
 2. Flashcards (`fc-*.js` + `ARQUIVOS` em `ativo-core.js`) — vazio. Fonte sugerida: Memorex 01–06 e Tabelas NEAF.
    Texto reescrito, nunca copiado.
 3. Cadernos legislativos (`cl-*.js`, lista em `caderno-legislativo.html` com `jsFile: null`) — fonte:

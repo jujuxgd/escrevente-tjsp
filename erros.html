@@ -675,7 +675,7 @@ function renderLista() {
 }
 
 // registros antigos guardavam a origem da questão em "o que faltou"
-const ORIGEM_ANTIGA = /^\d+º Exame, questão \d+\. Gabarito [A-D—]+(; marquei [A-D])?\.$/;
+const ORIGEM_ANTIGA = /^\d+º Exame, questão \d+\. Gabarito [A-E—]+(; marquei [A-E])?\.$/;
 function origemDe(e) {
   if (e.origem) return e.origem;
   if (ORIGEM_ANTIGA.test(e.o_que_faltou || '')) return e.o_que_faltou.replace(/\.$/, '').replace('. Gabarito', ' · gabarito').replace('; marquei', ' · marquei');
@@ -820,10 +820,10 @@ function _revMostrar() {
   const e = _revFila[_revIdx];
   const q = e.questao_id && _revBanco ? _revBanco[e.questao_id] : null;
   if (q) {
-    const alts = ['a', 'b', 'c', 'd'].map(k =>
+    const alts = ['a', 'b', 'c', 'd', 'e'].map(k =>
       `<button class="rev-alt" data-l="${k.toUpperCase()}"><span class="l">${k.toUpperCase()}</span><span>${escHtml(q['alternative_' + k] || '')}</span></button>`).join('');
     box.innerHTML = _revCabecalho(e) +
-      `<div class="rev-enun">${escHtml(q.statement)}</div><div id="rev-alts">${alts}</div><div id="rev-fim"></div>`;
+      `<div class="rev-enun">${enunciadoQuestao(q)}</div><div id="rev-alts">${alts}</div><div id="rev-fim"></div>`;
     box.querySelectorAll('.rev-alt').forEach(b => b.addEventListener('click', () => _revResponder(e, q, b.dataset.l)));
   } else {
     box.innerHTML = _revCabecalho(e) +

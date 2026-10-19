@@ -126,7 +126,7 @@
   </main>
 </div>
 
-<script src="questoes-banco.js"></script>
+<script src="questoes-banco.js?v=2"></script>
 <script src="progresso.js?v=1783859287"></script>
 <script src="script.js?v=1784021868"></script>
 <script src="perfil.js?v=1783860863"></script>
@@ -144,7 +144,7 @@
   function render() {
     var el = document.getElementById('r40');
     if (!BANCO.length) { el.innerHTML = '<p class="r40-vazio">O banco de questões do TJSP ainda está sendo montado. Assim que as provas anteriores entrarem, este painel mostra sua nota provável e onde estão os pontos mais fáceis.</p>'; return; }
-    var pesos = ESTUDO.pesosRecentes(BANCO, 41);
+    var pesos = ESTUDO.pesosRecentes(BANCO);
     var st = ESTUDO.statsPorDisciplina(BANCO);
     var linhas = Object.keys(pesos).map(function (d) {
       var s = st[d] || { total: 0, n: 0, ac: 0 };
@@ -156,13 +156,15 @@
     var respondidas = linhas.reduce(function (a, l) { return a + l.s.n; }, 0);
     var semDados = linhas.filter(function (l) { return l.s.n < 5; }).length;
     var notaR = Math.round(nota);
-    var acima = notaR >= 40;
+    // Referência de metade da prova até o edital 02/2026 ser conferido (a habilitação também exige mínimo por bloco).
+    var REF = Math.ceil(totalProva / 2);
+    var acima = notaR >= REF;
 
     var h = '<div class="r40-hero"><div><div class="r40-eb">Nota provável hoje</div><div class="r40-nota">' + (respondidas ? notaR : '—') + '<small> / ' + Math.round(totalProva) + '</small></div></div>' +
-      '<div><span class="r40-selo ' + (!respondidas ? '' : acima ? 'ok' : 'nao') + '">' + (!respondidas ? 'Ainda sem dados' : notaR === 40 ? 'Exatamente no corte' : acima ? 'Acima do corte por ' + (notaR - 40) + (notaR - 40 === 1 ? ' ponto' : ' pontos') : 'Falta' + (40 - notaR === 1 ? ' 1 ponto' : 'm ' + (40 - notaR) + ' pontos') + ' para o corte') + '</span>' +
-      '<div class="r40-regua"><i style="width:' + (respondidas ? Math.min(100, nota / totalProva * 100) : 0) + '%"></i><b style="left:' + (40 / totalProva * 100) + '%"></b></div>' +
-      '<div class="r40-regua-leg"><span>0</span><span>corte 40</span><span>' + Math.round(totalProva) + '</span></div>' +
-      '<p style="margin-top:.7rem">' + (!respondidas ? 'Resolva questões no Banco, no Hoje ou num Simulado para ver sua nota provável. ' : '') + 'Baseada em <b>' + respondidas + '</b> ' + (respondidas === 1 ? 'questão respondida' : 'questões respondidas') + ' e no peso de cada matéria nas provas mais recentes (41º ao 47º exame).' +
+      '<div><span class="r40-selo ' + (!respondidas ? '' : acima ? 'ok' : 'nao') + '">' + (!respondidas ? 'Ainda sem dados' : notaR === REF ? 'Exatamente na metade' : acima ? 'Acima da metade por ' + (notaR - REF) + (notaR - REF === 1 ? ' ponto' : ' pontos') : 'Falta' + (REF - notaR === 1 ? ' 1 ponto' : 'm ' + (REF - notaR) + ' pontos') + ' para a metade') + '</span>' +
+      '<div class="r40-regua"><i style="width:' + (respondidas ? Math.min(100, nota / totalProva * 100) : 0) + '%"></i><b style="left:' + (REF / totalProva * 100) + '%"></b></div>' +
+      '<div class="r40-regua-leg"><span>0</span><span>metade ' + REF + '</span><span>' + Math.round(totalProva) + '</span></div>' +
+      '<p style="margin-top:.7rem">' + (!respondidas ? 'Resolva questões no Banco, no Hoje ou num Simulado para ver sua nota provável. ' : '') + 'Baseada em <b>' + respondidas + '</b> ' + (respondidas === 1 ? 'questão respondida' : 'questões respondidas') + ' e no peso de cada matéria nas provas de 2021 a 2024, distribuído nos blocos do edital 02/2026 (Português 16, Direito 30, Gerais 24).' +
       (semDados ? ' ' + semDados + ' matérias ainda têm menos de 5 respostas, então contam perto de 50% até você resolver mais.' : '') + '</p></div></div>';
 
     var top = linhas.filter(function (l) { return l.ganho >= 0.25; }).sort(function (a, b) { return b.ganho - a.ganho; }).slice(0, 3);
@@ -185,7 +187,7 @@
       }).join('') + '</div>';
 
     var atual = ESTUDO.extraDaSemana();
-    h += '<div class="r40-sec"><h2>Matérias fora do plano</h2><span>não aparecem nos 120 dias, mas valem 10 questões por prova — uma por semana</span></div><div class="r40-top">' +
+    h += '<div class="r40-sec"><h2>Matérias fora do plano</h2><span>dependem do noticiário dos últimos meses — vale resolver um pouco toda semana</span></div><div class="r40-top">' +
       ESTUDO.EXTRAS.map(function (d) {
         var s = st[d] || { total: 0, n: 0, ac: 0 };
         return '<div class="r40-card r40-extra' + (d === atual ? ' atual' : '') + '">' + (d === atual ? '<span class="r40-tag">Desta semana</span>' : '') +

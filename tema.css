@@ -375,3 +375,11 @@ html[data-skin] body.home .tl + .section-label::after { background: rgba(255,255
   .pl-peca { flex-direction: column; align-items: flex-start; gap: .3rem; padding: .8rem; }
   .pl-peca b { font-size: 1.8rem; } .pl-peca p { display: none; } .pl-peca i { display: none; }
 }
+
+/* Questões do banco: texto-base recolhível e recorte do caderno (imagem sempre sobre branco) */
+.q-apoio{margin:0 0 .9rem;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:.9rem}
+.q-apoio summary{cursor:pointer;padding:.6rem .9rem;font-weight:600;color:var(--ink-soft)}
+.q-apoio[open] summary{border-bottom:1px solid var(--line)}
+.q-apoio-corpo{padding:.2rem 1rem .8rem;max-height:60vh;overflow:auto}
+.q-apoio-corpo p{margin:.6rem 0;line-height:1.65;white-space:normal}
+.q-fig{display:block;max-width:100%;height:auto;border-radius:8px;background:#fff;margin:.3rem 0}

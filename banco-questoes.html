@@ -355,7 +355,7 @@
   <nav class="pag" id="pag" aria-label="Paginação"></nav>
 </main>
 
-<script src="questoes-banco.js"></script>
+<script src="questoes-banco.js?v=2"></script>
 <script src="progresso.js"></script>
 <script src="erros-core.js"></script>
 <script src="script.js"></script>
@@ -365,6 +365,7 @@
 <script>
 (function () {
   var BANCO = window.BANCO_QUESTOES || [];
+  var NOME_EXAME = {}; BANCO.forEach(function (q) { NOME_EXAME[q.exam_number] = q.exam; });
   var K_RESP = 'tj_bq_respostas', K_FAV = 'tj_bq_favoritas';
   var DIF = { facil: 'Fácil', media: 'Média', dificil: 'Difícil' };
 
@@ -500,7 +501,7 @@
     if (!fica && F.situacao === 'favoritas' && favoritas.indexOf(q.id) === -1) return false;
     if (F.busca) {
       var alvo = sa([q.statement, q.alternative_a, q.alternative_b, q.alternative_c,
-                     q.alternative_d, q.topic, q.subtopic, q.discipline].join(' '));
+                     q.alternative_d, q.alternative_e, q.topic, q.subtopic, q.discipline].join(' '));
       if (alvo.indexOf(sa(F.busca)) === -1) return false;
     }
     return true;
@@ -551,7 +552,7 @@
     document.getElementById('slot-dif').appendChild(MS.dif.el);
 
     MS.dis.definir(valores('discipline').map(function (v) { return { valor: v, texto: v }; }));
-    MS.exa.definir(valores('exam_number').map(function (v) { return { valor: String(v), texto: v + 'º Exame' }; }));
+    MS.exa.definir(valores('exam_number').map(function (v) { return { valor: String(v), texto: NOME_EXAME[v] }; }));
     MS.dif.definir(['facil', 'media', 'dificil'].map(function (v) { return { valor: v, texto: DIF[v] }; }));
 
     var busca = document.getElementById('f-busca'), t = null;
@@ -600,7 +601,7 @@
     if (F.busca) c.push(['busca', null, '“' + F.busca + '”']);
     F.disciplinas.forEach(function (v) { c.push(['disciplinas', v, v]); });
     F.assuntos.forEach(function (v) { c.push(['assuntos', v, v]); });
-    F.exames.forEach(function (v) { c.push(['exames', v, v + 'º Exame']); });
+    F.exames.forEach(function (v) { c.push(['exames', v, NOME_EXAME[v]]); });
     F.dificuldades.forEach(function (v) { c.push(['dificuldades', v, DIF[v]]); });
     if (F.situacao !== 'todas') c.push(['situacao', null, SIT[F.situacao]]);
     var box = document.getElementById('f-chips');
@@ -656,15 +657,15 @@
   // a alternativa do gabarito oficial aparece sempre como gabarito, mesmo quando o comentário do material a chama de errada
   function formatarExplicacao(txt, gab) {
     // "A) Errado" seguido de "A alternativa A está incorreta, pois…": um cabeçalho só
-    txt = String(txt || '').replace(/(^|\n)(\s*([A-D])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
+    txt = String(txt || '').replace(/(^|\n)(\s*([A-E])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
     // Dois materiais, duas formas de abrir o comentário de cada alternativa:
     //   "A) Correto. ..."                   (provas XXII a 37º)
     //   "A alternativa A está correta. ..." (provas 38º a 47º)
     var JULGA = '(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)';
-    var ABRE = '(?:[A-D]\\)\\s*' + JULGA + '\\b'
-             + '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-D]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
-    var VER = new RegExp('^(?:([A-D])\\)\\s*(' + JULGA + ')'
-            + '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-D])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))'
+    var ABRE = '(?:[A-E]\\)\\s*' + JULGA + '\\b'
+             + '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-E]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
+    var VER = new RegExp('^(?:([A-E])\\)\\s*(' + JULGA + ')'
+            + '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-E])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))'
             + '\\b[\\s:.,-]*', 'i');
     var partes = txt.split(new RegExp('\\n(?=' + ABRE + ')', 'i'));
     return partes.map(function (bloco) {
@@ -693,7 +694,7 @@
 
     var TESOURA = '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>' +
                   '<path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>';
-    var alts = ['a', 'b', 'c', 'd'].map(function (L) {
+    var alts = ['a', 'b', 'c', 'd', 'e'].map(function (L) {
       var txt = q['alternative_' + L]; if (!txt) return '';
       var letra = L.toUpperCase(), cls = '', marca = '';
       var cortada = e.cortadas.indexOf(letra) !== -1;
@@ -744,13 +745,13 @@
       '<header class="q-cab">' +
         '<span class="q-num">' + posicao + '</span>' +
         '<span class="q-dis">' + esc(q.discipline) + '</span>' +
-        '<span class="pt">·</span><span>' + q.exam_number + 'º Exame · ' + q.year + ' · Q' + q.question_number + '</span>' +
+        '<span class="pt">·</span><span>' + esc(q.exam) + ' · Q' + q.question_number + '</span>' +
         (q.difficulty ? '<span class="pt">·</span><span class="q-dif ' + q.difficulty + '"><i></i>' + DIF[q.difficulty] + '</span>' : '') +
         (r ? '<span class="pt">·</span><span class="q-feita">respondida ' + r.vezes + 'x</span>' : '') +
         (q.topic ? '<span class="q-trilha">' + esc(q.topic) + (q.subtopic ? ' › ' + esc(q.subtopic) : '') + '</span>' : '') +
       '</header>' +
       '<div class="q-corpo">' +
-        '<div class="q-enun">' + esc(q.statement) + '</div>' +
+        '<div class="q-enun">' + enunciadoQuestao(q) + '</div>' +
         '<div class="alts">' + alts + '</div>' + ver + jus + expl + nota +
         '<div class="q-acoes">' + acoes + '</div>' +
       '</div></article>';
@@ -905,7 +906,7 @@
       erros_add({
         materia: q.discipline || '', topico: q.topic || '', subtopico: q.subtopic || '',
         motivo: j.motivo, o_que_faltou: j.o_que_faltou, justificada: true,
-        origem: q.exam_number + 'º Exame · questão ' + q.question_number +
+        origem: q.exam + ' · questão ' + q.question_number +
                 (e.escolha && e.escolha !== q.correct_answer ? ' · marquei ' + e.escolha : ' · foi chute') + ' · gabarito ' + (q.correct_answer || '—'),
         explicacao: q.explanation || '',
         questao_id: q.id

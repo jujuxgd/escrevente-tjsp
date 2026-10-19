@@ -36,16 +36,23 @@
       (situacao ? '&situacao=' + encodeURIComponent(situacao) : '');
   }
 
-  // Média de questões por disciplina nas provas a partir do exame `desde`.
+  // Edital 02/2026: 70 questões em três blocos (Português 16, Direito 30, Conhecimentos Gerais 24).
+  var BLOCOS = { pt: 16, dir: 30, ger: 24 };
+  var DIREITO = ['Direito Penal', 'Direito Processual Penal', 'Direito Processual Civil', 'Direito Constitucional',
+    'Direito Administrativo', 'Normas da Corregedoria'];
+  function bloco(d) { return d === 'Língua Portuguesa' ? 'pt' : DIREITO.indexOf(d) >= 0 ? 'dir' : 'ger'; }
+
+  // Questões por disciplina na prova de 2027: a divisão dentro de cada bloco não foi divulgada, então segue a
+  // proporção das provas a partir de `desde` (exam_number = ano + aplicação, ex. 20211).
   function pesosRecentes(banco, desde) {
-    var porExame = {}, soma = {};
+    var soma = {}, porBloco = {};
     banco.forEach(function (q) {
-      if (q.exam_number < (desde || 41)) return;
-      porExame[q.exam_number] = 1;
+      if (q.exam_number < (desde || 20211)) return;
       soma[q.discipline] = (soma[q.discipline] || 0) + 1;
+      porBloco[bloco(q.discipline)] = (porBloco[bloco(q.discipline)] || 0) + 1;
     });
-    var n = Object.keys(porExame).length || 1, pesos = {};
-    Object.keys(soma).forEach(function (d) { pesos[d] = soma[d] / n; });
+    var pesos = {};
+    Object.keys(soma).forEach(function (d) { pesos[d] = soma[d] / porBloco[bloco(d)] * BLOCOS[bloco(d)]; });
     return pesos;
   }
 
