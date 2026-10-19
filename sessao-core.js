@@ -406,10 +406,10 @@
   // a alternativa do gabarito oficial aparece sempre como gabarito, mesmo quando o comentário do material a chama de errada
   function formatarExplicacao(txt, gab) {
     // "A) Errado" seguido de "A alternativa A está incorreta, pois…": um cabeçalho só
-    txt = String(txt || '').replace(/(^|\n)(\s*([A-D])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
+    txt = String(txt || '').replace(/(^|\n)(\s*([A-E])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
     var JULGA = '(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)';
-    var ABRE = '(?:[A-D]\\)\\s*' + JULGA + '\\b|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-D]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
-    var VER = new RegExp('^(?:([A-D])\\)\\s*(' + JULGA + ')|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-D])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))\\b[\\s:.,-]*', 'i');
+    var ABRE = '(?:[A-E]\\)\\s*' + JULGA + '\\b|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-E]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
+    var VER = new RegExp('^(?:([A-E])\\)\\s*(' + JULGA + ')|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-E])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))\\b[\\s:.,-]*', 'i');
     return String(txt || '').split(new RegExp('\\n(?=' + ABRE + ')', 'i')).map(function (bloco) {
       var m = bloco.match(VER), corpo = m ? bloco.slice(m[0].length) : bloco;
       corpo = corpo.replace(/([^.:;?!)"”\s])[ \t]*\n\s*\n\s*/g, '$1 ').replace(/\n{2,}/g, '\u0000').replace(/\n/g, ' ').replace(/\u0000/g, '\n').replace(/[ \t]{2,}/g, ' ').trim();
@@ -471,10 +471,10 @@
     var q = qpor(id); if (!q) return '';
     var r = ler(K_RESP, {})[id], gab = (g || []).indexOf(id) >= 0, hoje = respostaDoDia(r);
     return '<div class="ss-q" data-q="' + id + '"' + (hoje ? ' data-feita="1"' : '') + '><div class="meta">' + (i + 1) + ' · ' + esc(nomeExame(q.exam_number)) +
-      ', questão ' + q.question_number + ' · ' + esc(q.topic || '') + (gab ? ' · <span class="gab">caiu no Gabaritaço</span>' : '') +
+      ', questão ' + q.question_number + (q.topic ? ' · ' + esc(q.topic) : '') + (gab ? ' · <span class="gab">caiu no Gabaritaço</span>' : '') +
       (r && !hoje ? ' · já respondida antes' : '') + '</div>' +
-      '<div class="enun">' + esc(q.statement) + '</div>' +
-      ['a', 'b', 'c', 'd'].map(function (k) {
+      '<div class="enun">' + enunciadoQuestao(q) + '</div>' +
+      ['a', 'b', 'c', 'd', 'e'].map(function (k) {
         var L = k.toUpperCase(), cls = hoje ? (L === q.correct_answer ? ' certa' : L === hoje.ultima_resposta ? ' errada' : '') : '';
         return q['alternative_' + k] ? '<div class="ss-linha"><button class="ss-tes" type="button" data-corta="' + L + '" title="Descartar a alternativa ' + L + '" aria-label="Descartar a alternativa ' + L + '">' + TESOURA + '</button>' +
           '<button class="ss-alt' + cls + '" data-l="' + L + '"' + (hoje ? ' disabled' : '') + '><span class="l">' + L +
@@ -488,7 +488,7 @@
       (certa ? '<b class="ok">Acertou.</b><button data-chute="1">Foi chute → errei</button>'
        : chute ? '<b class="no">Foi chute.</b> Foi para o Caderno de Erros.'
        : '<b class="no">Errou · gabarito ' + q.correct_answer + '.</b> Foi para o Caderno de Erros.') +
-      '<button data-expl="1">Ver comentário</button></div>' + (certa ? '' : htmlJustificar(q)) + '<div class="ss-expl" hidden>' + formatarExplicacao(q.explanation, q.correct_answer) +
+      (q.explanation ? '<button data-expl="1">Ver comentário</button>' : '') + '</div>' + (certa ? '' : htmlJustificar(q)) + '<div class="ss-expl" hidden>' + formatarExplicacao(q.explanation, q.correct_answer) +
       (q.legal_basis ? '<p><b>Fundamentação:</b> ' + esc(q.legal_basis) + '</p>' : '') +
       (q.notes ? '<p class="ss-nota">Sobre o material de origem: ' + esc(q.notes) + '</p>' : '') + '</div>';
   }

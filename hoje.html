@@ -1068,10 +1068,10 @@
   <main>
     <div class="topbar">
       <div class="page-title">
-        <div class="breadcrumb">Hoje · <span id="hj-data">—</span></div>
-        <h1>Dia <em id="hj-n">—</em> de <span id="hj-total">—</span></h1>
+        <div class="breadcrumb"><span id="hj-data">—</span> · dia <span id="hj-n">—</span> de <span id="hj-total">—</span></div>
+        <h1 id="hj-tema">Hoje</h1>
       </div>
-      <div class="topbar-actions"></div>
+      <div class="topbar-actions"><div class="pl-cont"><b id="hj-cont">—</b><span>dias para a prova</span></div></div>
     </div>
 
     <!-- DAY HERO -->
@@ -1103,6 +1103,8 @@
       </div>
       <button class="btn-estudei" id="btn-estudei" onclick="toggleDiaConcluido()">Estudei Hoje ✦</button>
     </div>
+
+    <div class="pl-faixa" id="pl-faixa"></div>
 
     <div id="hj-atraso"></div>
 
@@ -1215,6 +1217,10 @@
     document.getElementById('day-titulo-h2').innerHTML = DIA.top
       ? DIA.top.map(function (t) { return esc(S.curto(t.d)) + ': ' + esc(t.s); }).join(' <em>·</em> ')
       : esc(S.resumoDoDia());
+    document.getElementById('hj-tema').textContent = DIA.top
+      ? (S.DATA === S.HOJE ? 'Hoje: ' : '') + S.disciplinasDoDia().map(S.curto).join(' e ')
+      : S.TIPO[DIA.tipo] || 'Hoje';
+    document.getElementById('hj-cont').textContent = Math.max(0, Math.round((new Date(2027, 2, 14) - new Date(S.DATA + 'T00:00:00')) / 864e5));
     document.getElementById('day-meta').textContent = S.disciplinasDoDia().map(S.curto).join(' + ');
     var prev = S.vizinho(-1), next = S.vizinho(1);
     var np = document.getElementById('nav-prev'), nn = document.getElementById('nav-next');
@@ -1271,6 +1277,22 @@
       '<div class="ss-bloco"><h3>Extra · Caderno de erros</h3><p>' + n + (n === 1 ? ' erro vence' : ' erros vencem') +
       ' hoje (questões erradas em dias anteriores).</p><div class="ss-acoes"><a class="btn" href="erros.html">Revisar no caderno</a></div></div>';
   }
+  function faixa() {
+    var el = document.getElementById('pl-faixa'); if (!el || !DIA || DIA.tipo === 'prova') { if (el) el.remove(); return; }
+    var f = S.fila(), nfc = f.venc.length + f.novos.length, c = S.itensChecklist(), ck = {};
+    var feitos = (function () { try { return (JSON.parse(localStorage.getItem('tj_ativo_check_v1')) || {})[S.DATA] || {}; } catch (e) { return {}; } })();
+    c.forEach(function (x) { ck[x.id] = !!feitos[x.id]; });
+    var tops = (DIA.top || []).map(function (t, i) { return 't' + i; }), nq = tops.length * ATIVO.questoesPorTopico() || (DIA.tipo === 'revisao' ? 20 : DIA.tipo === 'leve' ? 10 : 0);
+    var ne = typeof erros_total_devidas === 'function' ? Math.min(erros_total_devidas(), ERROS_LIMITE_DIARIO) : 0;
+    var peca = function (n, tit, sub, ok, aba) {
+      return '<a class="pl-peca" href="hoje.html?data=' + S.DATA + '&aba=' + aba + '" data-aba="' + aba + '"><b>' + n + '</b><div><h4>' + tit + '</h4><p>' + sub + '</p></div><i' + (ok ? ' class="v"' : '') + '></i></a>';
+    };
+    el.innerHTML = peca(nfc, 'Flashcards', 'para revisar hoje', ck.fc, 'flashcards') +
+      peca(nq, 'Questões', 'das matérias do dia', tops.length ? tops.every(function (k) { return ck[k]; }) : ck.etica, 'questoes') +
+      '<a class="pl-peca" href="erros.html"><b>' + ne + '</b><div><h4>Erros</h4><p>para refazer</p></div><i' + (ne ? '' : ' class="v"') + '></i></a>';
+    el.onclick = function (ev) { var a = ev.target.closest('[data-aba]'); if (!a) return; ev.preventDefault(); abrir(a.dataset.aba); document.querySelector('.tabs-bar').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  }
+  document.addEventListener('sessao:checklist', faixa);
   function atualizarContador() {
     var p = S.progressoChecklist();
     document.getElementById('ck-cont').textContent = p.total ? p.feitos + '/' + p.total : '';
@@ -1373,6 +1395,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     cabecalho();
     montarChecklist();
+    faixa();
     abrir(aba);
     document.getElementById('fc-area').innerHTML = '<p class="ss-vazio">Carregando flashcards…</p>';
     ATIVO.carregarCartoes().then(function () { montarFlashcards(); montarChecklist(); });

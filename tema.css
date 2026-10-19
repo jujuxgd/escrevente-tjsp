@@ -1,0 +1,385 @@
+@import url('https://fonts.googleapis.com/css2?family=Gloock&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+/* Identidade do Escrevente: Palácio da Justiça — faixa escura na cor escolhida, bronze e cartões em arco.
+   Vale para todas as páginas (data-skin="palacio" no <html>, posto em cores-early.js) e redesenha o layout
+   herdado do projeto da OAB: barra e faixa verdes no topo, títulos em Gloock, cartões subindo sobre a faixa. */
+
+/* ── palacio: Palácio da Justiça — mármore verde, bronze e arcos ── */
+html[data-skin="palacio"] {
+  --bg: #F2F3F5 !important; --bg-soft: #E8EAEE !important; --bg-deep: #DCDFE5 !important;
+  --paper: #FFFFFF !important; --paper-tint: #F8F9FA !important;
+  --ink: #18191C !important; --ink-soft: #4C4F57 !important; --ink-faded: #858892 !important; --ink-ghost: #C3C6CD !important;
+  --line: #DADDE2 !important; --line-soft: #E6E8EC !important;
+  --font-display: 'Gloock', Georgia, serif; --font-body: 'Instrument Sans', system-ui, sans-serif; --font-brand: 'Gloock', serif;
+  --radius-sm: 10px; --radius: 22px 22px 6px 6px; --radius-lg: 28px 28px 8px 8px;
+  --shadow-sm: 0 1px 2px rgba(24,25,28,.06); --shadow: 0 2px 10px rgba(24,25,28,.07); --shadow-lg: 0 10px 30px rgba(24,25,28,.10);
+  --skin-marca: #A77B2F;
+}
+html[data-skin="palacio"] .tn-brand .seal { color: var(--skin-marca); }
+html[data-skin="palacio"] .ss-bloco, html[data-skin="palacio"] .side-card, html[data-skin="palacio"] .today-card { border-top: 2px solid var(--skin-marca) !important; }
+html[data-skin="palacio"] .tn-ink { background: var(--skin-marca) !important; }
+
+/* ── modo escuro dos três ── */
+html[data-skin][data-theme="dark"] {
+  --verde-noite: #0B0C0E;
+  --bg: #12161D !important; --bg-soft: #181D26 !important; --bg-deep: #1F2530 !important;
+  --paper: #171C24 !important; --paper-tint: #1B212A !important;
+  --ink: #EEF1F6 !important; --ink-soft: #B6BECC !important; --ink-faded: #808A9B !important; --ink-ghost: #3D4553 !important;
+  --line: #2A313D !important; --line-soft: #222833 !important;
+}
+
+/* ── letras: troca as famílias fixas herdadas (Fraunces, Inter, MagicalFeather) pelas do tema ── */
+html[data-skin] body { font-family: var(--font-body) !important; }
+html[data-skin] .tn-word, html[data-skin] .logo h1 { font-family: var(--font-brand) !important; font-size: 1.35rem; letter-spacing: -.01em; }
+html[data-skin] [style*="Fraunces"] { font-family: var(--font-display) !important; }
+html[data-skin] [style*="Inter"] { font-family: var(--font-body) !important; }
+html[data-skin] .alternativa .letra,
+html[data-skin] .app-toast .app-toast-text strong,
+html[data-skin] .bq h1,
+html[data-skin] .bq-t,
+html[data-skin] .ca-det .data,
+html[data-skin] .ca-it .tx,
+html[data-skin] .ca-mesnav h2,
+html[data-skin] .ca-n,
+html[data-skin] .cai-card .freq,
+html[data-skin] .card-title,
+html[data-skin] .chart-title,
+html[data-skin] .checklist-subgroup-header,
+html[data-skin] .cl-empty-msg,
+html[data-skin] .cl-native-content .cl-art-num,
+html[data-skin] .cl-toolbar .title,
+html[data-skin] .conq-head .txt b,
+html[data-skin] .countdown .date,
+html[data-skin] .countdown .number,
+html[data-skin] .day-info h2,
+html[data-skin] .day-number-big .num,
+html[data-skin] .day-toast-parabens,
+html[data-skin] .display,
+html[data-skin] .donut-inner .pct,
+html[data-skin] .donut-legend .item strong,
+html[data-skin] .empty-state h3,
+html[data-skin] .error-stat-card .num,
+html[data-skin] .est-sec h2,
+html[data-skin] .fact-card .fact,
+html[data-skin] .fact-card .year,
+html[data-skin] .favorita-card .badge .pct,
+html[data-skin] .favorita-card h3,
+html[data-skin] .fc-frente,
+html[data-skin] .hero .quote,
+html[data-skin] .hero h2,
+html[data-skin] .home-ring-c b,
+html[data-skin] .hub h1,
+html[data-skin] .hub-card h3,
+html[data-skin] .in-fato b,
+html[data-skin] .insight-card .ic-title,
+html[data-skin] .ju-modal-title,
+html[data-skin] .logo h1,
+html[data-skin] .mat-nome,
+html[data-skin] .mat-pct,
+html[data-skin] .mat-q-num,
+html[data-skin] .materia-bar .pct,
+html[data-skin] .meta-pct,
+html[data-skin] .mr-render h1,
+html[data-skin] .mr-render h2,
+html[data-skin] .mr-render h3,
+html[data-skin] .mt-date,
+html[data-skin] .novo-form-wrap h3,
+html[data-skin] .page-title h1,
+html[data-skin] .perfil-header-nome,
+html[data-skin] .playlist-card .pl-title,
+html[data-skin] .pn-details>summary,
+html[data-skin] .pomodoro-time,
+html[data-skin] .profile-avatar,
+html[data-skin] .prog-const strong,
+html[data-skin] .r40-card h3,
+html[data-skin] .r40-ganho,
+html[data-skin] .r40-nota,
+html[data-skin] .r40-sec h2,
+html[data-skin] .rank-pos,
+html[data-skin] .rank-val,
+html[data-skin] .res-nota,
+html[data-skin] .resultado-pct,
+html[data-skin] .resumo-prev-nome,
+html[data-skin] .resumo-tile .num,
+html[data-skin] .rf-card .nome,
+html[data-skin] .rf-hero h2,
+html[data-skin] .rf-modal-title,
+html[data-skin] .rf-section-title,
+html[data-skin] .rv-continuar strong,
+html[data-skin] .rv-cron b,
+html[data-skin] .rv-fase2-dias b,
+html[data-skin] .rv-grupo-cab h4,
+html[data-skin] .rv-no-tit,
+html[data-skin] .rv-ov-tit h3,
+html[data-skin] .rv-q-nome,
+html[data-skin] .rv-resumo-num b,
+html[data-skin] .rv-tr-form h3,
+html[data-skin] .rv-tr-item-top strong,
+html[data-skin] .rv-tr-num b,
+html[data-skin] .rv-tr-sec,
+html[data-skin] .serif,
+html[data-skin] .side-block h4,
+html[data-skin] .side-card h4,
+html[data-skin] .sim-card-nome,
+html[data-skin] .sim-card-pct,
+html[data-skin] .sim-num,
+html[data-skin] .sm h1,
+html[data-skin] .ss-bloco h3,
+html[data-skin] .ss-hero h2,
+html[data-skin] .ss-nums b,
+html[data-skin] .stat-big .num,
+html[data-skin] .stat-big .sub,
+html[data-skin] .stat-number,
+html[data-skin] .stats-hero::before,
+html[data-skin] .streak-pill .count,
+html[data-skin] .subject-panel-header .sp-nome,
+html[data-skin] .teoria .drop-cap::first-letter,
+html[data-skin] .teoria h3,
+html[data-skin] .tl-now,
+html[data-skin] .tn-av,
+html[data-skin] .tn-count .val,
+html[data-skin] .tn-word,
+html[data-skin] .toast-text strong,
+html[data-skin] .today-card h3,
+html[data-skin] .today-stat .num,
+html[data-skin] .totais-num,
+html[data-skin] .wrapped-card h3,
+html[data-skin] .wrapped-stat .v,
+html[data-skin] :root,
+html[data-skin] body.home .side-card h4,
+html[data-skin] body.home .today-card h3,
+html[data-skin] body.home .today-stat .num,
+html[data-skin] body.perfil .chart-card h4,
+html[data-skin] body.perfil .config-card h4,
+html[data-skin] body.perfil .resumo-tile .num { font-family: var(--font-display) !important; }
+html[data-skin] #meta-texto,
+html[data-skin] .adi-eb,
+html[data-skin] .alt,
+html[data-skin] .alt .l,
+html[data-skin] .b,
+html[data-skin] .bt-marcar,
+html[data-skin] .bt-principal,
+html[data-skin] .bt-secundario,
+html[data-skin] .btn-lim,
+html[data-skin] .busca input,
+html[data-skin] .ca-chip,
+html[data-skin] .ca-det .tag,
+html[data-skin] .ca-mesnav button,
+html[data-skin] .ca-n .at,
+html[data-skin] .ca-n .ok,
+html[data-skin] .ca-sem,
+html[data-skin] .cal-sem h4,
+html[data-skin] .cf-rot,
+html[data-skin] .cfg-bloco h2,
+html[data-skin] .chip,
+html[data-skin] .cl-native-content,
+html[data-skin] .cl-native-content .cl-inc-num,
+html[data-skin] .cl-native-content .cl-part,
+html[data-skin] .cl-native-content .cl-section,
+html[data-skin] .cl-oab-badge,
+html[data-skin] .comment .body,
+html[data-skin] .conq-btn,
+html[data-skin] .cron,
+html[data-skin] .cron-rot,
+html[data-skin] .ctl select,
+html[data-skin] .ex-bloco p,
+html[data-skin] .ex-l,
+html[data-skin] .ex-v,
+html[data-skin] .expl h4,
+html[data-skin] .fc-filtros button,
+html[data-skin] .fc-tag,
+html[data-skin] .form-group input,
+html[data-skin] .form-group select,
+html[data-skin] .form-group textarea,
+html[data-skin] .fp-check,
+html[data-skin] .fq,
+html[data-skin] .hand,
+html[data-skin] .hub-card .go,
+html[data-skin] .logo .subtitle,
+html[data-skin] .lp-apagar,
+html[data-skin] .lp-b,
+html[data-skin] .lp-lt,
+html[data-skin] .lp-num,
+html[data-skin] .lp-parte,
+html[data-skin] .lp-zoom,
+html[data-skin] .ms-bt,
+html[data-skin] .ms-busca input,
+html[data-skin] .ms-n,
+html[data-skin] .ms-op,
+html[data-skin] .ms-pe button,
+html[data-skin] .nav-section-label,
+html[data-skin] .pag button,
+html[data-skin] .page-title .breadcrumb,
+html[data-skin] .pill,
+html[data-skin] .pn-details>summary span,
+html[data-skin] .pn-lin.cab,
+html[data-skin] .prog-col h4,
+html[data-skin] .prova-bt,
+html[data-skin] .ql-container.ql-snow,
+html[data-skin] .ql-toolbar.ql-snow,
+html[data-skin] .r40-eb,
+html[data-skin] .r40-ganho small,
+html[data-skin] .r40-lin.cab,
+html[data-skin] .r40-selo,
+html[data-skin] .r40-tag,
+html[data-skin] .res-selo,
+html[data-skin] .res-tabela h2,
+html[data-skin] .resumo-text,
+html[data-skin] .rt-code-btn,
+html[data-skin] .rt-code-textarea,
+html[data-skin] .rv-chip,
+html[data-skin] .rv-conf-btn,
+html[data-skin] .rv-cron button,
+html[data-skin] .rv-fase2 label,
+html[data-skin] .rv-ic,
+html[data-skin] .rv-marca,
+html[data-skin] .rv-q-c,
+html[data-skin] .rv-q-nome small,
+html[data-skin] .rv-seg button,
+html[data-skin] .rv-tab,
+html[data-skin] .rv-tipo-btn,
+html[data-skin] .rv-tr-campo input,
+html[data-skin] .rv-tr-campo textarea,
+html[data-skin] .ss-bloco h3 .n,
+html[data-skin] .ss-eb,
+html[data-skin] .ss-tabs button,
+html[data-skin] .ss-top-cab .mat,
+html[data-skin] .stats-link,
+html[data-skin] .tl-left,
+html[data-skin] .tl-marks,
+html[data-skin] .tn-count .lbl,
+html[data-skin] .tn-fase button,
+html[data-skin] .tn-item > a,
+html[data-skin] .tn-sub a,
+html[data-skin] .vazio .t,
+html[data-skin] body,
+html[data-skin] body.home .mood-strip h4,
+html[data-skin] body.perfil .badge-tile .b-title,
+html[data-skin] body.perfil .resumo-tile .lbl,
+html[data-skin] body.perfil .section-label,
+html[data-skin] select,
+html[data-skin] textarea.handwritten { font-family: var(--font-body) !important; }
+
+/* o fundo "aurora" herdado é rosado: some nos temas */
+html[data-skin] .aurora-bg { display: none !important; }
+html[data-skin] body { background: var(--bg) !important; }
+
+/* ═══ Estrutura Palácio ═══ */
+/* faixa e barra do topo na cor escolhida no Perfil, escurecida (preto por padrão) */
+html[data-skin="palacio"] { --verde-noite: var(--rose-900, #111214); --bronze-claro: #E9D9B5; }
+
+/* barra do topo verde */
+html[data-skin] .tn, html[data-skin] .tn.scrolled { background: var(--verde-noite) !important; border-bottom: 0 !important; box-shadow: none !important; }
+html[data-skin] .tn-word { color: #fff !important; font-size: 1.45rem; }
+html[data-skin] .tn-brand .seal { width: 34px; height: 34px; transform: none !important; }
+html[data-skin] .tn-rule { background: rgba(255,255,255,.12) !important; }
+@media (min-width: 901px) {
+  html[data-skin] .tn-item > a { color: rgba(255,255,255,.75) !important; border-radius: 999px; padding-left: 1rem; padding-right: 1rem; }
+  html[data-skin] .tn-item > a:hover, html[data-skin] .tn-item.open > a { color: #fff !important; }
+  html[data-skin] .tn-item > a.on { background: var(--bronze-claro); color: var(--verde-noite) !important; }
+  html[data-skin] .tn-ink { display: none !important; }
+}
+html[data-skin] .tn-count .lbl { color: rgba(255,255,255,.6) !important; }
+html[data-skin] .tn-count .val, html[data-skin] .tn-count b { color: #fff !important; }
+html[data-skin] .tn-icon { color: rgba(255,255,255,.75) !important; }
+html[data-skin] .tn-av { background: var(--bronze-claro) !important; color: var(--verde-noite) !important; }
+
+/* faixa verde com o título de cada página; o conteúdo sobe sobre ela */
+html[data-skin] main { position: relative; isolation: isolate; padding-top: 0 !important; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { position: relative; padding: 2.4rem 0 6.5rem; margin-bottom: 0; align-items: flex-end; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar)::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) + * { position: relative; margin-top: -4.5rem; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1, html[data-skin] .hub h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1.05; letter-spacing: -.01em; max-width: 22ch; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1 em { color: var(--bronze-claro) !important; font-style: normal; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .breadcrumb { color: rgba(255,255,255,.6) !important; letter-spacing: .02em; text-transform: none; font-size: .86rem; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .rv-sub, html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) p { color: rgba(255,255,255,.78) !important; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .topbar-actions { color: #fff; }
+html[data-skin] .hub > .topbar + p.lead { color: rgba(255,255,255,.78); margin-top: -6rem !important; margin-bottom: 4.6rem; position: relative; }
+html[data-skin] .hub-grid { position: relative; }
+
+/* contagem grande no canto da faixa (Início e Hoje) */
+.pl-cont { text-align: right; color: var(--bronze-claro); line-height: 1; }
+.pl-cont b { display: block; font: 400 clamp(4rem, 9vw, 7.5rem)/.85 'Gloock', serif; color: #fff; }
+.pl-cont span { font-weight: 600; font-size: .9rem; }
+
+/* cartões: branco, topo em arco, fio de bronze */
+html[data-skin] .ss-bloco, html[data-skin] .side-card, html[data-skin] .today-card, html[data-skin] .hub-card,
+html[data-skin] .day-hero, html[data-skin] .rv-quadro, html[data-skin] .mat-card, html[data-skin] .rf-card {
+  background: var(--paper) !important; border: 1px solid var(--line) !important; border-top: 2px solid var(--skin-marca) !important;
+  border-radius: 26px 26px 10px 10px !important; box-shadow: 0 12px 30px rgba(20,38,30,.08) !important;
+}
+html[data-skin] .hub-card { border-radius: 120px 120px 14px 14px !important; padding-top: 3.2rem !important; text-align: center; align-items: center; }
+html[data-skin] .hub-card .hub-ico { margin-left: auto; margin-right: auto; }
+html[data-skin] .day-hero { border-radius: 160px 160px 14px 14px !important; padding-top: 2.6rem !important; }
+
+/* botões principais em pílula verde */
+html[data-skin] .btn-primary, html[data-skin] .btn-estudei, html[data-skin] .btn.btn-primary {
+  background: var(--rose) !important; border-color: var(--rose) !important; color: #fff !important; border-radius: 999px !important;
+}
+html[data-skin] .btn { border-radius: 999px; }
+
+/* abas do Hoje */
+html[data-skin] .tabs-bar .tab.active { color: var(--rose-deep) !important; }
+html[data-skin] .tabs-bar .tab.active::after, html[data-skin] .tabs-bar .tab.active:after { background: var(--skin-marca) !important; }
+
+/* faixa de atalhos do Hoje (flashcards, questões, erros) */
+.pl-faixa { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.4rem 0 1.6rem; }
+.pl-peca { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.2rem; display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--ink); cursor: pointer; }
+.pl-peca:hover { border-color: var(--rose); }
+.pl-peca:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+.pl-peca b { font: 400 2.4rem/1 'Gloock', serif; color: var(--rose); min-width: 2.6rem; }
+.pl-peca h4 { margin: 0; font: 600 1rem 'Instrument Sans', sans-serif; }
+.pl-peca p { margin: .1rem 0 0; color: var(--ink-soft); font-size: .86rem; }
+.pl-peca i { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex-shrink: 0; }
+.pl-peca i.v { background: var(--rose); border-color: var(--rose); }
+@media (max-width: 700px) {
+  .pl-faixa { grid-template-columns: 1fr; }
+  html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { padding-bottom: 5.5rem; flex-wrap: wrap; }
+  html[data-skin] .day-hero { border-radius: 60px 60px 12px 12px !important; }
+  .pl-cont { text-align: left; }
+}
+
+/* pílula do menu com altura própria (o link herdado ocupa a barra toda) */
+@media (min-width: 901px) {
+  html[data-skin] .tn-links { align-items: center; }
+  html[data-skin] .tn-item { display: flex; align-items: center; }
+  html[data-skin] .tn-item > a { height: auto !important; padding-top: .55rem !important; padding-bottom: .55rem !important; }
+}
+
+/* Início: a linha do tempo fica dentro da faixa verde, o resto sobe sobre ela */
+html[data-skin] body.home main > .topbar { padding-bottom: 1.4rem; }
+html[data-skin] body.home main > .topbar + * { margin-top: 0; }
+html[data-skin] body.home .tl { position: relative; padding: .4rem 0 6.5rem; margin: 0; }
+html[data-skin] body.home .tl::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
+html[data-skin] body.home .tl + * { position: relative; margin-top: -4.5rem; }
+html[data-skin] body.home .tl-now, html[data-skin] body.home .tl-left { color: #fff !important; }
+html[data-skin] body.home .tl-now b { color: var(--bronze-claro) !important; }
+html[data-skin] body.home .tl-marks { color: rgba(255,255,255,.6) !important; }
+html[data-skin] body.home .tl-track { background: rgba(255,255,255,.18) !important; }
+html[data-skin] body.home .tl-fill, html[data-skin] body.home .tl-dot { background: var(--bronze-claro) !important; }
+html[data-skin] body.home .tl-dot { box-shadow: 0 0 0 4px var(--verde-noite) !important; }
+html[data-skin] .home-quote, html[data-skin] .home-quote .quote-author { color: rgba(255,255,255,.78) !important; }
+html[data-skin] body.home .section-label { color: var(--ink-soft); }
+
+html[data-skin] main > .bq-cab .topbar { padding: 0; margin: 0 0 .5rem; }
+html[data-skin] main > .bq-cab .topbar .page-title h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); }
+html[data-skin] main > .bq-cab .breadcrumb { color: rgba(255,255,255,.6) !important; }
+html[data-skin] .ca-sub, html[data-skin] .rv-sub { color: rgba(255,255,255,.78) !important; }
+html[data-skin] .ca-sub b, html[data-skin] .rv-sub b { color: #fff !important; }
+html[data-skin] body.home main > .topbar { margin-bottom: 0 !important; }
+html[data-skin] body.home .tl + .section-label { color: rgba(255,255,255,.6) !important; }
+html[data-skin] body.home .tl + .section-label::after { background: rgba(255,255,255,.18) !important; }
+@media (max-width: 700px) {
+  .pl-cont { display: flex; align-items: baseline; gap: .5rem; margin-top: .6rem; }
+  .pl-cont b { font-size: 2.6rem; }
+  .pl-faixa { grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+  .pl-peca { flex-direction: column; align-items: flex-start; gap: .3rem; padding: .8rem; }
+  .pl-peca b { font-size: 1.8rem; } .pl-peca p { display: none; } .pl-peca i { display: none; }
+}
+
+/* Questões do banco: texto-base recolhível e recorte do caderno (imagem sempre sobre branco) */
+.q-apoio{margin:0 0 .9rem;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:.9rem}
+.q-apoio summary{cursor:pointer;padding:.6rem .9rem;font-weight:600;color:var(--ink-soft)}
+.q-apoio[open] summary{border-bottom:1px solid var(--line)}
+.q-apoio-corpo{padding:.2rem 1rem .8rem;max-height:60vh;overflow:auto}
+.q-apoio-corpo p{margin:.6rem 0;line-height:1.65;white-space:normal}
+.q-fig{display:block;max-width:100%;height:auto;border-radius:8px;background:#fff;margin:.3rem 0}

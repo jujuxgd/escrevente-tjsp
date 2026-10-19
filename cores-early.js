@@ -84,3 +84,10 @@
     Object.entries(aliases).forEach(([k, v]) => root.style.setProperty(k, v));
   } catch (e) {}
 })();
+
+// Identidade visual do Escrevente (tema.css), em todas as páginas.
+(function () {
+  var root = document.documentElement, h = document.head || root;
+  root.setAttribute('data-skin', 'palacio');
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'tema.css?v=3'; h.appendChild(css);
+})();

@@ -1891,7 +1891,8 @@ window.CAL_ATIVO = {
     "Direito Constitucional"
    ],
    "sim": {
-    "modo": "completo"
+    "modo": "completo",
+    "exame": 20241
    }
   },
   {

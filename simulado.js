@@ -16,10 +16,10 @@
 
   var CHAVE   = 'tj_simulado_atual';
   var SIM_KEY = 'tj_simulados_v1';
-  var DURACAO = 5 * 60 * 60 * 1000;   // 5 horas, como na 1ª fase
-  var CORTE   = 40;                    // acertos mínimos para aprovação
+  var DURACAO = 5 * 60 * 60 * 1000;   // 5 horas, como no caderno da prova
+  var CORTE   = 50;                    // referência: metade das 100 questões das provas anteriores
   var TREINO_N  = 20;                  // treino rápido: 20 questões em 1 hora,
-  var TREINO_MS = 60 * 60 * 1000;      // o mesmo ritmo das 80 em 5 horas (3,75 min cada)
+  var TREINO_MS = 60 * 60 * 1000;      // o mesmo ritmo das 100 em 5 horas (3 min cada)
 
   var BANCO = (typeof window.BANCO_QUESTOES !== 'undefined') ? window.BANCO_QUESTOES : [];
   var tela  = document.getElementById('tela');
@@ -123,7 +123,7 @@
       '<div class="cfg-grade">' +
       lista.map(function (e) {
         return '<button class="prova-bt" data-exame="' + e.num + '" type="button">' +
-               '<b>' + esc(e.nome.replace(' Exame de Ordem Unificado', 'º Exame').replace('ºº', 'º')) + '</b>' +
+               '<b>' + esc(e.nome) + '</b>' +
                '<span>' + e.ano + ' · ' + e.n + ' questões</span></button>';
       }).join('') +
       '</div>' +
@@ -187,7 +187,7 @@
                   .sort(function (a, b) { return a.question_number - b.question_number; });
     if (!qs.length) return;
     S = {
-      nome: qs[0].exam.replace(' Exame de Ordem Unificado', 'º Exame').replace('ºº', 'º'),
+      nome: qs[0].exam,
       exame: numExame,
       ids: qs.map(function (q) { return q.id; }),
       respostas: {}, marcadas: {},
@@ -226,16 +226,16 @@
   function comecarTreino(modo) {
     var E = window.ESTUDO;
     var resp = E.lerRespostas();
-    var pesos = E.pesosRecentes(BANCO, 41);
+    var pesos = E.pesosRecentes(BANCO);
     if (modo === 'fracas') {
-      // mesmo critério do painel Rumo aos 40: pontos a ganhar até 75%; só as 5 que mais rendem
+      // mesmo critério do painel Rumo à vaga: pontos a ganhar até 75%; só as 5 que mais rendem
       var st = E.statsPorDisciplina(BANCO, resp);
       Object.keys(pesos).forEach(function (d) { pesos[d] = pesos[d] * Math.max(0, 0.75 - E.acertoEstimado(st[d])); });
       var top5 = Object.keys(pesos).sort(function (a, b) { return pesos[b] - pesos[a]; }).slice(0, 5);
       Object.keys(pesos).forEach(function (d) { if (top5.indexOf(d) === -1) pesos[d] = 0; });
     }
     var porDisc = {};
-    BANCO.forEach(function (q) { (porDisc[q.discipline] = porDisc[q.discipline] || []).push(q); });
+    BANCO.forEach(function (q) { if (q.correct_answer) (porDisc[q.discipline] = porDisc[q.discipline] || []).push(q); });
     var disp = {};
     Object.keys(porDisc).forEach(function (d) { disp[d] = porDisc[d].length; });
     var vagas = repartir(pesos, TREINO_N, disp);
@@ -276,14 +276,14 @@
   }
 
   // Cada questão feita no simulado entra no histórico do banco (tj_bq_respostas),
-  // que é de onde o painel Rumo aos 40 tira o acerto por matéria. Em branco conta como erro.
+  // que é de onde o painel Rumo à vaga tira o acerto por matéria. Em branco conta como erro.
   function gravarNoHistorico() {
     if (S.historicoGravado) return;
     var hist = lerLocal('tj_bq_respostas', {});
     var agora = new Date().toISOString();
     S.ids.forEach(function (id) {
       var q = BANCO.filter(function (x) { return x.id === id; })[0];
-      if (!q) return;
+      if (!q || !q.correct_answer) return;
       var marcou = S.respostas[id] || null;
       var certa = marcou === q.correct_answer;
       var at = hist[id] || { vezes: 0, acertos: 0, erros: 0 };
@@ -356,7 +356,7 @@
       'Questão <b>' + (S.atual + 1) + '</b> de ' + S.ids.length +
       ' · <b>' + Object.keys(S.respostas).length + '</b> respondidas';
 
-    var alts = ['a', 'b', 'c', 'd'].map(function (L) {
+    var alts = ['a', 'b', 'c', 'd', 'e'].map(function (L) {
       var txt = q['alternative_' + L];
       if (!txt) return '';
       var letra = L.toUpperCase();
@@ -368,7 +368,7 @@
       '<article class="q">' +
         '<div class="q-cab"><span class="q-num">Questão ' + (S.atual + 1) + '</span>' +
         '<span>' + esc(S.nome) + '</span></div>' +
-        '<div class="q-corpo"><div class="q-enun">' + esc(q.statement) + '</div></div>' +
+        '<div class="q-corpo"><div class="q-enun">' + enunciadoQuestao(q) + '</div></div>' +
         '<div class="alts">' + alts + '</div>' +
         '<div class="q-pe">' +
           '<button class="bt-marcar' + (marcada ? ' on' : '') + '" id="bt-marcar" type="button">' +
@@ -450,7 +450,8 @@
       var q = BANCO.filter(function (x) { return x.id === id; })[0];
       if (!q) return;
       var marcou = S.respostas[id] || null;
-      var acertou = marcou === q.correct_answer;
+      // questão anulada vale o ponto para todos, como na prova
+      var acertou = !q.correct_answer || marcou === q.correct_answer;
       if (acertou) certas++;
       var d = q.discipline;
       if (!porMateria[d]) porMateria[d] = { certas: 0, total: 0 };
@@ -466,12 +467,12 @@
   // a alternativa do gabarito oficial aparece sempre como gabarito, mesmo quando o comentário do material a chama de errada
   function formatarExplicacao(txt, gab) {
     // "A) Errado" seguido de "A alternativa A está incorreta, pois…": um cabeçalho só
-    txt = String(txt || '').replace(/(^|\n)(\s*([A-D])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
+    txt = String(txt || '').replace(/(^|\n)(\s*([A-E])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
     var JULGA = '(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)';
-    var ABRE = '(?:[A-D]\\)\\s*' + JULGA + '\\b' +
-               '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-D]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
-    var VER = new RegExp('^(?:([A-D])\\)\\s*(' + JULGA + ')' +
-              '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-D])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))' +
+    var ABRE = '(?:[A-E]\\)\\s*' + JULGA + '\\b' +
+               '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-E]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
+    var VER = new RegExp('^(?:([A-E])\\)\\s*(' + JULGA + ')' +
+              '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-E])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))' +
               '\\b[\\s:.,-]*', 'i');
     return txt.split(new RegExp('\\n(?=' + ABRE + ')', 'i')).map(function (bloco) {
       var m = bloco.match(VER);
@@ -514,7 +515,7 @@
         '<div class="res-selo ' + (passou ? 'passou' : 'nao') + '">' +
           (passou ? 'Acima do corte' : 'Abaixo do corte') + '</div>' +
         '<div class="res-linha">' +
-          (S.treino ? 'Corte proporcional: <b>' + corte() + ' de ' + total + '</b> · ' : 'Corte da 1ª fase: <b>' + CORTE + ' acertos</b> · ') +
+          (S.treino ? 'Corte proporcional: <b>' + corte() + ' de ' + total + '</b> · ' : 'Referência: <b>' + CORTE + ' acertos</b> (metade) · ') +
           'Aproveitamento: <b>' + Math.round(r.certas / total * 100) + '%</b> · ' +
           'Tempo: <b>' + hhmmss(S.gastoAntes) + '</b>' +
           (brancos ? ' · <b>' + brancos + '</b> em branco' : '') +
@@ -550,8 +551,8 @@
             '<span class="r">' + (e.marcou ? 'você marcou ' + e.marcou : 'em branco') +
             ' · gabarito ' + esc(q.correct_answer) + '</span></div>' +
             '<div class="rev-corpo">' +
-              '<div class="q-enun" style="font-size:.875rem">' + esc(q.statement) + '</div>' +
-              ['a', 'b', 'c', 'd'].map(function (L) {
+              '<div class="q-enun" style="font-size:.875rem">' + enunciadoQuestao(q) + '</div>' +
+              ['a', 'b', 'c', 'd', 'e'].map(function (L) {
                 var t = q['alternative_' + L]; if (!t) return '';
                 var letra = L.toUpperCase();
                 var marca = letra === q.correct_answer ? ' ✓' : (letra === e.marcou ? ' ✕' : '');
