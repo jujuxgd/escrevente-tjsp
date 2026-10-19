@@ -1,19 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Gloock&family=Instrument+Sans:wght@400;500;600;700&display=swap');
-/* Identidade do Escrevente: Palácio da Justiça — verde-mármore, bronze e cartões em arco.
+/* Identidade do Escrevente: Palácio da Justiça — faixa escura na cor escolhida, bronze e cartões em arco.
    Vale para todas as páginas (data-skin="palacio" no <html>, posto em cores-early.js) e redesenha o layout
    herdado do projeto da OAB: barra e faixa verdes no topo, títulos em Gloock, cartões subindo sobre a faixa. */
 
 /* ── palacio: Palácio da Justiça — mármore verde, bronze e arcos ── */
 html[data-skin="palacio"] {
-  --rose-50: #EAF2EE !important; --rose-100: #D6E6DE !important; --rose-300: #8DB8A5 !important; --rose-500: #2C6E57 !important; --rose-600: #1F5A46 !important; --rose-700: #17463A !important; --rose-900: #0B2219 !important;
-  --bg: #EDF1EE !important; --bg-soft: #E2E9E4 !important; --bg-deep: #D3DDD6 !important;
-  --paper: #FFFFFF !important; --paper-tint: #F7F9F7 !important;
-  --ink: #14261E !important; --ink-soft: #3F5449 !important; --ink-faded: #78897F !important; --ink-ghost: #B7C4BC !important;
-  --line: #CFDAD3 !important; --line-soft: #E0E7E2 !important;
-  --rose: #1F5A46 !important; --rose-deep: #17463A !important; --rose-soft: #D6E6DE !important; --blush: #EAF2EE !important; --nude: #EFE3CB !important;
+  --bg: #F2F3F5 !important; --bg-soft: #E8EAEE !important; --bg-deep: #DCDFE5 !important;
+  --paper: #FFFFFF !important; --paper-tint: #F8F9FA !important;
+  --ink: #18191C !important; --ink-soft: #4C4F57 !important; --ink-faded: #858892 !important; --ink-ghost: #C3C6CD !important;
+  --line: #DADDE2 !important; --line-soft: #E6E8EC !important;
   --font-display: 'Gloock', Georgia, serif; --font-body: 'Instrument Sans', system-ui, sans-serif; --font-brand: 'Gloock', serif;
   --radius-sm: 10px; --radius: 22px 22px 6px 6px; --radius-lg: 28px 28px 8px 8px;
-  --shadow-sm: 0 1px 2px rgba(20,38,30,.06); --shadow: 0 2px 10px rgba(20,38,30,.07); --shadow-lg: 0 10px 30px rgba(20,38,30,.10);
+  --shadow-sm: 0 1px 2px rgba(24,25,28,.06); --shadow: 0 2px 10px rgba(24,25,28,.07); --shadow-lg: 0 10px 30px rgba(24,25,28,.10);
   --skin-marca: #A77B2F;
 }
 html[data-skin="palacio"] .tn-brand .seal { color: var(--skin-marca); }
@@ -22,12 +20,12 @@ html[data-skin="palacio"] .tn-ink { background: var(--skin-marca) !important; }
 
 /* ── modo escuro dos três ── */
 html[data-skin][data-theme="dark"] {
+  --verde-noite: #0B0C0E;
   --bg: #12161D !important; --bg-soft: #181D26 !important; --bg-deep: #1F2530 !important;
   --paper: #171C24 !important; --paper-tint: #1B212A !important;
   --ink: #EEF1F6 !important; --ink-soft: #B6BECC !important; --ink-faded: #808A9B !important; --ink-ghost: #3D4553 !important;
   --line: #2A313D !important; --line-soft: #222833 !important;
 }
-html[data-skin="palacio"][data-theme="dark"] { --rose: #7CC3A6 !important; --rose-deep: #98D3BA !important; --rose-soft: #1C3A30 !important; --blush: #152A23 !important; }
 
 /* ── letras: troca as famílias fixas herdadas (Fraunces, Inter, MagicalFeather) pelas do tema ── */
 html[data-skin] body { font-family: var(--font-body) !important; }
@@ -266,7 +264,8 @@ html[data-skin] .aurora-bg { display: none !important; }
 html[data-skin] body { background: var(--bg) !important; }
 
 /* ═══ Estrutura Palácio ═══ */
-html[data-skin="palacio"] { --verde-noite: #163F32; --bronze-claro: #E9D9B5; }
+/* faixa e barra do topo na cor escolhida no Perfil, escurecida (preto por padrão) */
+html[data-skin="palacio"] { --verde-noite: var(--rose-900, #111214); --bronze-claro: #E9D9B5; }
 
 /* barra do topo verde */
 html[data-skin] .tn, html[data-skin] .tn.scrolled { background: var(--verde-noite) !important; border-bottom: 0 !important; box-shadow: none !important; }
@@ -274,14 +273,14 @@ html[data-skin] .tn-word { color: #fff !important; font-size: 1.45rem; }
 html[data-skin] .tn-brand .seal { width: 34px; height: 34px; transform: none !important; }
 html[data-skin] .tn-rule { background: rgba(255,255,255,.12) !important; }
 @media (min-width: 901px) {
-  html[data-skin] .tn-item > a { color: #CFE0D7 !important; border-radius: 999px; padding-left: 1rem; padding-right: 1rem; }
+  html[data-skin] .tn-item > a { color: rgba(255,255,255,.75) !important; border-radius: 999px; padding-left: 1rem; padding-right: 1rem; }
   html[data-skin] .tn-item > a:hover, html[data-skin] .tn-item.open > a { color: #fff !important; }
   html[data-skin] .tn-item > a.on { background: var(--bronze-claro); color: var(--verde-noite) !important; }
   html[data-skin] .tn-ink { display: none !important; }
 }
-html[data-skin] .tn-count .lbl { color: #A9C4B7 !important; }
+html[data-skin] .tn-count .lbl { color: rgba(255,255,255,.6) !important; }
 html[data-skin] .tn-count .val, html[data-skin] .tn-count b { color: #fff !important; }
-html[data-skin] .tn-icon { color: #CFE0D7 !important; }
+html[data-skin] .tn-icon { color: rgba(255,255,255,.75) !important; }
 html[data-skin] .tn-av { background: var(--bronze-claro) !important; color: var(--verde-noite) !important; }
 
 /* faixa verde com o título de cada página; o conteúdo sobe sobre ela */
@@ -291,10 +290,10 @@ html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #te
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) + * { position: relative; margin-top: -4.5rem; }
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1, html[data-skin] .hub h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1.05; letter-spacing: -.01em; max-width: 22ch; }
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1 em { color: var(--bronze-claro) !important; font-style: normal; }
-html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .breadcrumb { color: #A9C4B7 !important; letter-spacing: .02em; text-transform: none; font-size: .86rem; }
-html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .rv-sub, html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) p { color: #C8DAD0 !important; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .breadcrumb { color: rgba(255,255,255,.6) !important; letter-spacing: .02em; text-transform: none; font-size: .86rem; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .rv-sub, html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) p { color: rgba(255,255,255,.78) !important; }
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .topbar-actions { color: #fff; }
-html[data-skin] .hub > .topbar + p.lead { color: #C8DAD0; margin-top: -6rem !important; margin-bottom: 4.6rem; position: relative; }
+html[data-skin] .hub > .topbar + p.lead { color: rgba(255,255,255,.78); margin-top: -6rem !important; margin-bottom: 4.6rem; position: relative; }
 html[data-skin] .hub-grid { position: relative; }
 
 /* contagem grande no canto da faixa (Início e Hoje) */
@@ -354,20 +353,20 @@ html[data-skin] body.home .tl::before { content: ''; position: absolute; z-index
 html[data-skin] body.home .tl + * { position: relative; margin-top: -4.5rem; }
 html[data-skin] body.home .tl-now, html[data-skin] body.home .tl-left { color: #fff !important; }
 html[data-skin] body.home .tl-now b { color: var(--bronze-claro) !important; }
-html[data-skin] body.home .tl-marks { color: #A9C4B7 !important; }
+html[data-skin] body.home .tl-marks { color: rgba(255,255,255,.6) !important; }
 html[data-skin] body.home .tl-track { background: rgba(255,255,255,.18) !important; }
 html[data-skin] body.home .tl-fill, html[data-skin] body.home .tl-dot { background: var(--bronze-claro) !important; }
 html[data-skin] body.home .tl-dot { box-shadow: 0 0 0 4px var(--verde-noite) !important; }
-html[data-skin] .home-quote, html[data-skin] .home-quote .quote-author { color: #C8DAD0 !important; }
+html[data-skin] .home-quote, html[data-skin] .home-quote .quote-author { color: rgba(255,255,255,.78) !important; }
 html[data-skin] body.home .section-label { color: var(--ink-soft); }
 
 html[data-skin] main > .bq-cab .topbar { padding: 0; margin: 0 0 .5rem; }
 html[data-skin] main > .bq-cab .topbar .page-title h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); }
-html[data-skin] main > .bq-cab .breadcrumb { color: #A9C4B7 !important; }
-html[data-skin] .ca-sub, html[data-skin] .rv-sub { color: #C8DAD0 !important; }
+html[data-skin] main > .bq-cab .breadcrumb { color: rgba(255,255,255,.6) !important; }
+html[data-skin] .ca-sub, html[data-skin] .rv-sub { color: rgba(255,255,255,.78) !important; }
 html[data-skin] .ca-sub b, html[data-skin] .rv-sub b { color: #fff !important; }
 html[data-skin] body.home main > .topbar { margin-bottom: 0 !important; }
-html[data-skin] body.home .tl + .section-label { color: #A9C4B7 !important; }
+html[data-skin] body.home .tl + .section-label { color: rgba(255,255,255,.6) !important; }
 html[data-skin] body.home .tl + .section-label::after { background: rgba(255,255,255,.18) !important; }
 @media (max-width: 700px) {
   .pl-cont { display: flex; align-items: baseline; gap: .5rem; margin-top: .6rem; }

@@ -66,15 +66,17 @@ Materiais extras (provas anteriores, apostilas de questões NEAF, simulados, edi
 - Domínio novo do Vercel precisa entrar em Firebase Auth → domínios autorizados; o leitor de PDF usa a chave da
   API do Drive restrita a `*.vercel.app`.
 
-## 5. Visual (escolha de Julia em 19/10/2026: modelo "Palácio")
+## 5. Visual (escolha de Julia em 19/10/2026: estrutura do modelo "Palácio", cor preta)
 
 Diferente do site da OAB de propósito. Tudo em `tema.css` (carregado por `cores-early.js`, que põe
-`data-skin="palacio"` no `<html>`): verde-noite `#163F32` e verde `#1F5A46`, bronze `#A77B2F`/`#E9D9B5`,
-fundo mármore `#EDF1EE`; títulos em **Gloock**, texto em **Instrument Sans**. Barra do topo verde com o item
-ativo em pílula bronze; cada página abre com uma faixa verde e título grande, e o primeiro bloco sobe sobre
-ela; cartões brancos com topo em arco e fio de bronze; botões em pílula. No Hoje, o título é a matéria do dia,
-a contagem grande fica à direita e há a faixa Flashcards · Questões · Erros. Favicon e ícones = arco com colunas.
-Não voltar ao rosa da OAB nem redesenhar sem perguntar.
+`data-skin="palacio"` no `<html>`). **Cor:** padrão **preto**, trocável no Perfil → Aparência → Cor personalizada,
+igual à OAB (`cores-early.js`/`cores.js`, chaves `tj_rose_intensity` e `tj_rose_custom_hex`). A barra do topo e a
+faixa usam `--rose-900` (a cor escolhida escurecida); botões e números usam `--rose`. **Não fixar cor de destaque
+no `tema.css`** (Julia não gostou do verde). Fundo neutro `#F2F3F5`, detalhes em bronze `#A77B2F`/`#E9D9B5`;
+títulos em **Gloock**, texto em **Instrument Sans**. Cada página abre com a faixa escura e título grande, e o
+primeiro bloco sobe sobre ela; cartões brancos com topo em arco e fio de bronze; botões em pílula. No Hoje, o título
+é a matéria do dia, a contagem grande fica à direita e há a faixa Flashcards · Questões · Erros.
+Favicon e ícones = arco preto com colunas. Não redesenhar sem perguntar.
 
 ## 6. Regras
 

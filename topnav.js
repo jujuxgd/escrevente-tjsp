@@ -72,7 +72,7 @@
     bar.className = 'tn';
     bar.innerHTML =
       '<a class="tn-brand" href="index.html" aria-label="Início">' +
-      '<svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 60V30a24 24 0 0 1 48 0v30z" fill="#2E7A5F"/>' +
+      '<svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 60V30a24 24 0 0 1 48 0v30z" fill="none" stroke="#E9D9B5" stroke-width="3"/>' +
       '<path d="M18 56V34M27 56V31M37 56V31M46 56V34" stroke="#E9D9B5" stroke-width="3.5" stroke-linecap="round"/><rect x="8" y="56" width="48" height="4" fill="#C9A55A"/></svg>' +
       '<span class="tn-word">Escrevente TJSP</span></a>' +
       '<div class="tn-rule" aria-hidden="true"></div>' +
@@ -181,7 +181,7 @@
   }
   tag('link', { rel: 'manifest', href: 'manifest.webmanifest' });
   tag('link', { rel: 'apple-touch-icon', href: 'apple-touch-icon.png' });
-  tag('meta', { name: 'theme-color', content: '#163F32' });
+  tag('meta', { name: 'theme-color', content: '#111214' });
   tag('meta', { name: 'apple-mobile-web-app-capable', content: 'yes' });
   tag('meta', { name: 'mobile-web-app-capable', content: 'yes' });
   tag('meta', { name: 'apple-mobile-web-app-title', content: 'TJSP' });

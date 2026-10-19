@@ -89,5 +89,5 @@
 (function () {
   var root = document.documentElement, h = document.head || root;
   root.setAttribute('data-skin', 'palacio');
-  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'tema.css?v=2'; h.appendChild(css);
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'tema.css?v=3'; h.appendChild(css);
 })();
