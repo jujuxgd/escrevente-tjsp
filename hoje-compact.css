@@ -1,0 +1,131 @@
+
+/* ── Hoje compacto ── */
+body.hoje .topbar{margin-bottom:.6rem!important}
+
+/* hero em uma linha só */
+body.hoje .day-hero{display:flex!important;align-items:center;gap:1.2rem!important;padding:.9rem 1.3rem!important;margin-bottom:1rem!important;border-radius:var(--radius)!important;background:var(--paper)!important;box-shadow:none!important;border:1px solid var(--line-soft)}
+body.hoje .day-number-big{border:0!important;padding:0!important;min-width:56px;text-align:center}
+body.hoje .day-number-big .num{font-size:2.3rem!important;line-height:1}
+body.hoje .day-number-big .month{font-size:.58rem!important;letter-spacing:.14em;margin-top:.2rem}
+body.hoje .day-info{flex:1;min-width:0}
+body.hoje .day-info h2{font-size:1.15rem!important;margin:.35rem 0 .1rem!important;line-height:1.25}
+body.hoje .day-info .meta{display:none}
+body.hoje .day-info .tag{font-size:.6rem!important;padding:.15rem .6rem!important}
+/* pomodoro vira pílula */
+body.hoje .pomodoro{display:flex!important;align-items:center;gap:.7rem;padding:.35rem .5rem .35rem 1rem!important;border-radius:999px!important;background:var(--bg-soft)!important;box-shadow:none!important;border:0!important;min-width:0!important;width:auto!important;margin:0!important;transform:none}
+body.hoje .pomodoro-status,body.hoje .pomodoro-cycles,body.hoje .pomo-btn-sm{display:none!important}
+body.hoje .pomodoro-mode{font-size:.62rem!important;margin:0!important;letter-spacing:.1em}
+body.hoje .pomodoro-time{font-size:1.15rem!important;margin:0!important;font-variant-numeric:tabular-nums}
+body.hoje .pomodoro-controls{margin:0!important;gap:0!important}
+body.hoje .pomo-btn-main{padding:.45rem .9rem!important;font-size:.7rem!important;min-height:36px}
+/* CTA principal no hero */
+body.hoje .day-hero .btn-estudei{padding:.7rem 1.3rem;font-size:.7rem;white-space:nowrap;box-shadow:none;border-radius:999px;min-height:44px}
+/* banners viram uma linha discreta */
+body.hoje main>div[style*="margin-bottom:1rem"]{padding:.5rem 1rem!important;border-radius:var(--radius-sm)!important;font-size:.82rem!important;background:var(--bg-soft)!important;color:var(--ink-soft)!important;margin-bottom:.8rem!important}
+body.hoje main>div[style*="margin-bottom:1rem"] *{font-size:.8rem!important;letter-spacing:0!important;color:inherit!important}
+/* abas finas, só texto + ícone desenhado */
+body.hoje .tabs-bar{background:none!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;padding:0!important;gap:1.6rem!important;box-shadow:none!important;margin-bottom:1rem!important;justify-content:flex-start!important}
+body.hoje .tab{flex:0 0 auto!important;background:none!important;color:var(--ink-faded)!important;box-shadow:none!important;border-radius:0!important;padding:.6rem 0!important;border-bottom:2px solid transparent;margin-bottom:-1px;font-size:.86rem!important;display:flex;align-items:center;gap:.45rem;min-height:44px}
+body.hoje .tab:hover{color:var(--ink)!important}
+body.hoje .tab.active{color:var(--ink)!important;border-bottom-color:var(--rose)!important;font-weight:600}
+body.hoje .tab svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+/* repete o título do dia: some */
+body.hoje #subject-panels>div:first-child:not(.subject-panel):not(.content-card){display:none!important}
+body.hoje #painel-materias{display:none!important}
+body.hoje #painel-diario>h4{display:none}
+body.hoje #painel-diario{padding-bottom:.4rem!important}
+/* painel da matéria mais plano */
+body.hoje .subject-panel{border-radius:var(--radius)!important;box-shadow:none!important;border:1px solid var(--line-soft)!important}
+body.hoje .subject-panel-header{padding:.7rem 1.1rem!important;background:var(--bg-soft)!important;color:var(--ink)!important}
+/* coluna direita: UM card, seções separadas por fio */
+body.hoje .content-layout{gap:1.4rem!important}
+body.hoje .side{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius);padding:.2rem 1.2rem!important;box-shadow:none;gap:0!important}
+body.hoje .side .side-block{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:1rem 0!important;margin:0!important}
+body.hoje .side .side-block+.side-block{border-top:1px solid var(--line-soft)!important}
+body.hoje .side-block h4{font-size:.92rem!important;margin-bottom:.6rem!important}
+/* microresumo recolhido */
+.cmp-collapsed>:not(:first-child){display:none!important}
+.cmp-collapsed{padding:.8rem 1.2rem!important;cursor:pointer}
+.cmp-collapsed>:first-child{margin-bottom:0!important}
+.cmp-chev{display:inline-block;margin-left:.5rem;transition:.2s;color:var(--ink-faded)}
+.cmp-collapsed .cmp-chev{transform:rotate(-90deg)}
+/* rodapé enxuto */
+body.hoje .day-footer{padding:.6rem 0 0!important;margin-top:1rem!important;border:0!important;background:none!important}
+body.hoje .day-footer>div:last-child{opacity:.9}
+@media(max-width:900px){
+ body.hoje .day-hero{flex-wrap:wrap}
+ body.hoje .day-hero .btn-estudei{width:100%}
+ body.hoje .tabs-bar{flex-wrap:wrap;overflow-x:visible;gap:1rem!important;row-gap:0}
+ body.hoje .tab{font-size:.82rem!important;min-height:40px;gap:.35rem}
+ body.hoje .tab span.tl{white-space:nowrap}
+}
+
+@media(max-width:480px){
+ /* 5 abas iguais, ícone em cima do nome (como a barra de baixo): cabem sem quebrar e ficam fáceis de tocar */
+ body.hoje .tabs-bar{display:grid!important;grid-template-columns:repeat(5,1fr);gap:0!important}
+ body.hoje .tab{flex-direction:column;justify-content:center;gap:.3rem!important;font-size:.7rem!important;letter-spacing:0!important;padding:.55rem 0 .5rem!important;min-height:54px}
+ body.hoje .tab svg{display:block;width:19px;height:19px}
+ body.hoje .tab .badge{font-size:.58rem;padding:0 .3rem}
+ body.hoje .day-info .tag{white-space:nowrap}
+ body.hoje .tab{position:relative}
+ body.hoje #ck-cont{position:absolute;top:5px;right:4px;font-size:.6rem!important}
+}
+
+/* checklist como aba principal */
+.cmp-check{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius);padding:.6rem 1.4rem 1rem}
+.cmp-check .checklist{margin:0}
+.cmp-check .checklist li:not(.checklist-subgroup-header){padding:.7rem 0;font-size:.93rem;min-height:44px;align-items:center}
+.cmp-check .checklist-group-header{margin-top:.6rem}
+
+/* ── rodapé do dia alinhado ── */
+body.hoje .day-footer { display: flex; flex-wrap: wrap; gap: .8rem 1.2rem; align-items: center; }
+body.hoje .day-nav { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+body.hoje .day-footer > div:last-child { margin-left: auto; }
+
+/* ── faixa de progresso dos tópicos ── */
+body.hoje .content-layout { grid-template-columns: 1fr !important; }
+.cmp-faixa {
+  background: var(--paper); border: 1px solid var(--line-soft);
+  border-radius: var(--radius); padding: .9rem 1.2rem; margin-bottom: .9rem;
+}
+.cf-topo { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.cf-rot { font: 600 .68rem 'Inter', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+.cf-num { font-size: .85rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cf-num b { font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+.cf-plano { margin-left: auto; font-size: .78rem; color: var(--ink-faded); font-variant-numeric: tabular-nums; }
+.cf-plano b { color: var(--ink-soft); font-weight: 600; }
+.cf-trilho { height: 5px; background: var(--line-soft); border-radius: 3px; overflow: hidden; }
+.cf-barra { display: block; height: 100%; width: 0; background: var(--rose); border-radius: 3px; transition: width .4s cubic-bezier(.2,.7,.2,1); }
+@media (max-width: 900px) { .cf-plano { margin-left: 0; width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .cf-barra { transition: none; } }
+
+/* ── nota de fim de semana: rodapé do cabeçalho, não faixa ── */
+body.hoje .nota-fds { text-transform: none; letter-spacing: 0; color: var(--ink-faded); font-weight: 400; }
+
+/* ── emoji não é sistema de ícone: some dos rótulos ── */
+body.hoje .checklist-group-header > span:first-child { display: none; }
+body.hoje .checklist-group-header { gap: 0 !important; }
+
+/* ── Resumos empilhados: Microresumo aberto, Resumo do Dia dobrável ── */
+.cmp-pilha { display: flex; flex-direction: column; gap: .8rem; }
+.cmp-pilha > .rt-card { margin: 0 !important; }
+.cmp-seta {
+  flex: none; display: grid; place-items: center;
+  width: 22px; height: 22px; margin-right: .15rem; padding: 0;
+  background: none; border: 0; cursor: pointer; color: var(--ink-faded);
+  transition: transform .18s ease, color .18s ease;
+}
+.cmp-seta:hover { color: var(--ink); }
+.cmp-seta:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; border-radius: 4px; }
+.cmp-seta svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cmp-dobra:not(.cmp-collapsed) .cmp-seta { transform: rotate(90deg); }
+.cmp-dobra.cmp-collapsed { cursor: default !important; }
+@media (prefers-reduced-motion: reduce) { .cmp-seta { transition: none; } }
+@media (max-width: 640px) {
+  body.hoje .day-footer { padding: .8rem 1.2rem !important; }
+  body.hoje .day-footer > div:last-child { margin-left: 0; }
+  body.hoje .day-nav { width: 100%; display: grid; grid-template-columns: 1fr auto 1fr; gap: .5rem; flex-wrap: nowrap; }
+  body.hoje .day-nav a { white-space: nowrap; padding: .4rem 0; }
+  body.hoje .day-nav a:nth-child(2) { text-align: center; }
+  body.hoje .day-nav a:last-child { text-align: right; }
+}

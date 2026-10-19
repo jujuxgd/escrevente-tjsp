@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js?v=1783862902"></script>
+<script src="auth-guard.js?v=1784132091"></script>
+<script src="cores-early.js?v=1784060144"></script>
+<script src="page-transition.js?v=1783861010"></script>
+<title>Revisar · TJSP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1784043341">
+<link rel="stylesheet" href="sessao.css"><link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script></head>
+<body>
+<div class="aurora-bg" aria-hidden="true"><div class="aurora-blob ab1"></div><div class="aurora-blob ab2"></div><div class="aurora-blob ab3"></div><div class="aurora-blob ab4"></div></div>
+<div class="app">
+  <main>
+    <div class="topbar"><div class="page-title"><div class="breadcrumb">Estudo · <span data-month-year>—</span></div><h1>Revisar <em>flashcards</em></h1></div></div>
+    <div class="ss-hero" id="rv-hero"><div class="ss-eb">Revisão espaçada</div><h2>Flashcards</h2><p>Responda errei, difícil, bom ou fácil: cada botão mostra quando o cartão volta, e o intervalo cresce a cada acerto. Fácil num cartão que já está em 15 dias tira ele da rotação. Os do dia ficam na aba Hoje; aqui você revisa por matéria quando quiser.</p><div class="ss-nums" id="rv-nums"></div></div>
+    <div class="fc-filtros" id="rv-filtros"></div>
+    <div id="rv-area"><p class="ss-vazio">Carregando flashcards…</p></div>
+  </main>
+</div>
+<script src="script.js?v=1784021868"></script>
+<script src="perfil.js?v=1783860863"></script>
+<script src="sync.js?v=1784058237"></script>
+<script src="progresso.js?v=1783859287"></script>
+<script src="cores.js"></script>
+<script src="estudo-core.js"></script>
+<script src="erros-core.js"></script>
+<script src="revisao-biblioteca.js"></script>
+<script src="calendario-ativo.js"></script>
+<script src="plano-dinamico.js"></script>
+<script src="ativo-core.js"></script>
+<script src="sessao-core.js"></script>
+<script>
+(function () {
+  var S = SESSAO, sel = new URLSearchParams(location.search).get('materia') || 'vencidos';
+  function montar() {
+    var cart = ATIVO.cartoes(), est = ATIVO.estados(), venc = ATIVO.vencidos(), r = ATIVO.resumo();
+    document.getElementById('rv-nums').innerHTML = '<div><b>' + venc.length + '</b>vencidos hoje</div><div><b>' + r.vistos + '/' + r.total + '</b>já vistos</div>' +
+      '<div><b>' + r.emRevisao + '</b>em revisão</div><div><b>' + r.fora + '</b>fora da rotação</div>';
+    var discs = cart.map(function (c) { return c.d; }).filter(function (d, i, a) { return a.indexOf(d) === i; });
+    document.getElementById('rv-filtros').innerHTML = '<button data-m="vencidos"' + (sel === 'vencidos' ? ' class="on"' : '') + '>Vencidos (' + venc.length + ')</button>' +
+      discs.map(function (d) {
+        var meus = cart.filter(function (c) { return c.d === d; }), vistos = meus.filter(function (c) { return est[c.id]; }).length;
+        return '<button data-m="' + S.esc(d) + '"' + (sel === d ? ' class="on"' : '') + '>' + S.esc(S.curto(d)) + ' · ' + vistos + '/' + meus.length + '</button>';
+      }).join('');
+    var rev = new URLSearchParams(location.search).get('rev');
+    var fila = sel === 'vencidos' ? venc
+      : venc.filter(function (c) { return c.d === sel; }).concat(ATIVO.novos([sel], rev ? 999 : 20));
+    if (rev && sel !== 'vencidos') fila = fila.filter(function (c) { return String(c.r) === rev; });
+    S.montarFlashcards(document.getElementById('rv-area'), fila, {
+      vazio: sel === 'vencidos' ? 'Nenhum flashcard vencido. Escolha uma matéria acima para ver cartões novos.' : 'Você já viu todos os cartões desta matéria e nenhum vence hoje.'
+    });
+  }
+  document.getElementById('rv-filtros').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-m]'); if (!b) return;
+    sel = b.dataset.m;
+    var u = new URL(location.href); u.searchParams.delete('rev'); if (sel === 'vencidos') u.searchParams.delete('materia'); else u.searchParams.set('materia', sel); history.replaceState(null, '', u);
+    montar();
+  });
+  document.addEventListener('DOMContentLoaded', function () { ATIVO.carregarCartoes().then(montar); });
+})();
+</script>
+</body>
+</html>

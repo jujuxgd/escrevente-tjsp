@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Banco de Questões</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1791163406">
+<script src="cores-early.js"></script>
+<link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script>
+<style>
+/* ══════════════════════════════════════════════════════════
+   Banco de Questões — superfície de trabalho (Operate)
+   Uma família (Inter) na UI; Fraunces só no título da página.
+   Escala fixa em rem, densidade alta, rosa só em ação e seleção.
+   ══════════════════════════════════════════════════════════ */
+
+.bq-cab { margin-bottom: 1.4rem; }
+.bq-cab .topbar { margin-bottom: .5rem; }
+.bq h1 { font: 500 1.875rem/1.15 'Fraunces', serif; letter-spacing: -.02em; margin: 0; color: var(--ink); }
+.bq h1 em { font-style: italic; color: var(--rose-deep); }
+@media (max-width: 900px) { .bq h1 { font-size: 1.7rem; } }
+@media (max-width: 640px) { .bq h1 { font-size: 1.55rem; } }
+.bq .lead { font-size: .875rem; color: var(--ink-faded); margin: 0; }
+
+/* ── barra de filtros: segunda camada, grudada no topo ── */
+.fp {
+  position: sticky; top: 76px; z-index: 20;
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: 10px; padding: .7rem .8rem; margin-bottom: 1.1rem;
+}
+.fp-l1 { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.fp-l2 { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--line-soft); }
+
+.ctl { position: relative; display: inline-flex; }
+.ctl select {
+  appearance: none; -webkit-appearance: none;
+  font: 400 .8125rem/1 'Inter', sans-serif; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 7px;
+  padding: .5rem 1.9rem .5rem .7rem; height: 34px; cursor: pointer;
+  max-width: 190px; text-overflow: ellipsis;
+  transition: border-color .18s ease, color .18s ease;
+}
+.ctl select:hover:not(:disabled) { border-color: var(--ink-ghost, var(--ink-faded)); }
+.ctl select:focus-visible { outline: 2px solid var(--rose); outline-offset: 1px; }
+.ctl select:disabled { color: var(--ink-faded); background: var(--bg); cursor: not-allowed; }
+.ctl select.ativo { border-color: var(--rose); color: var(--rose-deep); font-weight: 500; }
+.ctl::after {
+  content: ""; position: absolute; right: .65rem; top: 50%; width: 6px; height: 6px;
+  border-right: 1.5px solid var(--ink-faded); border-bottom: 1.5px solid var(--ink-faded);
+  transform: translateY(-70%) rotate(45deg); pointer-events: none;
+}
+.ctl.off::after { opacity: .3; }
+
+.busca { position: relative; flex: 1 1 220px; min-width: 160px; }
+.busca input {
+  width: 100%; font: 400 .8125rem 'Inter', sans-serif; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 7px;
+  padding: .5rem .7rem .5rem 2rem; height: 34px;
+  transition: border-color .18s ease;
+}
+.busca input::placeholder { color: var(--ink-faded); }
+.busca input:hover { border-color: var(--ink-faded); }
+.busca input:focus { outline: none; border-color: var(--rose); }
+.busca svg { position: absolute; left: .6rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; fill: none; stroke: var(--ink-faded); stroke-width: 1.8; pointer-events: none; }
+
+.pill {
+  font: 400 .8125rem/1 'Inter', sans-serif; color: var(--ink-soft); cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 7px;
+  padding: .5rem .7rem; height: 34px; transition: background .18s ease, color .18s ease;
+}
+.pill:hover { background: var(--paper); color: var(--ink); }
+.pill:focus-visible { outline: 2px solid var(--rose); outline-offset: 1px; }
+.pill.on { background: var(--rose); color: #fff; font-weight: 500; }
+.fp-sep { width: 1px; height: 20px; background: var(--line); margin: 0 .2rem; }
+.fp-check { display: inline-flex; align-items: center; gap: .4rem; font: 400 .8125rem 'Inter', sans-serif; letter-spacing: 0; text-transform: none; color: var(--ink-soft); cursor: pointer; height: 34px; padding: 0 .4rem; }
+.fp-check input { width: 15px; height: 15px; accent-color: var(--rose); cursor: pointer; }
+.btn-lim { background: none; border: 0; color: var(--ink-faded); font: 400 .8125rem 'Inter', sans-serif; cursor: pointer; padding: .5rem; height: 34px; }
+.btn-lim:hover { color: var(--rose-deep); text-decoration: underline; }
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem; height: 26px;
+  font: 400 .75rem 'Inter', sans-serif; color: var(--rose-deep);
+  background: var(--rose-50); border: 1px solid var(--rose-300); border-radius: 6px;
+  padding: 0 .25rem 0 .55rem;
+}
+.chip button { background: none; border: 0; cursor: pointer; color: inherit; font-size: .85rem; line-height: 1; padding: .2rem; opacity: .6; }
+.chip button:hover { opacity: 1; }
+
+/* ── seletor múltiplo com busca ── */
+.ms { position: relative; display: inline-flex; }
+.ms-bt {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font: 400 .8125rem/1 'Inter', sans-serif; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 7px;
+  padding: 0 .65rem; height: 34px; cursor: pointer; white-space: nowrap;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+.ms-bt:hover:not(:disabled) { border-color: var(--ink-faded); }
+.ms-bt:focus-visible { outline: 2px solid var(--rose); outline-offset: 1px; }
+.ms-bt:disabled { color: var(--ink-faded); background: var(--bg); cursor: not-allowed; }
+.ms-bt .cv { width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); opacity: .55; transition: transform .18s ease; }
+.ms.aberto .ms-bt .cv { transform: translateY(1px) rotate(-135deg); }
+.ms-bt.tem { border-color: var(--rose); color: var(--rose-deep); font-weight: 500; }
+.ms-n {
+  display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px;
+  border-radius: 9px; background: var(--rose); color: #fff;
+  font: 600 .6875rem/1 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+}
+.ms-pn {
+  position: absolute; top: calc(100% + 5px); left: 0; z-index: 60;
+  width: 290px; max-width: 86vw; background: var(--paper);
+  border: 1px solid var(--line); border-radius: 9px;
+  box-shadow: 0 2px 4px rgba(33,28,25,.05), 0 10px 28px rgba(33,28,25,.13);
+  display: none; overflow: hidden;
+}
+.ms.aberto .ms-pn { display: block; }
+.ms-busca { position: relative; border-bottom: 1px solid var(--line-soft); }
+.ms-busca input {
+  width: 100%; border: 0; background: none; color: var(--ink);
+  font: 400 .8125rem 'Inter', sans-serif; padding: .7rem 2.2rem .7rem .8rem;
+}
+.ms-busca input:focus { outline: none; }
+.ms-busca input::placeholder { color: var(--ink-faded); }
+.ms-busca svg { position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; fill: none; stroke: var(--ink-faded); stroke-width: 1.8; }
+.ms-lista { max-height: 268px; overflow-y: auto; overscroll-behavior: contain; padding: .25rem; }
+.ms-lista::-webkit-scrollbar { width: 9px; }
+.ms-lista::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; border: 3px solid var(--paper); }
+.ms-lista::-webkit-scrollbar-track { background: transparent; }
+.ms-op {
+  display: flex; align-items: flex-start; gap: .6rem; width: 100%; text-align: left;
+  padding: .55rem .6rem; border: 0; border-radius: 6px; background: none; cursor: pointer;
+  font: 400 .8125rem/1.45 'Inter', sans-serif; color: var(--ink); transition: background .15s ease;
+}
+.ms-op:hover { background: var(--bg-soft); }
+.ms-op:focus-visible { outline: 2px solid var(--rose); outline-offset: -2px; }
+.ms-cx {
+  flex: none; width: 16px; height: 16px; margin-top: .1rem; border-radius: 3px;
+  border: 1.5px solid var(--ink-faded); display: grid; place-items: center;
+  transition: background .15s ease, border-color .15s ease;
+}
+.ms-op.on .ms-cx { background: var(--rose); border-color: var(--rose); }
+.ms-op.on .ms-cx::after { content: ""; width: 4px; height: 8px; border: solid #fff; border-width: 0 1.6px 1.6px 0; transform: rotate(45deg) translate(-1px,-1px); }
+.ms-op.on { font-weight: 500; }
+.ms-vazio { padding: 1rem .7rem; font-size: .8125rem; color: var(--ink-faded); text-align: center; }
+.ms-pe { display: flex; justify-content: space-between; align-items: center; padding: .4rem .5rem; border-top: 1px solid var(--line-soft); }
+.ms-pe button { background: none; border: 0; cursor: pointer; font: 400 .78rem 'Inter', sans-serif; color: var(--ink-faded); padding: .35rem .5rem; border-radius: 5px; }
+.ms-pe button:hover { color: var(--rose-deep); background: var(--bg-soft); }
+@media (max-width: 900px) { .ms { flex: 1 1 140px; } .ms-bt { width: 100%; justify-content: space-between; } }
+
+/* ── linha de resultados ── */
+.res { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; margin-bottom: .9rem; padding: 0 .15rem; }
+.res-n { font-size: .8125rem; color: var(--ink-soft); }
+.res-n b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.res-dir { margin-left: auto; display: flex; gap: .4rem; align-items: center; }
+.res-dir .rot { font-size: .75rem; color: var(--ink-faded); }
+
+/* ── questão ── */
+.qs { display: flex; flex-direction: column; gap: .7rem; }
+.q { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
+.q-cab {
+  border-radius: 9px 9px 0 0;
+  display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+  padding: .6rem .9rem; background: var(--bg-soft); border-bottom: 1px solid var(--line-soft);
+  font-size: .75rem; color: var(--ink-soft);
+}
+.q-num { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.q-dis { font-weight: 600; color: var(--rose-deep); }
+.q-cab .pt { color: var(--ink-ghost, var(--ink-faded)); }
+.q-dif { display: inline-flex; align-items: center; gap: .3rem; }
+.q-dif i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.q-dif.facil i { background: #5E8C6A; } .q-dif.media i { background: #C79A2E; } .q-dif.dificil i { background: #C0524B; }
+.q-trilha { margin-left: auto; color: var(--ink-faded); }
+.q-feita { color: var(--ink-faded); }
+.q-corpo { padding: 1.1rem 1.2rem 1.2rem; }
+.q-enun { font-size: .9375rem; line-height: 1.65; color: var(--ink); margin-bottom: 1rem; white-space: pre-line; }
+
+.alts { border-top: 1px solid var(--line-soft); }
+.alt {
+  display: flex; gap: .75rem; align-items: flex-start; width: 100%; text-align: left;
+  padding: .75rem .3rem .75rem .5rem; cursor: pointer;
+  background: none; border: 0; border-bottom: 1px solid var(--line-soft);
+  border-left: 2px solid transparent; color: var(--ink);
+  font: 400 .9375rem/1.6 'Inter', sans-serif; transition: background .15s ease, border-color .15s ease;
+}
+.alt:hover:not(:disabled) { background: var(--bg-soft); }
+.alt:focus-visible { outline: 2px solid var(--rose); outline-offset: -2px; }
+.alt:disabled { cursor: default; }
+.alt .l {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; margin-top: .02rem;
+  display: grid; place-items: center; font: 600 .75rem 'Inter', sans-serif;
+  background: var(--bg-soft); color: var(--ink-soft); transition: background .15s ease, color .15s ease;
+}
+.alt.sel { border-left-color: var(--rose); background: var(--rose-50); }
+.alt.sel .l { background: var(--rose); color: #fff; }
+.alt.certa { border-left-color: #5E8C6A; background: rgba(94,140,106,.08); }
+.alt.certa .l { background: #5E8C6A; color: #fff; }
+.alt.errada { border-left-color: #C0524B; background: rgba(192,82,75,.08); }
+.alt.errada .l { background: #C0524B; color: #fff; }
+.alt .m { margin-left: auto; flex: none; font-size: .85rem; padding-left: .5rem; }
+
+/* ── tesoura: vive na margem, fora da alternativa, ligada à letra
+   por um tracejado (igual ao padrão do QConcursos) ── */
+.alts { padding-left: 0; }
+.alt-linha { position: relative; display: flex; align-items: flex-start; border-bottom: 1px solid var(--line-soft); }
+.alt-linha .alt { border-bottom: 0; flex: 1; min-width: 0; }
+.tesoura {
+  position: absolute; left: -2.45rem; top: .62rem;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--paper);
+  cursor: pointer; color: var(--ink-faded);
+  display: grid; place-items: center; opacity: 0;
+  transition: opacity .15s ease, color .15s ease, border-color .15s ease, background .15s ease;
+}
+/* o tracejado que liga a tesoura à letra */
+.tesoura::after {
+  content: ""; position: absolute; left: calc(100% + 1px); top: 50%;
+  width: 11px; border-top: 1.5px dashed var(--line);
+}
+.tesoura:hover { color: var(--rose-deep); border-color: var(--rose-300); }
+.tesoura:focus-visible { outline: 2px solid var(--rose); outline-offset: 1px; }
+.tesoura svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* só aparece sob o mouse — inclusive na alternativa já cortada, que é
+   como se desfaz o corte. No teclado também, senão some pra quem navega
+   sem mouse. */
+.alt-linha:hover .tesoura, .tesoura:focus-visible { opacity: 1; }
+/* No toque não há mouse e a tesoura não fica à mostra: descarta-se
+   arrastando a alternativa da direita para a esquerda, e traz-se de volta
+   arrastando para a direita. */
+@media (hover: none) {
+  .tesoura { display: none; }
+  .alt-linha { touch-action: pan-y; }
+  .alt-linha .alt { transition: transform .18s cubic-bezier(.2,.7,.2,1); }
+  .alt-linha.arrastando .alt { transition: none; }
+}
+.dica-corte { display: none; }
+@media (hover: none) {
+  .dica-corte {
+    display: block; font-size: .72rem; color: var(--ink-faded);
+    margin: .5rem 0 0; padding-left: .1rem;
+  }
+}
+
+/* alternativa descartada */
+.alt-linha.cortada .tesoura { color: var(--rose); border-color: var(--rose-300); background: var(--rose-50); }
+.alt-linha.cortada .tesoura::after { border-top-color: var(--rose-300); }
+.alt-linha.cortada .alt { opacity: .55; }
+.alt-linha.cortada .alt > span:nth-child(2) { text-decoration: line-through; font-style: italic; }
+.alt-linha.cortada .alt .l { background: transparent; border: 1px solid var(--rose-300); color: var(--rose-deep); }
+.alt-linha.cortada .alt:hover { background: none; }
+.tesoura:hover { color: var(--rose-deep); background: var(--bg-soft); }
+.tesoura:focus-visible { outline: 2px solid var(--rose); outline-offset: -2px; }
+.tesoura svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.alt-linha.cortada .tesoura { color: var(--rose); }
+.alt-linha.cortada .alt { opacity: .5; }
+.alt-linha.cortada .alt > span:nth-child(2) { text-decoration: line-through; font-style: italic; }
+.alt-linha.cortada .alt .l { background: transparent; border: 1px solid var(--ink-faded); color: var(--ink-faded); }
+.alt-linha.cortada .alt:hover { background: none; }
+
+.q-acoes { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: 1rem; }
+.b {
+  font: 500 .8125rem/1 'Inter', sans-serif; cursor: pointer; height: 36px;
+  padding: 0 1.1rem; border-radius: 7px; border: 1px solid transparent;
+  background: var(--rose-deep); color: #fff; transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.b:hover:not(:disabled) { background: var(--rose-700); }
+.b:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+.b:disabled { background: var(--bg-deep); color: var(--ink-faded); cursor: default; }
+.b.g { background: none; color: var(--ink-soft); border-color: var(--line); }
+.b.g:hover { background: var(--bg-soft); color: var(--ink); border-color: var(--ink-faded); }
+.b.g.on { background: var(--rose-50); border-color: var(--rose-300); color: var(--rose-deep); }
+.b.g:disabled { background: none; border-color: var(--line-soft); }
+
+.ver { margin-top: .9rem; padding: .6rem .8rem; border-radius: 7px; font-size: .8125rem; border-left: 2px solid; }
+.ver.ok { background: rgba(94,140,106,.09); border-left-color: #5E8C6A; color: #3F6B3A; }
+.ver.nao { background: rgba(192,82,75,.09); border-left-color: #C0524B; color: #A33527; }
+[data-theme="dark"] .ver.ok { color: #A8CBA0; } [data-theme="dark"] .ver.nao { color: #E0A197; }
+.expl { margin-top: .9rem; padding-top: .9rem; border-top: 1px solid var(--line-soft); }
+.expl h4 { font: 600 .75rem 'Inter', sans-serif; color: var(--ink); margin: 0 0 .5rem; }
+.ex-bloco { display: flex; gap: .7rem; padding: .7rem 0; border-top: 1px solid var(--line-soft); }
+.ex-bloco:first-child { border-top: 0; padding-top: .2rem; }
+.ex-bloco p { font: 400 .875rem/1.7 'Inter', sans-serif; color: var(--ink-soft); margin: 0 0 .5rem; overflow-wrap: break-word; }
+.ex-bloco p:last-child { margin-bottom: 0; }
+.ex-txt { min-width: 0; flex: 1; }
+.ex-l {
+  flex: none; width: 22px; height: 22px; border-radius: 50%; margin-top: .15rem;
+  display: grid; place-items: center; font: 600 .72rem 'Inter', sans-serif;
+  background: var(--bg-soft); color: var(--ink-faded);
+}
+.ex-v { display: block; font: 600 .72rem 'Inter', sans-serif; letter-spacing: .04em; text-transform: uppercase; margin-bottom: .3rem; color: var(--ink-faded); }
+.ex-certo .ex-l { background: #5E8C6A; color: #fff; }
+.ex-certo .ex-v { color: #3F6B3A; }
+.ex-errado .ex-v { color: var(--ink-faded); }
+[data-theme="dark"] .ex-certo .ex-v { color: #A8CBA0; }
+.ex-intro { padding-left: 0; }
+.ex-intro p { color: var(--ink); }
+.base { margin-top: .7rem; font-size: .78rem; color: var(--ink-faded); }
+.base b { color: var(--ink-soft); font-weight: 600; }
+.nota { margin-top: .7rem; padding: .55rem .7rem; border-radius: 6px; background: var(--bg-soft); font-size: .78rem; color: var(--ink-soft); }
+
+/* ── paginação ── */
+.pag { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; justify-content: center; margin-top: 1.6rem; }
+.pag button {
+  min-width: 34px; height: 34px; padding: 0 .55rem; border-radius: 7px;
+  background: var(--paper); border: 1px solid var(--line); color: var(--ink-soft);
+  font: 400 .8125rem 'Inter', sans-serif; cursor: pointer; font-variant-numeric: tabular-nums;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.pag button:hover:not(:disabled):not(.on) { background: var(--bg-soft); color: var(--ink); }
+.pag button.on { background: var(--rose-deep); border-color: var(--rose-deep); color: #fff; font-weight: 500; }
+.pag button:disabled { opacity: .35; cursor: default; }
+.pag .reticencia { color: var(--ink-faded); padding: 0 .2rem; font-size: .8125rem; }
+.pag .pg-nav {
+  min-width: 0; height: 38px; padding: 0 1.1rem; display: inline-flex; align-items: center; gap: .4rem;
+  font-weight: 500; color: var(--ink);
+}
+.pag .pg-nav:hover:not(:disabled) { border-color: var(--rose-300); color: var(--rose-deep); background: var(--paper); }
+.pag .pg-pos { font-size: .8125rem; color: var(--ink-faded); font-variant-numeric: tabular-nums; padding: 0 .9rem; }
+.pag .pg-pos b { color: var(--ink); font-weight: 600; }
+
+/* ── vazio que ensina ── */
+.vazio { background: var(--paper); border: 1px dashed var(--line); border-radius: 10px; padding: 2.4rem 1.6rem; text-align: center; }
+.vazio .t { font: 500 1rem 'Inter', sans-serif; color: var(--ink); margin: 0 0 .4rem; }
+.vazio p { margin: 0; font-size: .875rem; color: var(--ink-soft); }
+.vazio .b { margin-top: 1rem; }
+
+@media (max-width: 900px) {
+  .fp { position: static; }
+  .ctl select { max-width: none; flex: 1; }
+  .ctl { flex: 1 1 140px; }
+  .q-trilha { margin-left: 0; width: 100%; }
+  .tesoura { left: -1.9rem; width: 23px; height: 23px; }
+  .tesoura::after { width: 7px; }
+  .res-dir { margin-left: 0; width: 100%; flex-wrap: wrap; }
+  .ctl { flex: 1 1 120px; min-width: 0; }
+  .ctl select { width: 100%; min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<main class="bq">
+  <div class="bq-cab">
+    <div class="topbar"><div class="page-title"><div class="breadcrumb">Treino · <span data-month-year>—</span></div><h1>Banco de <em>questões</em></h1></div></div>
+    <p class="lead">Provas anteriores da Vunesp para Escrevente do TJSP, com gabarito oficial.</p>
+  </div>
+
+  <section class="fp" id="fp"></section>
+  <div class="res" id="res"></div>
+  <div class="qs" id="lista"></div>
+  <nav class="pag" id="pag" aria-label="Paginação"></nav>
+</main>
+
+<script src="questoes-banco.js"></script>
+<script src="progresso.js"></script>
+<script src="erros-core.js"></script>
+<script src="script.js"></script>
+<script src="perfil.js"></script>
+<script src="sync.js"></script>
+<script src="cores.js"></script>
+<script>
+(function () {
+  var BANCO = window.BANCO_QUESTOES || [];
+  var K_RESP = 'tj_bq_respostas', K_FAV = 'tj_bq_favoritas';
+  var DIF = { facil: 'Fácil', media: 'Média', dificil: 'Difícil' };
+
+  function ler(k, p) { try { return JSON.parse(localStorage.getItem(k)) || p; } catch (e) { return p; } }
+  function gravar(k, v) {
+    try {
+      localStorage.setItem(k, JSON.stringify(v));
+      localStorage.setItem('tj_local_rev', String(Date.now()));
+      if (window._syncOAB && window._syncOAB.notificarAlteracaoLocal) window._syncOAB.notificarAlteracaoLocal(k);
+    } catch (e) {}
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function sa(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+
+  var respostas = ler(K_RESP, {});
+  var favoritas = ler(K_FAV, []);
+  var estado = {}, pagina = 1, fixas = {}, sitFixas = null;
+
+  // filtros de valor múltiplo: cada um guarda uma lista
+  var F = {
+    busca: '', disciplinas: [], assuntos: [], dificuldades: [], exames: [],
+    situacao: 'todas', ordem: 'exame_desc', porPagina: 1
+  };
+
+  function valores(campo, base) {
+    var v = [];
+    (base || BANCO).forEach(function (q) { if (q[campo] != null && v.indexOf(q[campo]) === -1) v.push(q[campo]); });
+    return v.sort(function (a, b) { return typeof a === 'number' ? b - a : String(a).localeCompare(String(b), 'pt-BR'); });
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     Seletor múltiplo: botão + painel com busca e caixas.
+     O <select> do navegador não marca vários nem busca dentro.
+     ───────────────────────────────────────────────────────── */
+  function MultiSel(cfg) {
+    var raiz = document.createElement('span');
+    raiz.className = 'ms';
+    raiz.innerHTML =
+      '<button class="ms-bt" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="rot"></span><span class="cv"></span></button>' +
+      '<div class="ms-pn" role="dialog" aria-label="' + esc(cfg.rotulo) + '">' +
+        '<div class="ms-busca"><input type="text" placeholder="Busca rápida" aria-label="Buscar em ' + esc(cfg.rotulo) + '">' +
+        '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>' +
+        '<div class="ms-lista" role="listbox" aria-multiselectable="true"></div>' +
+        '<div class="ms-pe"><button type="button" data-t="todos">Marcar todos</button><button type="button" data-t="nenhum">Limpar</button></div>' +
+      '</div>';
+    var bt = raiz.querySelector('.ms-bt');
+    var rot = raiz.querySelector('.rot');
+    var pn = raiz.querySelector('.ms-pn');
+    var inp = raiz.querySelector('.ms-busca input');
+    var lista = raiz.querySelector('.ms-lista');
+    var opcoes = [], termo = '';
+
+    function rotulo() {
+      var n = cfg.sel().length;
+      rot.innerHTML = esc(cfg.rotulo) + (n ? ' <span class="ms-n">' + n + '</span>' : '');
+      bt.classList.toggle('tem', n > 0);
+    }
+    function pintar() {
+      var sel = cfg.sel();
+      var vis = opcoes.filter(function (o) { return !termo || sa(o.texto).indexOf(sa(termo)) !== -1; });
+      lista.innerHTML = vis.length
+        ? vis.map(function (o) {
+            var on = sel.indexOf(o.valor) !== -1;
+            return '<button class="ms-op' + (on ? ' on' : '') + '" type="button" role="option" aria-selected="' + on +
+                   '" data-v="' + esc(o.valor) + '"><span class="ms-cx"></span><span>' + esc(o.texto) + '</span></button>';
+          }).join('')
+        : '<div class="ms-vazio">Nada encontrado</div>';
+      rotulo();
+    }
+    function abrir(sim) {
+      document.querySelectorAll('.ms.aberto').forEach(function (x) {
+        if (x !== raiz) { x.classList.remove('aberto'); x.querySelector('.ms-bt').setAttribute('aria-expanded', 'false'); }
+      });
+      raiz.classList.toggle('aberto', sim);
+      bt.setAttribute('aria-expanded', sim ? 'true' : 'false');
+      if (sim) {
+        termo = ''; inp.value = ''; pintar();
+        // o painel abre colado à esquerda do botão; se o botão está no fim
+        // da linha ele sai da tela, então é puxado de volta para dentro.
+        pn.style.left = '0px';
+        var caixa = pn.getBoundingClientRect();
+        var folga = 8;
+        var sobra = caixa.right - (document.documentElement.clientWidth - folga);
+        if (sobra > 0) pn.style.left = -Math.min(sobra, Math.max(0, caixa.left - folga)) + 'px';
+        setTimeout(function () { inp.focus(); }, 10);
+      }
+    }
+    bt.onclick = function (e) { e.stopPropagation(); if (!bt.disabled) abrir(!raiz.classList.contains('aberto')); };
+    pn.onclick = function (e) { e.stopPropagation(); };
+    inp.oninput = function () { termo = inp.value.trim(); pintar(); };
+    inp.onkeydown = function (e) { if (e.key === 'Escape') { abrir(false); bt.focus(); } };
+    lista.onclick = function (e) {
+      var op = e.target.closest('.ms-op'); if (!op) return;
+      var v = op.dataset.v, sel = cfg.sel(), i = sel.indexOf(v);
+      if (i === -1) sel.push(v); else sel.splice(i, 1);
+      pintar(); cfg.mudou();
+    };
+    raiz.querySelector('.ms-pe').onclick = function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var sel = cfg.sel();
+      sel.length = 0;
+      if (b.dataset.t === 'todos') {
+        opcoes.filter(function (o) { return !termo || sa(o.texto).indexOf(sa(termo)) !== -1; })
+              .forEach(function (o) { sel.push(o.valor); });
+      }
+      pintar(); cfg.mudou();
+    };
+
+    return {
+      el: raiz,
+      definir: function (lst) { opcoes = lst; pintar(); },
+      desabilitar: function (sim, textoAlt) {
+        bt.disabled = sim;
+        if (sim) { raiz.classList.remove('aberto'); rot.textContent = textoAlt || cfg.rotulo; bt.classList.remove('tem'); }
+        else rotulo();
+      },
+      fechar: function () { abrir(false); },
+      atualizar: rotulo
+    };
+  }
+
+  var MS = {};
+
+  function passa(q) {
+    if (F.disciplinas.length && F.disciplinas.indexOf(q.discipline) === -1) return false;
+    if (F.assuntos.length && F.assuntos.indexOf(q.topic) === -1) return false;
+    if (F.dificuldades.length && F.dificuldades.indexOf(q.difficulty) === -1) return false;
+    if (F.exames.length && F.exames.indexOf(String(q.exam_number)) === -1) return false;
+    var r = respostas[q.id], fica = fixas[q.id] === F.situacao;
+    if (!fica && F.situacao === 'nao' && r) return false;
+    if (!fica && F.situacao === 'acertei' && !(r && r.ultima_correta)) return false;
+    if (!fica && F.situacao === 'errei' && !(r && r.ultima_correta === false)) return false;
+    if (!fica && F.situacao === 'favoritas' && favoritas.indexOf(q.id) === -1) return false;
+    if (F.busca) {
+      var alvo = sa([q.statement, q.alternative_a, q.alternative_b, q.alternative_c,
+                     q.alternative_d, q.topic, q.subtopic, q.discipline].join(' '));
+      if (alvo.indexOf(sa(F.busca)) === -1) return false;
+    }
+    return true;
+  }
+
+  function ordenar(lista) {
+    var c = lista.slice();
+    if (F.ordem === 'exame_desc') c.sort(function (a, b) { return b.exam_number - a.exam_number || a.question_number - b.question_number; });
+    if (F.ordem === 'exame_asc') c.sort(function (a, b) { return a.exam_number - b.exam_number || a.question_number - b.question_number; });
+    if (F.ordem === 'disciplina') c.sort(function (a, b) { return String(a.discipline).localeCompare(String(b.discipline), 'pt-BR') || a.exam_number - b.exam_number || a.question_number - b.question_number; });
+    if (F.ordem === 'dificuldade') { var p = { facil: 1, media: 2, dificil: 3 }; c.sort(function (a, b) { return (p[a.difficulty] || 9) - (p[b.difficulty] || 9) || a.exam_number - b.exam_number; }); }
+    return c;
+  }
+
+  function montarPainel() {
+    var fp = document.getElementById('fp');
+    fp.innerHTML =
+      '<div class="fp-l1">' +
+        '<span class="busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
+        '<input id="f-busca" type="search" placeholder="Buscar palavra no enunciado…" aria-label="Buscar"></span>' +
+        '<span id="slot-dis"></span><span id="slot-top"></span><span id="slot-exa"></span><span id="slot-dif"></span>' +
+      '</div>' +
+      '<div class="fp-l2">' +
+        '<span id="f-sit" style="display:flex;gap:.1rem;flex-wrap:wrap">' +
+          '<button class="pill on" data-v="todas" type="button">Todas</button>' +
+          '<button class="pill" data-v="nao" type="button">Não respondidas</button>' +
+          '<button class="pill" data-v="acertei" type="button">Acertei</button>' +
+          '<button class="pill" data-v="errei" type="button">Errei</button>' +
+          '<button class="pill" data-v="favoritas" type="button">Favoritas</button>' +
+        '</span>' +
+        '<span class="fp-sep"></span>' +
+        '<span id="f-chips" style="display:flex;gap:.3rem;flex-wrap:wrap"></span>' +
+        '<button class="btn-lim" id="f-limpar" type="button" style="margin-left:auto">Limpar tudo</button>' +
+      '</div>';
+
+    MS.dis = MultiSel({ rotulo: 'Disciplina', sel: function () { return F.disciplinas; },
+      mudou: function () { F.assuntos.length = 0; pagina = 1; sincronizarAssunto(); aplicar(); } });
+    MS.top = MultiSel({ rotulo: 'Assunto', sel: function () { return F.assuntos; },
+      mudou: function () { pagina = 1; aplicar(); } });
+    MS.exa = MultiSel({ rotulo: 'Exame', sel: function () { return F.exames; },
+      mudou: function () { pagina = 1; aplicar(); } });
+    MS.dif = MultiSel({ rotulo: 'Dificuldade', sel: function () { return F.dificuldades; },
+      mudou: function () { pagina = 1; aplicar(); } });
+
+    document.getElementById('slot-dis').appendChild(MS.dis.el);
+    document.getElementById('slot-top').appendChild(MS.top.el);
+    document.getElementById('slot-exa').appendChild(MS.exa.el);
+    document.getElementById('slot-dif').appendChild(MS.dif.el);
+
+    MS.dis.definir(valores('discipline').map(function (v) { return { valor: v, texto: v }; }));
+    MS.exa.definir(valores('exam_number').map(function (v) { return { valor: String(v), texto: v + 'º Exame' }; }));
+    MS.dif.definir(['facil', 'media', 'dificil'].map(function (v) { return { valor: v, texto: DIF[v] }; }));
+
+    var busca = document.getElementById('f-busca'), t = null;
+    busca.oninput = function () { clearTimeout(t); t = setTimeout(function () { F.busca = busca.value.trim(); pagina = 1; aplicar(); }, 220); };
+    document.getElementById('f-sit').onclick = function (e) {
+      var b = e.target.closest('.pill'); if (!b) return;
+      F.situacao = b.dataset.v; pagina = 1;
+      this.querySelectorAll('.pill').forEach(function (x) { x.classList.toggle('on', x === b); });
+      aplicar();
+    };
+    document.getElementById('f-limpar').onclick = limpar;
+
+    document.addEventListener('click', function () {
+      Object.keys(MS).forEach(function (k) { MS[k].fechar(); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') Object.keys(MS).forEach(function (k) { MS[k].fechar(); });
+    });
+  }
+
+  // o assunto só abre depois que alguma disciplina é escolhida
+  function sincronizarAssunto() {
+    if (!F.disciplinas.length) {
+      MS.top.definir([]);
+      MS.top.desabilitar(true, 'Assunto');
+      return;
+    }
+    var daDisciplina = BANCO.filter(function (q) { return F.disciplinas.indexOf(q.discipline) !== -1; });
+    MS.top.definir(valores('topic', daDisciplina).map(function (v) { return { valor: v, texto: v }; }));
+    MS.top.desabilitar(false);
+  }
+
+  function limpar() {
+    F.busca = ''; F.disciplinas.length = 0; F.assuntos.length = 0;
+    F.dificuldades.length = 0; F.exames.length = 0;
+    F.situacao = 'todas'; pagina = 1;
+    document.getElementById('f-busca').value = '';
+    document.querySelectorAll('#f-sit .pill').forEach(function (x) { x.classList.toggle('on', x.dataset.v === 'todas'); });
+    ['dis', 'exa', 'dif'].forEach(function (k) { MS[k].atualizar(); });
+    sincronizarAssunto(); aplicar();
+  }
+
+  function montarChips() {
+    var SIT = { nao: 'Não respondidas', acertei: 'Acertei', errei: 'Errei', favoritas: 'Favoritas' };
+    var c = [];
+    if (F.busca) c.push(['busca', null, '“' + F.busca + '”']);
+    F.disciplinas.forEach(function (v) { c.push(['disciplinas', v, v]); });
+    F.assuntos.forEach(function (v) { c.push(['assuntos', v, v]); });
+    F.exames.forEach(function (v) { c.push(['exames', v, v + 'º Exame']); });
+    F.dificuldades.forEach(function (v) { c.push(['dificuldades', v, DIF[v]]); });
+    if (F.situacao !== 'todas') c.push(['situacao', null, SIT[F.situacao]]);
+    var box = document.getElementById('f-chips');
+    box.innerHTML = c.map(function (x) {
+      return '<span class="chip">' + esc(x[2]) + '<button type="button" data-k="' + x[0] + '" data-v="' + esc(x[1] == null ? '' : x[1]) + '" aria-label="Remover filtro">✕</button></span>';
+    }).join('');
+    box.onclick = function (e) {
+      e.stopPropagation();
+      var b = e.target.closest('button[data-k]'); if (!b) return;
+      var k = b.dataset.k, v = b.dataset.v;
+      if (k === 'situacao') {
+        F.situacao = 'todas';
+        document.querySelectorAll('#f-sit .pill').forEach(function (x) { x.classList.toggle('on', x.dataset.v === 'todas'); });
+      }
+      else if (k === 'busca') { F.busca = ''; document.getElementById('f-busca').value = ''; }
+      else {
+        var i = F[k].indexOf(v); if (i !== -1) F[k].splice(i, 1);
+        var mapa = { disciplinas: 'dis', assuntos: 'top', exames: 'exa', dificuldades: 'dif' };
+        MS[mapa[k]].atualizar();
+        if (k === 'disciplinas') { F.assuntos.length = 0; sincronizarAssunto(); }
+      }
+      pagina = 1; aplicar();
+    };
+  }
+
+  function montarResultados(total) {
+    var feitas = 0, acertos = 0;
+    BANCO.forEach(function (q) { var r = respostas[q.id]; if (r) { feitas++; if (r.ultima_correta) acertos++; } });
+    var pct = feitas ? Math.round((acertos / feitas) * 100) : null;
+    document.getElementById('res').innerHTML =
+      '<span class="res-n"><b>' + total + '</b> ' + (total === 1 ? 'questão' : 'questões') +
+        (feitas ? ' · <b>' + feitas + '</b> respondidas · <b>' + pct + '%</b> de acerto' : '') + '</span>' +
+      '<span class="res-dir">' +
+        '<span class="rot">Ordenar</span>' +
+        '<span class="ctl"><select id="f-ord" aria-label="Ordenar por">' +
+          '<option value="exame_desc">Exame mais recente</option><option value="exame_asc">Exame mais antigo</option>' +
+          '<option value="disciplina">Disciplina</option><option value="dificuldade">Dificuldade</option>' +
+        '</select></span>' +
+        '<span class="rot">Por página</span>' +
+        '<span class="ctl"><select id="f-pp" aria-label="Questões por página">' +
+          [1, 5, 10, 20, 50, 100].map(function (n) { return '<option value="' + n + '">' + n + (n === 1 ? ' por página' : '') + '</option>'; }).join('') +
+          '<option value="0">Todas</option></select></span>' +
+      '</span>';
+    var ord = document.getElementById('f-ord'); ord.value = F.ordem;
+    ord.onchange = function () { F.ordem = this.value; pagina = 1; aplicar(); };
+    var pp = document.getElementById('f-pp'); pp.value = String(F.porPagina);
+    pp.onchange = function () { F.porPagina = parseInt(this.value, 10); pagina = 1; aplicar(); };
+  }
+
+  // O comentário vem do PDF com quebra de linha no meio das frases.
+  // Renderizar cru (pre-wrap) reproduzia essas quebras na tela. Aqui a
+  // gente separa em blocos por alternativa e junta o texto de cada um.
+  // a alternativa do gabarito oficial aparece sempre como gabarito, mesmo quando o comentário do material a chama de errada
+  function formatarExplicacao(txt, gab) {
+    // "A) Errado" seguido de "A alternativa A está incorreta, pois…": um cabeçalho só
+    txt = String(txt || '').replace(/(^|\n)(\s*([A-D])\)\s*(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)\b[ \t:.,-]*)\n+\s*(?:A\s+)?(?:alternativa|assertiva|letra)\s+\3\s+(?:est[áa]|é)\s+(?:corret[ao]|cert[ao]|errad[ao]|incorret[ao])\b[\s:.,-]*/gi, '$1$2\n');
+    // Dois materiais, duas formas de abrir o comentário de cada alternativa:
+    //   "A) Correto. ..."                   (provas XXII a 37º)
+    //   "A alternativa A está correta. ..." (provas 38º a 47º)
+    var JULGA = '(?:Correto|Correta|Certo|Certa|Errado|Errada|Incorreto|Incorreta)';
+    var ABRE = '(?:[A-D]\\)\\s*' + JULGA + '\\b'
+             + '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+[A-D]\\s+(?:est[áa]|é)\\s+' + JULGA + '\\b)';
+    var VER = new RegExp('^(?:([A-D])\\)\\s*(' + JULGA + ')'
+            + '|(?:A\\s+)?(?:alternativa|assertiva|letra)\\s+([A-D])\\s+(?:est[áa]|é)\\s+(' + JULGA + '))'
+            + '\\b[\\s:.,-]*', 'i');
+    var partes = txt.split(new RegExp('\\n(?=' + ABRE + ')', 'i'));
+    return partes.map(function (bloco) {
+      var m = bloco.match(VER);
+      var corpo = m ? bloco.slice(m[0].length) : bloco;
+      corpo = corpo.replace(/([^.:;?!)"”\s])[ \t]*\n\s*\n\s*/g, '$1 ').replace(/\n{2,}/g, '\u0000').replace(/\n/g, ' ')
+                   .replace(/\u0000/g, '\n').replace(/[ \t]{2,}/g, ' ').trim();
+      if (!corpo && !m) return '';
+      var paras = corpo.split('\n').filter(Boolean)
+                       .map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+      if (!m) return '<div class="ex-bloco ex-intro">' + paras + '</div>';
+      var letra = m[1] || m[3], veredito = m[2] || m[4];
+      var certo = /^(corret|cert)/i.test(veredito);
+      if (gab && letra.toUpperCase() === gab && !certo) { veredito = 'Gabarito'; certo = true; }
+      return '<div class="ex-bloco ' + (certo ? 'ex-certo' : 'ex-errado') + '">' +
+             '<span class="ex-l">' + esc(letra.toUpperCase()) + '</span>' +
+             '<div class="ex-txt"><span class="ex-v">' + esc(veredito) + '</span>' + paras + '</div></div>';
+    }).join('');
+  }
+
+  function cartao(q, posicao) {
+    var e = estado[q.id] || (estado[q.id] = { escolha: null, respondida: false, expl: false, cortadas: [] });
+    if (!e.cortadas) e.cortadas = [];
+    var r = respostas[q.id];
+    var fav = favoritas.indexOf(q.id) !== -1;
+
+    var TESOURA = '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>' +
+                  '<path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>';
+    var alts = ['a', 'b', 'c', 'd'].map(function (L) {
+      var txt = q['alternative_' + L]; if (!txt) return '';
+      var letra = L.toUpperCase(), cls = '', marca = '';
+      var cortada = e.cortadas.indexOf(letra) !== -1;
+      if (e.respondida) {
+        if (letra === q.correct_answer) { cls = ' certa'; marca = '✓'; }
+        else if (letra === e.escolha) { cls = ' errada'; marca = '✕'; }
+      } else if (letra === e.escolha) cls = ' sel';
+      // riscar não é responder: a tesoura só elimina a alternativa da análise
+      var travada = e.respondida || cortada;
+      return '<div class="alt-linha' + (cortada ? ' cortada' : '') + '">' +
+             (e.respondida ? '' :
+               '<button class="tesoura" data-corta="' + letra + '" type="button" aria-pressed="' + cortada + '"' +
+               ' title="' + (cortada ? 'Trazer de volta a alternativa ' : 'Descartar a alternativa ') + letra + '"' +
+               ' aria-label="' + (cortada ? 'Trazer de volta a alternativa ' : 'Descartar a alternativa ') + letra + '">' + TESOURA + '</button>') +
+             '<button class="alt' + cls + '" data-l="' + letra + '"' + (travada ? ' disabled' : '') + '>' +
+             '<span class="l">' + letra + '</span><span>' + esc(txt) + '</span>' +
+             (marca ? '<span class="m">' + marca + '</span>' : '') + '</button></div>';
+    }).join('') + (e.respondida ? '' :
+      '<p class="dica-corte">Arraste a alternativa para a esquerda para descartá-la.</p>');
+
+    var ver = '';
+    if (e.respondida) {
+      if (!q.correct_answer) ver = '<div class="ver nao">Esta questão foi <b>anulada</b> e não tem gabarito.</div>';
+      else if (e.escolha === q.correct_answer) ver = '<div class="ver ok">Você acertou. Gabarito: <b>' + q.correct_answer + '</b>.</div>';
+      else ver = '<div class="ver nao">Você marcou <b>' + e.escolha + '</b>. O gabarito é <b>' + q.correct_answer + '</b>.</div>';
+    }
+    var expl = (e.respondida && e.expl && q.explanation)
+      ? '<div class="expl"><h4>Comentário</h4>' + formatarExplicacao(q.explanation, q.correct_answer) +
+        (q.legal_basis ? '<p class="base"><b>Fundamentação:</b> ' + esc(q.legal_basis) + '</p>' : '') + '</div>' : '';
+    // errou: o formulário de justificativa já abre; acertou (mas foi chute) abre pelo botão
+    var reg = e.respondida && typeof erros_da_questao === 'function' ? erros_da_questao(q.id) : null;
+    var errou = e.respondida && q.correct_answer && e.escolha !== q.correct_answer;
+    var jus = '';
+    if (reg) jus = '<div class="ej-ok">No Caderno de Erros' + (reg.justificada ? ' · <b>' + esc(MOTIVOS_ERROS[reg.motivo] || reg.motivo) + '</b>' + (reg.o_que_faltou ? ' — ' + esc(reg.o_que_faltou) : '') : '') + '</div>';
+    else if (e.respondida && typeof erros_html_justificar === 'function' && (e.cad || (errou && !e.semCaderno)))
+      jus = erros_html_justificar({ titulo: errou ? 'Por que você errou? Salve no Caderno de Erros para revisar em 3, 7 e 15 dias.' : 'Por que mandar para o caderno?', botao: 'Salvar no caderno', cancelar: true });
+    var nota = (e.respondida && q.notes) ? '<div class="nota">Sobre o material de origem: ' + esc(q.notes) + '</div>' : '';
+
+    var acoes = e.respondida
+      ? (q.explanation ? '<button class="b g' + (e.expl ? ' on' : '') + '" data-a="expl">' + (e.expl ? 'Esconder comentário' : 'Ver comentário') + '</button>' : '') +
+        '<button class="b g" data-a="refazer">Refazer</button>' +
+        '<button class="b g' + (fav ? ' on' : '') + '" data-a="fav">' + (fav ? '★ Favoritada' : '☆ Favoritar') + '</button>' +
+        (reg || jus ? '' : '<button class="b g" data-a="erro">+ Caderno de Erros</button>')
+      : '<button class="b" data-a="resp"' + (e.escolha ? '' : ' disabled') + '>Responder</button>' +
+        '<button class="b g' + (fav ? ' on' : '') + '" data-a="fav">' + (fav ? '★ Favoritada' : '☆ Favoritar') + '</button>';
+
+    return '<article class="q" data-id="' + q.id + '">' +
+      '<header class="q-cab">' +
+        '<span class="q-num">' + posicao + '</span>' +
+        '<span class="q-dis">' + esc(q.discipline) + '</span>' +
+        '<span class="pt">·</span><span>' + q.exam_number + 'º Exame · ' + q.year + ' · Q' + q.question_number + '</span>' +
+        (q.difficulty ? '<span class="pt">·</span><span class="q-dif ' + q.difficulty + '"><i></i>' + DIF[q.difficulty] + '</span>' : '') +
+        (r ? '<span class="pt">·</span><span class="q-feita">respondida ' + r.vezes + 'x</span>' : '') +
+        (q.topic ? '<span class="q-trilha">' + esc(q.topic) + (q.subtopic ? ' › ' + esc(q.subtopic) : '') + '</span>' : '') +
+      '</header>' +
+      '<div class="q-corpo">' +
+        '<div class="q-enun">' + esc(q.statement) + '</div>' +
+        '<div class="alts">' + alts + '</div>' + ver + jus + expl + nota +
+        '<div class="q-acoes">' + acoes + '</div>' +
+      '</div></article>';
+  }
+
+  function montarPaginacao(total) {
+    var box = document.getElementById('pag');
+    if (!F.porPagina || total <= F.porPagina) { box.innerHTML = ''; return; }
+    var paginas = Math.ceil(total / F.porPagina), itens = [];
+
+    // Uma por página vira navegação de prova: só avançar e voltar.
+    // Numerar 20+ páginas quando cada uma é uma questão é só ruído.
+    if (F.porPagina === 1) {
+      box.innerHTML =
+        '<button class="pg-nav" data-p="' + (pagina - 1) + '"' + (pagina === 1 ? ' disabled' : '') + '>' +
+          '<span aria-hidden="true">←</span> Anterior</button>' +
+        '<span class="pg-pos"><b>' + pagina + '</b> de ' + paginas + '</span>' +
+        '<button class="pg-nav" data-p="' + (pagina + 1) + '"' + (pagina === paginas ? ' disabled' : '') + '>' +
+          'Próxima <span aria-hidden="true">→</span></button>';
+      box.onclick = aoTrocarPagina;
+      return;
+    }
+
+    function bt(n, rotulo, extra) { return '<button data-p="' + n + '"' + (extra || '') + '>' + (rotulo || n) + '</button>'; }
+    itens.push(bt(pagina - 1, '←', pagina === 1 ? ' disabled' : ''));
+    var mostrar = [];
+    for (var i = 1; i <= paginas; i++) if (i === 1 || i === paginas || Math.abs(i - pagina) <= 1) mostrar.push(i);
+    var ant = 0;
+    mostrar.forEach(function (n) {
+      if (ant && n - ant > 1) itens.push('<span class="reticencia">…</span>');
+      itens.push(bt(n, null, n === pagina ? ' class="on"' : ''));
+      ant = n;
+    });
+    itens.push(bt(pagina + 1, '→', pagina === paginas ? ' disabled' : ''));
+    box.innerHTML = itens.join('');
+    box.onclick = aoTrocarPagina;
+  }
+
+  function aoTrocarPagina(ev) {
+    var b = ev.target.closest('button[data-p]'); if (!b || b.disabled) return;
+    pagina = parseInt(b.dataset.p, 10); aplicar();
+    window.scrollTo({ top: document.getElementById('res').offsetTop - 90, behavior: 'smooth' });
+  }
+
+  function aplicar() {
+    if (sitFixas !== F.situacao) { fixas = {}; sitFixas = F.situacao; }
+    montarChips();
+    var lista = ordenar(BANCO.filter(passa));
+    montarResultados(lista.length);
+    var alvo = document.getElementById('lista');
+    if (!BANCO.length) {
+      alvo.innerHTML = '<div class="vazio"><p class="t">Nenhuma questão carregada</p><p>O banco do TJSP está em montagem: as provas anteriores da Vunesp entram aos poucos.</p></div>';
+      document.getElementById('pag').innerHTML = ''; return;
+    }
+    if (!lista.length) {
+      alvo.innerHTML = '<div class="vazio"><p class="t">Nenhuma questão com esses filtros</p>' +
+        '<p>Tente tirar a dificuldade ou o exame, que são os que mais restringem.</p>' +
+        '<button class="b" type="button" onclick="document.getElementById(\'f-limpar\').click()">Limpar filtros</button></div>';
+      document.getElementById('pag').innerHTML = ''; return;
+    }
+    var tam = F.porPagina || lista.length;
+    var totalPaginas = Math.ceil(lista.length / tam);
+    if (pagina > totalPaginas) pagina = totalPaginas;
+    var inicio = (pagina - 1) * tam;
+    alvo.innerHTML = lista.slice(inicio, inicio + tam).map(function (q, i) { return cartao(q, inicio + i + 1); }).join('');
+    montarPaginacao(lista.length);
+  }
+
+  function questaoDe(no) {
+    var art = no && no.closest('.q'); if (!art) return null;
+    var q = BANCO.filter(function (x) { return x.id === art.dataset.id; })[0]; if (!q) return null;
+    var e = estado[q.id] || (estado[q.id] = { escolha: null, respondida: false, expl: false });
+    if (!e.cortadas) e.cortadas = [];
+    return { q: q, e: e };
+  }
+
+  function alternarCorte(e, letra, cortar) {
+    var j = e.cortadas.indexOf(letra);
+    var jaCortada = j !== -1;
+    if (cortar === jaCortada) return false;
+    if (jaCortada) e.cortadas.splice(j, 1);
+    else { e.cortadas.push(letra); if (e.escolha === letra) e.escolha = null; }
+    return true;
+  }
+
+  // ── no toque, descartar é arrastar a alternativa para a esquerda ──
+  // (e trazer de volta é arrastar para a direita). A tesoura fica só no
+  // mouse; aqui ela não aparece, então o gesto é o único caminho.
+  (function () {
+    var LIMIAR = 46, inicio = null;
+
+    function linhaDe(ev) {
+      var t = ev.target.closest && ev.target.closest('.alt-linha');
+      return (t && !t.closest('.q').querySelector('.ver')) ? t : null;
+    }
+
+    document.addEventListener('touchstart', function (ev) {
+      if (ev.touches.length !== 1) { inicio = null; return; }
+      var linha = linhaDe(ev); if (!linha) return;
+      var ctx = questaoDe(linha); if (!ctx || ctx.e.respondida) return;
+      inicio = { x: ev.touches[0].clientX, y: ev.touches[0].clientY,
+                 linha: linha, alt: linha.querySelector('.alt'),
+                 letra: linha.querySelector('.alt').dataset.l,
+                 cortada: linha.classList.contains('cortada'),
+                 ctx: ctx, horizontal: false };
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (ev) {
+      if (!inicio) return;
+      var dx = ev.touches[0].clientX - inicio.x;
+      var dy = ev.touches[0].clientY - inicio.y;
+      if (!inicio.horizontal) {
+        if (Math.abs(dy) > Math.abs(dx)) { inicio = null; return; }  // é rolagem
+        if (Math.abs(dx) < 10) return;
+        inicio.horizontal = true;
+        inicio.linha.classList.add('arrastando');
+      }
+      ev.preventDefault();
+      // só puxa para o lado que faz sentido: cortar arrasta para a
+      // esquerda, descortar para a direita.
+      var util = inicio.cortada ? Math.max(0, dx) : Math.min(0, dx);
+      inicio.alt.style.transform = 'translateX(' + (util / 2) + 'px)';
+    }, { passive: false });
+
+    function soltar() {
+      if (!inicio) return;
+      var i = inicio; inicio = null;
+      i.linha.classList.remove('arrastando');
+      i.alt.style.transform = '';
+    }
+
+    document.addEventListener('touchend', function (ev) {
+      if (!inicio) return;
+      var i = inicio, dx = ev.changedTouches[0].clientX - i.x;
+      soltar();
+      if (!i.horizontal) return;
+      var cortar = dx <= -LIMIAR ? true : (dx >= LIMIAR ? false : null);
+      if (cortar !== null && alternarCorte(i.ctx.e, i.letra, cortar)) aplicar();
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', soltar, { passive: true });
+  })();
+
+  document.addEventListener('click', function (ev) {
+    var ctx0 = questaoDe(ev.target); if (!ctx0) return;
+    var q = ctx0.q, e = ctx0.e;
+
+    if (ev.target.closest('.ej-cancelar')) { e.cad = false; e.semCaderno = true; aplicar(); return; }
+    var sal = ev.target.closest('.ej-salvar');
+    if (sal) {
+      var j = erros_ler_justificar(sal.closest('.ej'));
+      erros_add({
+        materia: q.discipline || '', topico: q.topic || '', subtopico: q.subtopic || '',
+        motivo: j.motivo, o_que_faltou: j.o_que_faltou, justificada: true,
+        origem: q.exam_number + 'º Exame · questão ' + q.question_number +
+                (e.escolha && e.escolha !== q.correct_answer ? ' · marquei ' + e.escolha : ' · foi chute') + ' · gabarito ' + (q.correct_answer || '—'),
+        explicacao: q.explanation || '',
+        questao_id: q.id
+      });
+      e.cad = false; aplicar(); return;
+    }
+    var tes = ev.target.closest('button[data-corta]');
+    if (tes) {
+      alternarCorte(e, tes.dataset.corta, !tes.closest('.alt-linha').classList.contains('cortada'));
+      aplicar(); return;
+    }
+    var alt = ev.target.closest('.alt');
+    if (alt && !e.respondida && !alt.disabled) { e.escolha = alt.dataset.l; aplicar(); return; }
+    var b = ev.target.closest('button[data-a]'); if (!b) return;
+
+    if (b.dataset.a === 'resp') {
+      e.respondida = true; e.expl = true;
+      var certa = !!q.correct_answer && e.escolha === q.correct_answer;
+      var at = respostas[q.id] || { vezes: 0, acertos: 0, erros: 0 };
+      at.vezes += 1;
+      if (certa) at.acertos += 1; else at.erros += 1;
+      at.ultima_correta = certa; at.ultima_resposta = e.escolha; at.ultima_data = new Date().toISOString();
+      fixas[q.id] = F.situacao;
+      respostas[q.id] = at; gravar(K_RESP, respostas); aplicar();
+    } else if (b.dataset.a === 'expl') { e.expl = !e.expl; aplicar(); }
+    else if (b.dataset.a === 'refazer') { e.escolha = null; e.respondida = false; e.expl = false; e.cortadas = []; aplicar(); }
+    else if (b.dataset.a === 'fav') {
+      var i = favoritas.indexOf(q.id);
+      if (i === -1) favoritas.push(q.id); else favoritas.splice(i, 1);
+      gravar(K_FAV, favoritas); aplicar();
+    } else if (b.dataset.a === 'erro') {
+      if (typeof erros_add !== 'function') { b.textContent = 'Caderno indisponível'; return; }
+      e.cad = true; e.semCaderno = false; aplicar();
+    }
+  });
+
+  // Hoje e o painel Rumo à vaga abrem o banco já filtrado: ?disciplina=...&situacao=nao|errei
+  function filtrosDaUrl() {
+    var p = new URLSearchParams(location.search);
+    var d = p.get('disciplina'), s = p.get('situacao');
+    if (d && valores('discipline').indexOf(d) !== -1) { F.disciplinas.push(d); MS.dis.atualizar(); }
+    if (s && ['nao', 'acertei', 'errei', 'favoritas'].indexOf(s) !== -1) {
+      F.situacao = s;
+      document.querySelectorAll('#f-sit .pill').forEach(function (x) { x.classList.toggle('on', x.dataset.v === s); });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    montarPainel(); filtrosDaUrl(); sincronizarAssunto(); aplicar();
+  });
+})();
+</script>
+</body>
+</html>

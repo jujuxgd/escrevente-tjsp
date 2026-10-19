@@ -1,0 +1,1629 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js?v=1783862902"></script>
+<script src="auth-guard.js?v=1784132091"></script>
+<script src="cores-early.js?v=1784060144"></script>
+<script src="page-transition.js?v=1783861010"></script>
+<title>Escrevente TJSP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1784043341">
+<style>
+/* STATS HERO */
+.stats-hero {
+  background: linear-gradient(135deg, var(--blush) 0%, var(--rose-soft) 100%);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-hero::before {
+  content: '◈';
+  position: absolute;
+  top: -60px;
+  right: -10px;
+  font-size: 16rem;
+  color: rgba(255,255,255,0.18);
+  font-family: 'Fraunces', serif;
+  line-height: 1;
+}
+
+[data-theme="dark"] .stats-hero::before { color: rgba(0,0,0,0.18); }
+
+.stat-big {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-big .num {
+  font-family: 'Fraunces', serif;
+  font-size: 3rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.3rem;
+}
+
+.stat-big .num em { font-style: italic; color: var(--rose-deep); }
+.stat-big .num small {
+  font-size: 1.2rem;
+  color: var(--ink-faded);
+  font-weight: 400;
+}
+
+.stat-big .label {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.2rem;
+}
+
+.stat-big .sub {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  font-family: 'Fraunces', serif;
+}
+
+/* GRIDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .stats-grid, .stats-grid-2 { grid-template-columns: 1fr; }
+  .stats-hero { grid-template-columns: 1fr 1fr; }
+}
+
+.chart-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.8rem 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.chart-title em { font-style: italic; color: var(--rose-deep); }
+
+.chart-sub {
+  font-size: 0.75rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.05em;
+}
+
+/* LINE CHART (área SVG-style com divs) */
+.line-chart {
+  height: 200px;
+  position: relative;
+  padding: 1rem 0;
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.line-day {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: end;
+}
+
+.line-bar {
+  width: 60%;
+  background: linear-gradient(180deg, var(--rose) 0%, var(--rose-deep) 100%);
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  transition: all var(--transition);
+}
+
+.line-bar:hover { opacity: 0.85; }
+
+.line-day .lbl {
+  font-size: 0.65rem;
+  color: var(--ink-faded);
+  margin-top: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+/* DONUT (CSS-only) */
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.donut {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--rose-deep) 0% 72%,
+    var(--bg-soft) 72% 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.donut::before {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  background: var(--paper);
+  border-radius: 50%;
+}
+
+.donut-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.donut-inner .pct {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+  line-height: 1;
+}
+
+.donut-inner .lbl {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-top: 0.3rem;
+}
+
+.donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.donut-legend .item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink-soft);
+}
+
+.donut-legend .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.donut-legend .item strong {
+  font-family: 'Fraunces', serif;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* MATÉRIAS RANKING */
+.ranking-list { list-style: none; }
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px dotted var(--line);
+}
+
+.rank-item:last-child { border-bottom: none; }
+
+.rank-pos {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--rose-deep);
+  font-weight: 500;
+  width: 30px;
+}
+
+.rank-name {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.rank-bar {
+  flex: 2;
+  height: 6px;
+  background: var(--bg-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rank-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+  border-radius: 3px;
+}
+
+.rank-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  color: var(--rose-deep);
+  font-size: 0.95rem;
+  min-width: 45px;
+  text-align: right;
+}
+
+/* FAVORITA HIGHLIGHT */
+.favorita-card {
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--rose);
+  padding: 1.6rem 2rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: var(--shadow-sm);
+  /* --champagne não escurece no modo escuro, então o texto precisa de
+     uma cor fixa e escura em vez de herdar --ink (que vira claro no
+     modo escuro e some sobre esse fundo dourado). */
+  color: #211C19;
+}
+
+.favorita-icon {
+  font-size: 3rem;
+}
+
+.favorita-card .eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-bottom: 0.4rem;
+}
+
+.favorita-card h3 {
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.01em;
+}
+
+.favorita-card h3 em { font-style: italic; color: var(--rose-deep); }
+
+.favorita-card p {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  max-width: 480px;
+}
+
+.favorita-card .badge {
+  background: var(--bg-soft);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.favorita-card .badge .pct {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+}
+
+.favorita-card .badge .lbl {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-top: 0.2rem;
+}
+
+/* WRAPPED-STYLE SHARE CARD */
+.wrapped-card {
+  background: linear-gradient(135deg, var(--rose-700) 0%, var(--rose-deep) 50%, var(--rose) 100%);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  color: var(--paper);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.wrapped-card::before, .wrapped-card::after {
+  content: '🌸';
+  position: absolute;
+  font-size: 4rem;
+  opacity: 0.15;
+}
+
+.wrapped-card::before { top: -20px; left: -20px; }
+.wrapped-card::after { bottom: -20px; right: -20px; }
+
+.wrapped-card .eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 0.7rem;
+}
+
+.wrapped-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.wrapped-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.wrapped-stat .v {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.wrapped-stat .l {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-top: 0.3rem;
+}
+
+.wrapped-card .btn {
+  background: var(--paper);
+  color: var(--rose-deep);
+  border-color: var(--paper);
+}
+
+.wrapped-card .btn:hover {
+  background: transparent;
+  color: var(--paper);
+}
+/* ── Hero de stats ─── */
+.sim-hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.sim-stat {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.3rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.sim-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+}
+.sim-stat.pass::before { background: linear-gradient(90deg,#60b860,#3a9840); }
+.sim-stat.fail::before { background: linear-gradient(90deg,#e05070,#c03050); }
+.sim-num {
+  font-family: 'Fraunces', serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.sim-stat.pass .sim-num { color: #3a9840; }
+.sim-stat.fail .sim-num { color: #c03050; }
+.sim-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faded); }
+
+/* ── Meta bar ─── */
+.meta-bar {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.4rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+.meta-label { font-size: 0.78rem; color: var(--ink-faded); white-space: nowrap; }
+.meta-track {
+  flex: 1;
+  min-width: 120px;
+  height: 10px;
+  background: var(--bg-soft);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.meta-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.6s ease;
+  background: linear-gradient(90deg, #e05070, #e05070);
+}
+.meta-fill.ok { background: linear-gradient(90deg, #60b860, #3a9840); }
+.meta-pct {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.meta-nota {
+  font-size: 0.75rem;
+  color: var(--ink-faded);
+  white-space: nowrap;
+}
+
+/* ── Formulário ─── */
+.sim-form {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: none;
+}
+.sim-form.open { display: block; animation: fadeInUp 0.3s ease; }
+
+.tipo-toggle {
+  display: flex;
+  gap: 0;
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 1.2rem;
+  width: fit-content;
+}
+.tipo-btn {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--ink-faded);
+  background: transparent;
+}
+.tipo-btn.active {
+  background: var(--paper);
+  color: var(--rose-deep);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.sim-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+@media (max-width: 600px) { .sim-form-grid { grid-template-columns: 1fr; } }
+
+.sim-field label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.sim-input, .sim-select {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  color: var(--ink);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  appearance: none;
+}
+.sim-input:focus, .sim-select:focus {
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(255, 77, 166, 0.12);
+}
+.sim-input[type="number"] { text-align: center; }
+
+.resultado-preview {
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+  margin: 0.8rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+.resultado-pct {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 1;
+}
+.resultado-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+.resultado-badge.pass { background: rgba(90, 180, 90, 0.15); color: #3a9840; }
+.resultado-badge.fail { background: rgba(200, 60, 80, 0.12); color: #c03050; }
+
+.sim-form-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0.8rem;
+}
+
+/* ── Lista de simulados ─── */
+.sim-filters {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+.sim-chip {
+  padding: 0.35rem 0.85rem;
+  background: var(--bg-soft);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.sim-chip:hover { background: var(--blush); }
+.sim-chip.active {
+  background: var(--rose-deep); color: #fff;
+  color: white;
+}
+
+.sim-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.sim-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  transition: box-shadow var(--transition);
+}
+.sim-card:hover { box-shadow: var(--shadow); }
+
+.sim-card-type {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sim-card-type.simulado { background: var(--rose-soft); color: var(--rose-deep); }
+.sim-card-type.prova { background: rgba(80, 80, 200, 0.1); color: #4040c0; }
+[data-theme="dark"] .sim-card-type.prova { color: #9090ff; background: rgba(100,100,255,0.15); }
+
+.sim-card-info { min-width: 0; }
+.sim-card-nome {
+  font-family: 'Fraunces', serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sim-card-data { font-size: 0.72rem; color: var(--ink-faded); margin-top: 0.1rem; }
+
+.sim-card-result { text-align: right; flex-shrink: 0; }
+.sim-card-pct {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1;
+}
+.sim-card-pct.pass { color: #3a9840; }
+.sim-card-pct.fail { color: #c03050; }
+.sim-card-detail { font-size: 0.7rem; color: var(--ink-faded); margin-top: 0.1rem; }
+
+.sim-card-actions { flex-shrink: 0; }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .sim-card { grid-template-columns: 1fr auto; grid-template-rows: auto auto; gap: 0.5rem; }
+  .sim-card-type { grid-column: 1; }
+  .sim-card-result { grid-column: 2; grid-row: 1 / 3; }
+  .sim-card-info { grid-column: 1; grid-row: 2; }
+  .sim-card-actions { display: none; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--ink-faded);
+}
+.empty-state .eicon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.empty-state h3 { font-family:'Fraunces',serif; font-size:1.2rem; color:var(--ink-soft); margin-bottom:0.5rem; }
+/* ── Seções e leitura rápida ── */
+.est-sec { margin: 2.2rem 0 1rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.est-sec h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.35rem; color: var(--ink); margin: 0; }
+.est-sec h2 em { color: var(--rose-deep); }
+.est-sec .acao { font-size: .78rem; color: var(--rose-deep); text-decoration: none; }
+.leitura { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.4rem 1.6rem; box-shadow: var(--shadow-sm); margin-bottom: 1rem; }
+.leitura .eyebrow { font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faded); margin-bottom: .8rem; }
+.leitura ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .7rem; }
+.leitura li { display: flex; gap: .7rem; align-items: baseline; font-size: .9rem; line-height: 1.5; color: var(--ink); }
+.leitura li .pt { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--ink-faded); transform: translateY(-1px); }
+.leitura li .pt.ok { background: #5E8C6A; } .leitura li .pt.no { background: #C0524B; } .leitura li .pt.at { background: var(--gold); }
+.leitura li a { color: var(--rose-deep); }
+.leitura li small { color: var(--ink-faded); }
+.rank-val small { color: var(--ink-faded); font-weight: 400; }
+.est-rodape { margin: 2.5rem 0 1rem; display: flex; justify-content: flex-end; }
+
+</style>
+<link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script></head>
+<body>
+
+<div class="aurora-bg" aria-hidden="true">
+  <div class="aurora-blob ab1"></div>
+  <div class="aurora-blob ab2"></div>
+  <div class="aurora-blob ab3"></div>
+  <div class="aurora-blob ab4"></div>
+</div>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()" title="Menu">☰</button>
+<button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Esconder menu">‹</button>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="mark"><svg class="seal" viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><circle cx="32" cy="32" r="23" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="32" y="33" font-size="15" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-weight="700" fill="currentColor">TJSP</text></svg></div>
+      <h1>Escrevente TJSP</h1>
+      <div class="subtitle">Escrevente Técnico Judiciário</div>
+    </div>
+    <div class="nav-section-label">Principal</div>
+    <a href="index.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span><span>Início</span></a>
+    <a href="hoje.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></span><span>Hoje</span></a>
+    <a href="calendario.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span>Calendário</span></a>
+    <a href="revisar.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg></span><span>Revisar</span></a>
+    <div class="nav-section-label">Estudo</div>
+    <a href="materias.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span>Matérias</span></a>
+    <a href="banco-questoes.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span><span>Questões</span></a>
+    <a href="erros.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.9.85a.5.5 0 0 1-.62-.62l.85-2.9a2 2 0 0 1 .5-.85z"/></svg></span><span>Caderno de Erros</span></a>
+    <a href="caderno-legislativo.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><span>Caderno Legislativo</span></a>
+
+    
+    
+    
+    <div class="nav-section-label">Análise</div>
+    <a href="estatisticas.html" class="nav-link active"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16v-3"/><path d="M12 16V8"/><path d="M17 16v-5"/></svg></span><span>Estatísticas</span></a>
+    <a href="estatisticas.html#simulados" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12l2 2 4-4"/></svg></span><span>Simulados</span></a>
+
+    <div class="nav-section-label">Extra</div>
+    <a href="reta-final.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V4"/></svg></span><span>Reta Final</span></a>
+    <div class="sidebar-footer">
+      <div class="profile-card">
+        <div class="profile-avatar">
+          <img src="foto-perfil.jpg" alt="Julia" onerror="this.style.display='none'; if (this.parentElement) this.parentElement.textContent='J';">
+        </div>
+        <div class="profile-info"><div class="name">Julia</div><div class="meta">Estudante de Direito</div></div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-label">Modo escuro</span>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="page-title">
+        <div class="breadcrumb">Treino · <span data-month-year>—</span></div>
+        <h1>Seu <em>caminho</em> em números</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" id="btn-novo-sim" onclick="toggleForm();document.getElementById('simulados').scrollIntoView({behavior:'smooth'})">+ Registrar simulado</button>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="stats-hero">
+      <div class="stat-big">
+        <div class="label">Questões resolvidas</div>
+        <div class="num" id="hero-questoes">0</div>
+        <div class="sub" id="hero-questoes-sub">sem registros</div>
+      </div>
+      <div class="stat-big">
+        <div class="label">Média nos simulados</div>
+        <div class="num" id="hero-sim">—</div>
+        <div class="sub" id="hero-sim-sub">nenhum registrado</div>
+      </div>
+      <div class="stat-big">
+        <div class="label">Dias seguidos</div>
+        <div class="num" id="hero-streak">0<small> dias</small></div>
+        <div class="sub" id="hero-streak-sub">comece a estudar!</div>
+      </div>
+      <div class="stat-big">
+        <div class="label">Horas de foco</div>
+        <div class="num" id="hero-horas">0<small>h</small></div>
+        <div class="sub" id="hero-horas-sub">use o Pomodoro da aba Hoje</div>
+      </div>
+    </div>
+
+    <!-- LEITURA RÁPIDA -->
+    <div class="leitura"><div class="eyebrow">Como você está</div><ul id="leitura"></ul></div>
+
+    <!-- QUESTÕES -->
+    <div class="est-sec"><h2>Questões</h2><a class="acao" href="rumo40.html">Nota provável no Rumo aos 40 →</a></div>
+    <div class="stats-grid">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Acerto por <em>matéria</em></div>
+            <div class="chart-sub">Banco, aba Hoje e Simulado · vale a última resposta de cada questão · corte da prova = 50%</div>
+          </div>
+        </div>
+        <ul class="ranking-list" id="ranking-acertos"></ul>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Taxa de <em>acerto</em></div>
+            <div class="chart-sub" id="donut-sub">questões registradas</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut" id="donut-circle" style="background:conic-gradient(var(--rose-deep) 0% 0%, var(--bg-soft) 0% 100%)">
+            <div class="donut-inner">
+              <div class="pct" id="donut-pct">—</div>
+              <div class="lbl">acertos</div>
+            </div>
+          </div>
+        </div>
+        <div class="donut-legend" style="margin-top:1.5rem">
+          <div class="item"><span class="dot" style="background:var(--rose-deep)"></span><span>Acertos: <strong id="donut-acertos">0</strong></span></div>
+          <div class="item"><span class="dot" style="background:var(--bg-soft);border:1px solid var(--line)"></span><span>Erros: <strong id="donut-erros">0</strong></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIMULADOS (antigo Meus simulados) -->
+    <div class="est-sec" id="simulados"><h2>Simulados</h2><a class="acao" href="simulado.html">Fazer um simulado →</a></div>
+    <!-- STATS -->
+    <div class="sim-hero" id="sim-hero"></div>
+
+    <!-- META -->
+    <div class="meta-bar" id="meta-bar">
+      <span class="meta-label">Meta (≥ 50%)</span>
+      <div class="meta-track"><div class="meta-fill" id="meta-fill" style="width:0%"></div></div>
+      <span class="meta-pct" id="meta-pct">—</span>
+      <span class="meta-nota" id="meta-nota">Nenhum simulado registrado</span>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div class="sim-form" id="sim-form">
+      <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;margin-bottom:1.2rem;color:var(--ink)">
+        Registrar simulado
+      </div>
+
+      <!-- Tipo -->
+      <div class="tipo-toggle">
+        <button class="tipo-btn active" id="btn-tipo-sim" onclick="setTipo('simulado')">📝 Simulado</button>
+        <button class="tipo-btn" id="btn-tipo-prova" onclick="setTipo('prova_oab')">⚖️ Prova anterior</button>
+      </div>
+
+      <!-- Origem -->
+      <div id="campo-simulado" class="sim-field" style="margin-bottom:0.8rem">
+        <label>Fonte / Origem do simulado</label>
+        <input type="text" class="sim-input" id="sim-fonte" placeholder="Ex: CERS, Estratégia, Gran Cursos, IA, próprio...">
+      </div>
+      <div id="campo-prova" style="display:none;margin-bottom:0.8rem">
+        <div class="sim-form-grid">
+          <div class="sim-field">
+            <label>Ano da prova</label>
+            <select class="sim-select" id="sim-ano">
+              <option value="">Selecione...</option>
+              <option>2026</option><option>2025</option><option>2024</option><option>2023</option>
+              <option>2022</option><option>2021</option><option>2020</option>
+              <option>2019</option><option>2018</option><option>2017</option>
+              <option>2016</option><option>2015</option><option>2014</option>
+              <option>2013</option><option>2012</option><option>2011</option><option>2010</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label>Nº do exame</label>
+            <select class="sim-select" id="sim-exame">
+              <option value="">Selecione...</option>
+              <option>47</option><option>46</option><option>45</option><option>44</option>
+              <option>43</option><option>42</option><option>41</option><option>40</option>
+              <option>39</option><option>38</option><option>37</option><option>36</option>
+              <option>35</option><option>34</option><option>33</option><option>32</option>
+              <option>31</option><option>30</option><option>29</option><option>28</option>
+              <option>27</option><option>26</option><option>25</option><option>24</option>
+              <option>23</option><option>22</option><option>21</option><option>20</option>
+              <option>19</option><option>18</option><option>17</option><option>16</option>
+              <option>15</option><option>14</option><option>13</option><option>12</option>
+              <option>11</option><option>10</option><option>9</option><option>8</option>
+              <option>7</option><option>6</option><option>5</option><option>4</option>
+              <option>3</option><option>2</option><option>1</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data + Questões -->
+      <div class="sim-form-grid">
+        <div class="sim-field">
+          <label>Data de realização</label>
+          <input type="date" class="sim-input" id="sim-data">
+        </div>
+        <div class="sim-field">
+          <label>Total de questões</label>
+          <input type="number" class="sim-input" id="sim-total" value="80" min="1" max="200" oninput="atualizarPreview()">
+        </div>
+      </div>
+
+      <!-- Acertos + Erros -->
+      <div class="sim-form-grid">
+        <div class="sim-field">
+          <label>✅ Acertos</label>
+          <input type="number" class="sim-input" id="sim-acertos" min="0" max="200" placeholder="0" oninput="atualizarPreview()">
+        </div>
+        <div class="sim-field">
+          <label>❌ Erros / Em branco</label>
+          <input type="number" class="sim-input" id="sim-erros" min="0" max="200" placeholder="auto" oninput="sincronizarErros()">
+        </div>
+      </div>
+
+      <!-- Preview resultado -->
+      <div class="resultado-preview" id="resultado-preview" style="display:none">
+        <div>
+          <div class="resultado-pct" id="preview-pct">—</div>
+          <div style="font-size:0.72rem;color:var(--ink-faded);margin-top:0.15rem" id="preview-frac">0/80</div>
+        </div>
+        <div style="flex:1">
+          <span class="resultado-badge" id="preview-badge">—</span>
+          <div style="font-size:0.75rem;color:var(--ink-soft);margin-top:0.3rem" id="preview-msg">—</div>
+        </div>
+      </div>
+
+      <!-- Observações -->
+      <div class="sim-field" style="margin-bottom:0.8rem">
+        <label>Observações (opcional)</label>
+        <textarea class="sim-input" id="sim-obs" rows="2" placeholder="Ex: Materias com mais erros, condições do dia, pontos a revisar..."></textarea>
+      </div>
+
+      <div class="sim-form-actions">
+        <button class="btn btn-ghost" onclick="cancelarForm()">Cancelar</button>
+        <button class="btn btn-primary" id="btn-salvar-sim" style="padding:0.6rem 1.8rem" onclick="registrarSimulado()">Registrar</button>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="sim-filters">
+      <span class="sim-chip active" onclick="setFilter('todos', this)">Todos</span>
+      <span class="sim-chip" onclick="setFilter('aprovado', this)">✅ Aprovado (≥50%)</span>
+      <span class="sim-chip" onclick="setFilter('reprovado', this)">❌ Reprovado (&lt;50%)</span>
+      <span class="sim-chip" onclick="setFilter('simulado', this)">📝 Simulados</span>
+      <span class="sim-chip" onclick="setFilter('prova_oab', this)">⚖️ Provas anteriores</span>
+    </div>
+
+    <!-- LISTA -->
+    <div class="sim-list" id="sim-list"></div>
+
+    <!-- ROTINA -->
+    <div class="est-sec"><h2>Rotina</h2></div>
+    <div class="stats-grid-2">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Dias estudados · <em>últimos 14 dias</em></div>
+            <div class="chart-sub" id="chart-sub-evol">barra cheia = dia marcado como estudado; meia = checklist começado</div>
+          </div>
+        </div>
+        <div class="line-chart" id="line-chart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Tempo de foco por <em>matéria</em></div>
+            <div class="chart-sub">Sessões do Pomodoro, divididas entre as matérias do dia</div>
+          </div>
+        </div>
+        <ul class="ranking-list" id="ranking-tempo"></ul>
+      </div>
+    </div>
+
+    <!-- FLASHCARDS (tj_fc_estado_v1) -->
+    <div class="est-sec"><h2>Flashcards</h2><a class="acao" href="revisar.html">Revisar →</a></div>
+    <div class="stats-grid-2">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Situação dos <em>cartões</em></div>
+            <div class="chart-sub" id="fc-sub">carregando…</div>
+          </div>
+        </div>
+        <ul class="ranking-list" id="fc-geral"></ul>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Flashcards por <em>matéria</em></div>
+            <div class="chart-sub">cartões vistos · % de acerto (tudo menos "errei")</div>
+          </div>
+        </div>
+        <ul class="ranking-list" id="fc-materias"></ul>
+      </div>
+    </div>
+
+    <div class="est-rodape"><button class="btn" onclick="exportarProgresso()">↓ Exportar meus dados</button></div>
+  </main>
+</div>
+
+<script src="script.js?v=1784021868"></script>
+<script src="perfil.js?v=1783860863"></script>
+<script src="sync.js?v=1784058237"></script>
+<script src="progresso.js?v=1783859287"></script>
+<script src="cards.js"></script>
+<script src="cores.js"></script>
+<script src="calendario-ativo.js"></script>
+<script src="plano-dinamico.js"></script>
+<script src="ativo-core.js"></script>
+<script>
+// ── Simulados (antes em simulados.html; dados em tj_simulados_v1) ──
+const SIM_KEY = 'tj_simulados_v1';
+let _currentFilter = 'todos';
+let _currentTipo = 'simulado';
+
+// ── Storage ──────────────────────────────────
+function _loadSims() {
+  try { return JSON.parse(localStorage.getItem(SIM_KEY) || '[]'); } catch { return []; }
+}
+function _saveSims(arr) {
+  localStorage.setItem(SIM_KEY, JSON.stringify(arr));
+  try { localStorage.setItem('tj_local_rev', String(Date.now())); } catch (e) {}
+  if (window._syncOAB && window._syncOAB.notificarAlteracaoLocal) {
+    try { window._syncOAB.notificarAlteracaoLocal(SIM_KEY); } catch (e) {}
+  }
+}
+
+// ── Tipo toggle ───────────────────────────────
+function setTipo(tipo) {
+  _currentTipo = tipo;
+  document.getElementById('btn-tipo-sim').classList.toggle('active', tipo === 'simulado');
+  document.getElementById('btn-tipo-prova').classList.toggle('active', tipo === 'prova_oab');
+  document.getElementById('campo-simulado').style.display = tipo === 'simulado' ? 'block' : 'none';
+  document.getElementById('campo-prova').style.display   = tipo === 'prova_oab'  ? 'block' : 'none';
+}
+
+// ── Form toggle ───────────────────────────────
+let _editingId = null;
+
+function toggleForm() {
+  const form = document.getElementById('sim-form');
+  const isOpen = form.classList.contains('open');
+  if (!isOpen) {
+    form.classList.add('open');
+    document.getElementById('btn-novo-sim').textContent = '✕ Cancelar';
+    // Default date = today
+    const today = dataLocalHoje();
+    document.getElementById('sim-data').value = today;
+    setTimeout(() => {
+      if (_currentTipo === 'simulado') document.getElementById('sim-fonte').focus();
+    }, 60);
+  } else {
+    cancelarForm();
+  }
+}
+
+function cancelarForm() {
+  _editingId = null;
+  document.getElementById('sim-form').classList.remove('open');
+  document.getElementById('btn-novo-sim').textContent = '+ Registrar simulado';
+  const submitBtn = document.getElementById('btn-salvar-sim');
+  if (submitBtn) submitBtn.textContent = 'Registrar';
+  document.getElementById('sim-fonte').value = '';
+  document.getElementById('sim-ano').value = '';
+  document.getElementById('sim-exame').value = '';
+  document.getElementById('sim-total').value = '80';
+  document.getElementById('sim-acertos').value = '';
+  document.getElementById('sim-erros').value = '';
+  document.getElementById('sim-obs').value = '';
+  document.getElementById('resultado-preview').style.display = 'none';
+}
+
+function editarSim(id) {
+  const s = _loadSims().find(x => x.id === id);
+  if (!s) return;
+  _editingId = id;
+  setTipo(s.tipo);
+  document.getElementById('sim-form').classList.add('open');
+  document.getElementById('btn-novo-sim').textContent = '✕ Cancelar';
+  const submitBtn = document.getElementById('btn-salvar-sim');
+  if (submitBtn) submitBtn.textContent = 'Salvar alterações';
+  document.getElementById('sim-data').value = s.data || '';
+  document.getElementById('sim-total').value = s.total;
+  document.getElementById('sim-acertos').value = s.acertos;
+  document.getElementById('sim-erros').value = s.erros;
+  document.getElementById('sim-obs').value = s.obs || '';
+  if (s.tipo === 'simulado') {
+    document.getElementById('sim-fonte').value = s.nome || '';
+  } else {
+    const m = /^Exame\s+(.+?)(?:\s+\((\d+)\))?$/.exec(s.nome || '');
+    document.getElementById('sim-exame').value = m ? m[1] : (s.nome || '');
+    document.getElementById('sim-ano').value = m && m[2] ? m[2] : '';
+  }
+  _showPreview(s.acertos, s.total);
+  document.getElementById('sim-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Preview em tempo real ─────────────────────
+function atualizarPreview() {
+  const total   = parseInt(document.getElementById('sim-total').value) || 80;
+  const acertos = parseInt(document.getElementById('sim-acertos').value);
+  const errEl   = document.getElementById('sim-erros');
+  if (!isNaN(acertos) && acertos >= 0) {
+    errEl.value = Math.max(0, total - acertos);
+    _showPreview(acertos, total);
+  } else {
+    document.getElementById('resultado-preview').style.display = 'none';
+  }
+}
+
+function sincronizarErros() {
+  const total  = parseInt(document.getElementById('sim-total').value) || 80;
+  const erros  = parseInt(document.getElementById('sim-erros').value);
+  const acEl   = document.getElementById('sim-acertos');
+  if (!isNaN(erros) && erros >= 0) {
+    const acertos = Math.max(0, total - erros);
+    acEl.value = acertos;
+    _showPreview(acertos, total);
+  }
+}
+
+function _showPreview(acertos, total) {
+  const pct     = total > 0 ? Math.round((acertos / total) * 100) : 0;
+  const aprovado = pct >= 50;
+  const pEl     = document.getElementById('resultado-preview');
+  pEl.style.display = 'flex';
+  document.getElementById('preview-pct').textContent  = pct + '%';
+  document.getElementById('preview-pct').style.color  = aprovado ? '#3a9840' : '#c03050';
+  document.getElementById('preview-frac').textContent = `${acertos}/${total} questões`;
+  const badge = document.getElementById('preview-badge');
+  badge.textContent  = aprovado ? '✅ Aprovado' : '❌ Reprovado';
+  badge.className    = 'resultado-badge ' + (aprovado ? 'pass' : 'fail');
+  const msg = document.getElementById('preview-msg');
+  if (aprovado) {
+    const sobre = acertos - Math.ceil(total * 0.5);
+    msg.textContent = `${sobre} ${sobre !== 1 ? 'questões' : 'questão'} acima da meta — parabéns!`;
+  } else {
+    const falta = Math.ceil(total * 0.5) - acertos;
+    msg.textContent = `Faltam ${falta} acerto${falta !== 1 ? 's' : ''} para atingir os 50%`;
+  }
+}
+
+// ── Registrar ─────────────────────────────────
+function registrarSimulado() {
+  const total   = parseInt(document.getElementById('sim-total').value) || 80;
+  const acertos = parseInt(document.getElementById('sim-acertos').value);
+  const data    = document.getElementById('sim-data').value;
+
+  if (isNaN(acertos) || acertos < 0 || acertos > total) {
+    document.getElementById('sim-acertos').focus();
+    document.getElementById('sim-acertos').style.borderColor = 'var(--rose-deep)';
+    setTimeout(() => document.getElementById('sim-acertos').style.borderColor = '', 2000);
+    return;
+  }
+
+  let nome;
+  if (_currentTipo === 'simulado') {
+    const fonte = document.getElementById('sim-fonte').value.trim();
+    nome = fonte || 'Simulado ' + new Date(data || Date.now()).toLocaleDateString('pt-BR');
+  } else {
+    const ano   = document.getElementById('sim-ano').value;
+    const exame = document.getElementById('sim-exame').value;
+    if (!exame) {
+      document.getElementById('sim-exame').focus();
+      return;
+    }
+    nome = `Exame ${exame}${ano ? ' (' + ano + ')' : ''}`;
+  }
+
+  const arr = _loadSims();
+  if (_editingId) {
+    const i = arr.findIndex(s => s.id === _editingId);
+    if (i >= 0) {
+      arr[i] = {
+        ...arr[i],
+        tipo: _currentTipo,
+        nome,
+        data: data || dataLocalHoje(),
+        total, acertos,
+        erros: total - acertos,
+        pct: Math.round((acertos / total) * 100),
+        obs: document.getElementById('sim-obs').value.trim(),
+      };
+    }
+  } else {
+    arr.unshift({
+      id:       Date.now(),
+      tipo:     _currentTipo,
+      nome,
+      data:     data || dataLocalHoje(),
+      total,
+      acertos,
+      erros:    total - acertos,
+      pct:      Math.round((acertos / total) * 100),
+      obs:      document.getElementById('sim-obs').value.trim(),
+      criado:   new Date().toISOString()
+    });
+  }
+  _saveSims(arr);
+  cancelarForm();
+  render();
+}
+
+// ── Deletar ───────────────────────────────────
+function deletarSim(id) {
+  if (!confirm('Excluir este registro?')) return;
+  _saveSims(_loadSims().filter(s => s.id !== id));
+  render();
+}
+
+// ── Filtro ────────────────────────────────────
+function setFilter(filter, el) {
+  _currentFilter = filter;
+  document.querySelectorAll('.sim-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+// ── Format date ───────────────────────────────
+function _fmtDate(iso) {
+  try {
+    return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  } catch { return iso; }
+}
+
+// ── Renderizar stats ──────────────────────────
+function renderStats() {
+  const arr   = _loadSims();
+  const total = arr.length;
+  if (total === 0) {
+    document.getElementById('sim-hero').innerHTML = `
+      <div class="sim-stat"><div class="sim-num">0</div><div class="sim-label">Simulados realizados</div></div>
+      <div class="sim-stat"><div class="sim-num">—</div><div class="sim-label">Média geral</div></div>
+      <div class="sim-stat"><div class="sim-num">—</div><div class="sim-label">Aprovados (≥50%)</div></div>
+      <div class="sim-stat"><div class="sim-num">—</div><div class="sim-label">Melhor resultado</div></div>`;
+    document.getElementById('meta-fill').style.width = '0%';
+    document.getElementById('meta-pct').textContent = '—';
+    document.getElementById('meta-nota').textContent = 'Nenhum simulado registrado';
+    return;
+  }
+
+  const media     = Math.round(arr.reduce((s, x) => s + x.pct, 0) / total);
+  const aprovados = arr.filter(x => x.pct >= 50).length;
+  const melhor    = Math.max(...arr.map(x => x.pct));
+  const aprovPct  = Math.round((aprovados / total) * 100);
+
+  document.getElementById('sim-hero').innerHTML = `
+    <div class="sim-stat"><div class="sim-num">${total}</div><div class="sim-label">Simulados realizados</div></div>
+    <div class="sim-stat ${media >= 50 ? 'pass' : 'fail'}"><div class="sim-num">${media}%</div><div class="sim-label">Média geral</div></div>
+    <div class="sim-stat ${aprovPct >= 50 ? 'pass' : 'fail'}"><div class="sim-num">${aprovados}/${total}</div><div class="sim-label">Aprovados (≥50%)</div></div>
+    <div class="sim-stat ${melhor >= 50 ? 'pass' : 'fail'}"><div class="sim-num">${melhor}%</div><div class="sim-label">Melhor resultado</div></div>`;
+
+  const fillEl = document.getElementById('meta-fill');
+  const pctEl  = document.getElementById('meta-pct');
+  const notaEl = document.getElementById('meta-nota');
+  const clamp  = Math.min(media, 100);
+  fillEl.style.width = clamp + '%';
+  fillEl.className   = 'meta-fill' + (media >= 50 ? ' ok' : '');
+  pctEl.textContent  = media + '%';
+  pctEl.style.color  = media >= 50 ? '#3a9840' : '#c03050';
+
+  if (media >= 50) {
+    notaEl.textContent = `Média ${media >= 60 ? 'excelente' : 'suficiente'} — ${media >= 50 ? '✅ acima' : '❌ abaixo'} da meta de 50%`;
+    notaEl.style.color = '#3a9840';
+  } else {
+    const falta = 50 - media;
+    notaEl.textContent = `Precisa de +${falta}% na média para atingir a meta de 50%`;
+    notaEl.style.color = '#c03050';
+  }
+
+  // Tendência (últimos 3 vs primeiros 3)
+  if (arr.length >= 6) {
+    const ultimos = arr.slice(0, 3).map(x => x.pct);
+    const primeiros = arr.slice(-3).map(x => x.pct);
+    const mediaUlt = Math.round(ultimos.reduce((a,b) => a+b, 0) / 3);
+    const mediaPri = Math.round(primeiros.reduce((a,b) => a+b, 0) / 3);
+    if (mediaUlt > mediaPri) {
+      notaEl.textContent += ` · Tendência: ↑ melhorando`;
+    } else if (mediaUlt < mediaPri) {
+      notaEl.textContent += ` · Tendência: ↓ atenção`;
+    }
+  }
+}
+
+// ── Renderizar lista ──────────────────────────
+function renderList() {
+  let arr = _loadSims();
+  if (_currentFilter === 'aprovado')  arr = arr.filter(s => s.pct >= 50);
+  if (_currentFilter === 'reprovado') arr = arr.filter(s => s.pct < 50);
+  if (_currentFilter === 'simulado')  arr = arr.filter(s => s.tipo === 'simulado');
+  if (_currentFilter === 'prova_oab') arr = arr.filter(s => s.tipo === 'prova_oab');
+
+  const list = document.getElementById('sim-list');
+  if (!arr.length) {
+    list.innerHTML = `<div class="empty-state">
+      <span class="eicon">${_loadSims().length ? '🔍' : '📊'}</span>
+      <h3>${_loadSims().length ? 'Nenhum resultado neste filtro' : 'Nenhum simulado ainda'}</h3>
+      <p style="font-size:0.85rem">${_loadSims().length ? 'Tente outro filtro.' : 'Clique em "+ Registrar simulado" para começar.'}</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = arr.map(s => {
+    const aprovado = s.pct >= 50;
+    const typeCls  = s.tipo === 'prova_oab' ? 'prova' : 'simulado';
+    const typeLabel = s.tipo === 'prova_oab' ? '⚖️ Prova anterior' : '📝 Simulado';
+    return `<div class="sim-card">
+      <span class="sim-card-type ${typeCls}">${typeLabel}</span>
+      <div class="sim-card-info">
+        <div class="sim-card-nome">${s.nome.replace(/</g,'&lt;')}</div>
+        <div class="sim-card-data">${_fmtDate(s.data)}${s.obs ? ' · ' + s.obs.slice(0,50).replace(/</g,'&lt;') : ''}</div>
+      </div>
+      <div class="sim-card-result">
+        <div class="sim-card-pct ${aprovado ? 'pass' : 'fail'}">${s.pct}%</div>
+        <div class="sim-card-detail">${s.acertos}/${s.total} · ${aprovado ? '✅ Aprovado' : '❌ Reprovado'}</div>
+      </div>
+      <div class="sim-card-actions">
+        <button class="btn btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.6rem" onclick="editarSim(${s.id})" title="Editar">✎</button>
+        <button class="btn btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.6rem;color:var(--error)" onclick="deletarSim(${s.id})" title="Excluir">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function render() { renderStats(); renderList(); }
+
+document.addEventListener('DOMContentLoaded', render);
+</script>
+<script src="erros-core.js"></script>
+<script>
+function montarEstatisticas() {
+  const p      = carregarProgresso();
+  const stats  = calcularStats();
+  const hoje   = getCurrentDate();
+
+  // ── Calendário dinâmico: dias marcados em "Estudei hoje" e checklist do dia
+  const CK = (() => { try { return JSON.parse(localStorage.getItem('tj_ativo_check_v1')) || {}; } catch (e) { return {}; } })();
+  const isoDe = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const feito = iso => !!(CK[iso] && CK[iso].feito);
+  p.streak = streakOAB();
+  const CAL = window.CAL_ATIVO;
+  if (CAL) { stats.concluidos = CAL.dias.filter(x => feito(x.d)).length; stats.pct = Math.round(stats.concluidos / CAL.dias.length * 100); }
+  const totalDiasPlano = CAL ? CAL.dias.length : 120;
+
+  // ── Questões: Tracker + banco (Hoje, Banco e Simulados gravam em tj_bq_respostas)
+  const q = (() => {
+    const t = getTotaisQuestoes();
+    let r = {}; try { r = JSON.parse(localStorage.getItem('tj_bq_respostas')) || {}; } catch (e) {}
+    const ids = Object.keys(r), ok = ids.filter(k => r[k].ultima_correta).length;
+    const total = t.total + ids.length, acertos = t.acertos + ok;
+    return { total, acertos, pct: total ? Math.round(acertos / total * 100) : 0 };
+  })();
+
+  // ── Streak
+  const streakEl = document.getElementById('streak-count');
+  if (streakEl) streakEl.textContent = p.streak || 0;
+
+  // ── Tempo estudado = sessões de foco do Pomodoro da aba Hoje (25 min cada, pomo_sessions_AAAA-MM-DD).
+  // Num dia com mais de uma matéria no calendário, os minutos são divididos igualmente entre elas.
+  let minutosReaisTotal = 0;
+  let diasComRegistroReal = 0;
+  const minutosPorMateria = {};
+  const CURTO = { 'Língua Portuguesa':'Português','Direito Constitucional':'Constitucional','Direito Processual Civil':'Processo Civil',
+    'Direito Penal':'Direito Penal','Direito Processual Penal':'Processo Penal','Direito Administrativo':'Administrativo',
+    'Normas da Corregedoria':'Normas da Corregedoria','Informática':'Informática','Raciocínio Lógico':'Raciocínio Lógico',
+    'Matemática':'Matemática','Atualidades':'Atualidades','Estatuto da Pessoa com Deficiência':'Estatuto PcD' };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i), m = /^pomo_sessions_(\d{4}-\d{2}-\d{2})$/.exec(k || '');
+    if (!m) continue;
+    const minDia = (parseInt(localStorage.getItem(k)) || 0) * 25;
+    if (!minDia) continue;
+    minutosReaisTotal += minDia;
+    diasComRegistroReal++;
+    const x = CAL ? CAL.dias.find(y => y.d === m[1]) : null;
+    const discs = x && x.top ? x.top.map(t => t.d).filter((d, j, arr) => arr.indexOf(d) === j)
+      : x && x.foco ? x.foco : [];
+    if (!discs.length) continue;
+    discs.forEach(d => { const nome = CURTO[d] || d; minutosPorMateria[nome] = (minutosPorMateria[nome] || 0) + minDia / discs.length; });
+  }
+  const mediaRealMin = diasComRegistroReal > 0 ? Math.round(minutosReaisTotal / diasComRegistroReal) : 0;
+
+  // ── Hero
+  document.getElementById('hero-horas').innerHTML     = diasComRegistroReal > 0 ? fmtMinutosParaTexto(minutosReaisTotal) : '0<small>h</small>';
+  document.getElementById('hero-horas-sub').textContent = diasComRegistroReal > 0 ? `média ${fmtMinutosParaTexto(mediaRealMin)} por dia de foco` : 'use o Pomodoro da aba Hoje';
+  document.getElementById('hero-questoes').textContent  = q.total;
+  document.getElementById('hero-questoes-sub').innerHTML = q.total > 0 ? `acerto <em>${q.pct}%</em>` : 'sem registros';
+  const sims = _loadSims();
+  if (sims.length) {
+    const media = Math.round(sims.reduce((a, x) => a + x.pct, 0) / sims.length);
+    document.getElementById('hero-sim').innerHTML = `${media}<small>%</small>`;
+    document.getElementById('hero-sim-sub').textContent = `${sims.length} ${sims.length === 1 ? 'simulado' : 'simulados'} · melhor ${Math.max(...sims.map(x => x.pct))}%`;
+  }
+  document.getElementById('hero-streak').innerHTML    = `${p.streak||0}<small> ${(p.streak||0) === 1 ? 'dia' : 'dias'}</small>`;
+  document.getElementById('hero-streak-sub').textContent = p.streak >= 7 ? `recorde ✨ ${p.streak} dias` : p.streak > 0 ? 'continue assim!' : 'comece a estudar!';
+  document.getElementById('chart-sub-evol').textContent = `${stats.concluidos} de ${totalDiasPlano} dias do plano marcados como estudados · barra cheia = dia estudado, meia = checklist começado`;
+
+  // ── Matéria favorita (maior score: acertos × log(total+1))
+  // Tracker + banco (Hoje, Banco e Simulados), por matéria
+  const qTodas = getTodasQuestoes();
+  const ID_DISC = { 'Língua Portuguesa':'portugues','Direito Constitucional':'constitucional','Direito Processual Civil':'proc_civil',
+    'Direito Penal':'penal','Direito Processual Penal':'proc_penal','Direito Administrativo':'administrativo',
+    'Normas da Corregedoria':'normas','Informática':'informatica','Raciocínio Lógico':'rlm','Matemática':'matematica',
+    'Atualidades':'atualidades','Estatuto da Pessoa com Deficiência':'pcd' };
+  if (window.BANCO_QUESTOES) {
+    let r = {}; try { r = JSON.parse(localStorage.getItem('tj_bq_respostas')) || {}; } catch (e) {}
+    const disc = {}; BANCO_QUESTOES.forEach(x => { disc[x.id] = x.discipline; });
+    Object.keys(r).forEach(id => {
+      const mid = ID_DISC[disc[id]]; if (!mid) return;
+      const o = qTodas[mid] || (qTodas[mid] = { total: 0, acertos: 0 });
+      o.total++; if (r[id].ultima_correta) o.acertos++;
+    });
+  }
+  const NOMES_MAT = { portugues:'Português',constitucional:'Constitucional',proc_civil:'Processo Civil',penal:'Direito Penal',
+    proc_penal:'Processo Penal',administrativo:'Administrativo',normas:'Normas da Corregedoria',informatica:'Informática',
+    rlm:'Raciocínio Lógico',matematica:'Matemática',atualidades:'Atualidades',pcd:'Estatuto PcD' };
+  const EMOJIS_MAT = { portugues:'✍️',constitucional:'🏛️',proc_civil:'⚖️',penal:'⚔️',proc_penal:'📋',administrativo:'🏢',
+    normas:'📚',informatica:'💻',rlm:'🧩',matematica:'➗',atualidades:'📰',pcd:'♿' };
+
+
+  // ── Gráfico de evolução (últimos 14 dias)
+  const lineChart = document.getElementById('line-chart');
+  if (lineChart) {
+    const maxH = 4; // max horas esperadas por dia para escalar o gráfico
+    let html = '';
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(hoje);
+      d.setDate(d.getDate() - i);
+      const ds = dataLocalDe(d);
+      const dayLabel = d.getDate();
+      const c = CK[ds] || {};
+      const itens = Object.keys(c).filter(k => k !== 'feito' && c[k]).length;
+      const horas = c.feito ? maxH : itens ? maxH / 2 : 0;
+      const pct = horas > 0 ? Math.min(100, Math.round((horas / maxH) * 100)) : 0;
+      html += `<div class="line-day" title="${ds}: ${c.feito ? 'dia estudado' : itens ? itens + (itens === 1 ? ' item' : ' itens') + ' do checklist' : 'não estudado'}">
+        ${horas > 0 ? `<div class="line-bar" style="height:${pct}%"></div>` : `<div style="width:60%;height:4px;background:var(--line-soft);border-radius:2px;margin-bottom:1px"></div>`}
+        <div class="lbl">${dayLabel}</div>
+      </div>`;
+    }
+    lineChart.innerHTML = html;
+  }
+
+  // ── Donut
+  const donutPct  = document.getElementById('donut-pct');
+  const donutCircle = document.getElementById('donut-circle');
+  const donutSub  = document.getElementById('donut-sub');
+  if (q.total > 0) {
+    if (donutPct) donutPct.textContent = q.pct + '%';
+    if (donutCircle) donutCircle.style.background = `conic-gradient(var(--rose-deep) 0% ${q.pct}%, var(--bg-soft) ${q.pct}% 100%)`;
+    if (donutSub) donutSub.textContent = `${q.total} ${q.total!==1?'questões resolvidas':'questão resolvida'}`;
+  } else {
+    if (donutPct) donutPct.textContent = '—';
+    if (donutSub) donutSub.textContent = 'nenhuma questão registrada';
+  }
+  const donutAcertos = document.getElementById('donut-acertos');
+  const donutErros   = document.getElementById('donut-erros');
+  if (donutAcertos) donutAcertos.textContent = q.acertos;
+  if (donutErros)   donutErros.textContent   = q.total - q.acertos;
+
+  // ── Ranking tempo por matéria
+  const rankingTempo = document.getElementById('ranking-tempo');
+  if (rankingTempo) {
+    const sorted = Object.entries(minutosPorMateria).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    if (sorted.length === 0) {
+      rankingTempo.innerHTML = '<li style="padding:1rem 0;color:var(--ink-faded);font-size:0.85rem;font-style:italic">Nenhum tempo registrado ainda.</li>';
+    } else {
+      const maxMin = sorted[0][1];
+      const romanos = ['I','II','III','IV','V'];
+      rankingTempo.innerHTML = sorted.map(([nome,min],i) => `
+        <li class="rank-item">
+          <span class="rank-pos">${romanos[i]}</span>
+          <span class="rank-name">${nome}</span>
+          <div class="rank-bar"><div class="rank-fill" style="width:${Math.round((min/maxMin)*100)}%"></div></div>
+          <span class="rank-val">${fmtMinutosParaTexto(Math.round(min))}</span>
+        </li>`).join('');
+    }
+  }
+
+  // ── Ranking acertos por matéria
+  const rankingAcertos = document.getElementById('ranking-acertos');
+  if (rankingAcertos) {
+    const sorted = Object.entries(qTodas)
+      .filter(([,d]) => d.total > 0)
+      .map(([id,d]) => ({ id, nome: NOMES_MAT[id]||id, pct: Math.round((d.acertos/d.total)*100), total: d.total }))
+      .sort((a,b) => b.pct - a.pct || b.total - a.total);
+    if (sorted.length === 0) {
+      rankingAcertos.innerHTML = '<li style="padding:1rem 0;color:var(--ink-faded);font-size:0.85rem;font-style:italic">Registre questões para ver o ranking.</li>';
+    } else {
+      rankingAcertos.innerHTML = sorted.map(({nome,pct,total}) => {
+        const cor = pct >= 70 ? '' : pct >= 50 ? 'background:linear-gradient(90deg,var(--gold),var(--rose))' : 'background:linear-gradient(90deg,var(--error),var(--gold))';
+        return `<li class="rank-item">
+          <span class="rank-name">${nome}</span>
+          <div class="rank-bar"><div class="rank-fill" style="width:${pct}%;${cor}"></div></div>
+          <span class="rank-val">${pct}% <small>· ${total}</small></span>
+        </li>`;
+      }).join('');
+    }
+  }
+
+  montarLeitura({ q, qTodas, NOMES_MAT, p, stats, totalDiasPlano });
+}
+// ── Leitura rápida: o que os números dizem, em frases
+function montarLeitura({ q, qTodas, NOMES_MAT, p, stats, totalDiasPlano }) {
+  const el = document.getElementById('leitura'); if (!el) return;
+  const li = (cls, html, id) => `<li${id ? ` id="${id}"` : ''}><span class="pt ${cls}"></span><span>${html}</span></li>`;
+  const out = [];
+  if (q.total) out.push(li(q.pct >= 50 ? 'ok' : 'no', `Você acerta <b>${q.pct}%</b> das ${q.total} questões que fez — ${q.pct >= 50 ? 'acima' : 'abaixo'} do corte da prova (50%).`));
+  else out.push(li('', 'Ainda não há questões resolvidas. Comece pela aba <a href="hoje.html?aba=questoes">Hoje</a> ou pelo <a href="banco-questoes.html">Banco</a>.'));
+  const mats = Object.entries(qTodas).filter(([, d]) => d.total >= 5)
+    .map(([id, d]) => ({ nome: NOMES_MAT[id] || id, pct: Math.round(d.acertos / d.total * 100), total: d.total }));
+  if (mats.length) {
+    const melhor = mats.slice().sort((a, b) => b.pct - a.pct)[0];
+    const fracas = mats.filter(m => m.pct < 50).sort((a, b) => a.pct - b.pct);
+    out.push(li(fracas.length ? 'at' : 'ok', `Melhor matéria: <b>${melhor.nome}</b> (${melhor.pct}%).` +
+      (fracas.length ? ` Abaixo do corte: ${fracas.slice(0, 4).map(m => `<b>${m.nome}</b> (${m.pct}%)`).join(', ')}.` : ' Nenhuma matéria abaixo do corte.') +
+      ` <small>(matérias com 5+ questões)</small>`));
+  }
+  const sims = _loadSims();
+  if (sims.length) {
+    const u = sims.slice().sort((a, b) => String(b.data).localeCompare(String(a.data)))[0];
+    out.push(li(u.pct >= 50 ? 'ok' : 'no', `Último simulado: <b>${u.acertos}/${u.total}</b> (${u.pct}%) em ${_fmtDate(u.data)}.` +
+      (sims.length > 1 ? ` Média de ${Math.round(sims.reduce((a, x) => a + x.pct, 0) / sims.length)}% em ${sims.length} simulados.` : '')));
+  } else out.push(li('', 'Nenhum simulado registrado. <a href="simulado.html">Faça um</a> ou registre abaixo um feito fora do site.'));
+  out.push(li('', 'Revisão de hoje: carregando…', 'leitura-rev'));
+  out.push(li(p.streak ? 'ok' : '', `${stats.concluidos} de ${totalDiasPlano} dias do plano estudados` + (p.streak ? ` · <b>${p.streak}</b> ${p.streak === 1 ? 'dia seguido' : 'dias seguidos'}.` : '.')));
+  el.innerHTML = out.join('');
+  if (window._preencherRev) window._preencherRev();
+}
+// ── Flashcards: estado em tj_fc_estado_v1 (Hoje e Revisar); cada "sei"/"errei" fica no histórico do cartão
+function montarFlashcardsStats() {
+  if (!window.ATIVO) return;
+  ATIVO.carregarCartoes().then(() => {
+    const est = ATIVO.estados(), cart = ATIVO.cartoes(), r = ATIVO.resumo(), por = {};
+    let sei = 0, resp = 0;
+    cart.forEach(c => {
+      const m = por[c.d] || (por[c.d] = { total: 0, vistos: 0, sei: 0, resp: 0 });
+      m.total++;
+      const e = est[c.id]; if (!e) return;
+      m.vistos++;
+      (e.h || []).forEach(x => { m.resp++; resp++; if (x[1] !== 'e') { m.sei++; sei++; } });
+    });
+    const curto = d => (window.CAL_ATIVO && CAL_ATIVO.curto && CAL_ATIVO.curto[d]) || d.replace(/^Direito (do |Processual )?/, '');
+    const vazio = t => `<li style="padding:1rem 0;color:var(--ink-faded);font-size:0.85rem;font-style:italic">${t}</li>`;
+    const linha = (pos, nome, pct, val) => `<li class="rank-item"><span class="rank-pos">${pos}</span><span class="rank-name">${nome}</span>
+      <div class="rank-bar"><div class="rank-fill" style="width:${pct}%"></div></div><span class="rank-val">${val}</span></li>`;
+    const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
+    (window._preencherRev = function () {
+    const lr = document.getElementById('leitura-rev');
+    if (lr) {
+      const ce = typeof erros_total_devidas === 'function' ? erros_total_devidas() : 0;
+      lr.innerHTML = `<span class="pt ${r.vencidos || ce ? 'at' : 'ok'}"></span><span>` + (r.vencidos || ce
+        ? `Para revisar hoje: <b>${r.vencidos}</b> ${r.vencidos === 1 ? 'flashcard' : 'flashcards'} (<a href="revisar.html">Revisar</a>) e <b>${ce}</b> ${ce === 1 ? 'erro' : 'erros'} do caderno (<a href="erros.html">Caderno</a>).`
+        : 'Revisão de hoje em dia: nenhum flashcard nem erro do caderno vence hoje.') + '</span>';
+    }
+    })();
+    document.getElementById('fc-sub').textContent = resp ? `${resp} ${resp !== 1 ? 'respostas' : 'resposta'} · ${pc(sei, resp)}% de acerto` : 'nenhum flashcard respondido ainda';
+    document.getElementById('fc-geral').innerHTML = !r.vistos ? vazio('Faça os flashcards na aba Hoje ou em Revisar.') :
+      linha('✦', 'Vistos', pc(r.vistos, r.total), `${r.vistos}/${r.total}`) +
+      linha('✦', 'Em revisão', pc(r.emRevisao, r.total), r.emRevisao) +
+      linha('✦', 'Dominados', pc(r.fora, r.total), r.fora) +
+      linha('✦', 'Vencem hoje', pc(r.vencidos, Math.max(r.emRevisao, 1)), r.vencidos);
+    const mats = Object.keys(por).filter(d => por[d].vistos).sort((a, b) => por[b].vistos - por[a].vistos);
+    document.getElementById('fc-materias').innerHTML = !mats.length ? vazio('Nenhuma matéria começada.') :
+      mats.map(d => { const m = por[d]; return linha('✦', `${curto(d)} <small style="color:var(--ink-faded)">· ${pc(m.sei, m.resp)}% sei</small>`, pc(m.vistos, m.total), `${m.vistos}/${m.total}`); }).join('');
+  });
+}
+document.addEventListener('DOMContentLoaded', montarFlashcardsStats);
+document.addEventListener('DOMContentLoaded', () => {
+  let temBanco = false; try { temBanco = Object.keys(JSON.parse(localStorage.getItem('tj_bq_respostas')) || {}).length > 0; } catch (e) {}
+  if (!temBanco || window.BANCO_QUESTOES) { montarEstatisticas(); return; }
+  const sc = document.createElement('script');
+  sc.src = 'questoes-banco.js';
+  sc.onload = sc.onerror = montarEstatisticas;
+  document.head.appendChild(sc);
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

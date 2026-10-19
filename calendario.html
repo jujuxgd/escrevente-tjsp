@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js?v=1783862902"></script>
+<script src="auth-guard.js?v=1784132091"></script>
+<script src="cores-early.js?v=1784060144"></script>
+<script src="page-transition.js?v=1783861010"></script>
+<title>Calendário · TJSP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1784043341">
+<link rel="stylesheet" href="sessao.css"><link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script></head>
+<body>
+<div class="aurora-bg" aria-hidden="true"><div class="aurora-blob ab1"></div><div class="aurora-blob ab2"></div><div class="aurora-blob ab3"></div><div class="aurora-blob ab4"></div></div>
+<div class="app">
+  <main>
+    <style>
+    .ca-sub{margin:.5rem 0 0;color:var(--ink-soft);font-size:.95rem;max-width:60ch;line-height:1.5}
+    .ca-sub b{font-weight:600;color:var(--rose-deep)}
+    .ca-wrap{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:1.2rem;align-items:start;margin-top:1.6rem}
+
+    /* cartão do mês */
+    .ca-mesbox{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:1.5rem 1.6rem 1.2rem}
+    .ca-mesnav{display:flex;align-items:center;gap:.4rem;margin-bottom:1.3rem}
+    .ca-mesnav h2{font:500 1.5rem/1.1 'Fraunces',serif;letter-spacing:-.01em;margin:0 auto 0 0;color:var(--ink)}
+    .ca-mesnav button{border:1px solid var(--line-soft);background:var(--paper);color:var(--ink-soft);border-radius:999px;height:34px;min-width:34px;padding:0 .75rem;font:500 .8rem Inter,sans-serif;cursor:pointer;transition:border-color .15s,color .15s}
+    .ca-mesnav button:hover:not(:disabled){border-color:var(--rose);color:var(--rose-deep)}
+    .ca-mesnav button:disabled{opacity:.3;cursor:default}
+    .ca-mesnav button:focus-visible{outline:2px solid var(--rose-deep);outline-offset:2px}
+
+    .ca-grade{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+    .ca-sem{font:600 .6rem Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faded);padding:0 .55rem .6rem}
+    .ca-c{position:relative;min-height:128px;border:0;border-top:1px solid var(--line-soft);background:none;padding:.7rem .6rem .7rem;text-align:left;font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;transition:background .15s}
+    .ca-c:hover{background:var(--bg-soft)}
+    .ca-c:focus-visible{outline:2px solid var(--rose-deep);outline-offset:-2px;border-radius:10px}
+    .ca-c.vazio{cursor:default}
+    .ca-c.vazio:hover,.ca-c.fora:hover{background:none}
+    .ca-c.fora{cursor:default}
+    .ca-c.fora .ca-n{color:var(--line)}
+    .ca-n{display:inline-flex;align-items:center;gap:.3rem;font:500 1.2rem/1 'Fraunces',serif;color:var(--ink);font-variant-numeric:tabular-nums}
+    .ca-n b{font-weight:500;display:inline-grid;place-items:center;min-width:2rem;height:2rem;margin:-.25rem 0 0 -.3rem;border-radius:50%}
+    .ca-n .ok{font:600 .62rem Inter,sans-serif;color:#5E8C6A}
+    .ca-c.hoje .ca-n b{background:var(--rose);color:#fff}
+    .ca-c.sel{background:color-mix(in srgb,var(--rose) 9%,transparent)}
+    .ca-c.sel:not(.hoje) .ca-n b{box-shadow:inset 0 0 0 1.5px var(--rose)}
+    .ca-c.passado .ca-n{color:var(--ink-faded)}
+    .ca-c.passado .ca-chip{opacity:.55}
+    .ca-c.atraso{background:color-mix(in srgb,#c0504d 8%,transparent)}
+    .ca-c.atraso .ca-n{color:#a33f3c}
+    .ca-n .at{font:600 .58rem Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#a33f3c}
+    [data-theme="dark"] .ca-c.atraso .ca-n,[data-theme="dark"] .ca-n .at,[data-theme="dark"] .ca-det .atr{color:#e8908c}
+    .ca-det .atr{color:#a33f3c;font-weight:600}
+
+    /* etiquetas */
+    .ca-chip{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:600 .7rem/1 Inter,sans-serif;padding:.35rem .6rem;border-radius:999px;background:var(--c,var(--bg-soft));color:var(--cd,var(--ink-soft))}
+    .ca-chip.sim{background:none;box-shadow:inset 0 0 0 1px var(--ink-soft);color:var(--ink)}
+    .ca-chip.rev{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-soft)}
+    .ca-chip.leve{background:none;color:var(--ink-faded);padding-left:0}
+    .ca-chip.prova{background:var(--rose);color:#fff}
+
+    /* painel do dia */
+    .ca-side{position:sticky;top:90px}
+    .ca-det{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:1.5rem 1.4rem 1.4rem}
+    .ca-det .tag{display:inline-block;font:600 .6rem Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);background:var(--bg-soft);border-radius:999px;padding:.35rem .7rem;margin-bottom:.9rem}
+    .ca-det .data{font:500 1.45rem/1.15 'Fraunces',serif;color:var(--ink);margin:0 0 .25rem}
+    .ca-det .fase{font-size:.8rem;color:var(--ink-faded);margin:0 0 1.2rem}
+    .ca-it{padding:.85rem 0;border-top:1px solid var(--line-soft)}
+    .ca-it .ca-chip{margin-bottom:.45rem}
+    .ca-it .tx{display:block;font:500 1.02rem/1.35 'Fraunces',serif;color:var(--ink)}
+    .ca-it small{display:block;font-size:.74rem;color:var(--ink-faded);margin-top:.3rem;line-height:1.4}
+    .ca-det .btn{display:block;text-align:center;text-decoration:none;margin-top:.9rem;border-radius:999px;padding:.75rem 1rem}
+    .ca-adi{font-size:.76rem;color:var(--rose-deep);margin:-.6rem 0 1rem}
+
+    @media (max-width:1020px){.ca-wrap{grid-template-columns:1fr}.ca-side{position:static}}
+    @media (max-width:640px){
+      .ca-mesbox{padding:1.1rem .8rem .9rem}
+      .ca-mesnav h2{font-size:1.2rem}
+      .ca-sem{padding:0 0 .5rem;text-align:center;letter-spacing:.08em}
+      .ca-c{min-height:74px;padding:.55rem .1rem;align-items:center;gap:.4rem}
+      .ca-n{font-size:1rem}
+      .ca-n b{margin:0}
+      .ca-n .ok,.ca-n .at{display:none}
+      .ca-chips{display:flex;gap:3px;justify-content:center}
+      .ca-grade .ca-chip{width:7px;height:7px;padding:0;font-size:0;background:var(--cd,var(--ink-faded))}
+      .ca-grade .ca-chip.sim{background:var(--ink-soft);box-shadow:none}
+      .ca-grade .ca-chip.rev{background:var(--line);box-shadow:none}
+      .ca-grade .ca-chip.leve{display:none}
+      .ca-grade .ca-chip.prova{background:var(--rose)}
+    }
+    @media (prefers-reduced-motion:reduce){.ca-c,.ca-mesnav button{transition:none}}
+    </style>
+    <div class="ca">
+      <div class="topbar">
+        <div class="page-title">
+          <div class="breadcrumb">Calendário · <span data-month-year>—</span></div>
+          <h1>Até a <em>prova</em></h1>
+          <p id="ca-sub" class="ca-sub"></p>
+        </div>
+      </div>
+
+      <div class="ca-wrap">
+        <section class="ca-mesbox" aria-label="Calendário do mês">
+          <div class="ca-mesnav">
+            <button type="button" id="ca-ant" aria-label="Mês anterior">‹</button>
+            <h2 id="ca-mestit"></h2>
+            <button type="button" id="ca-prox" aria-label="Próximo mês">›</button>
+            <button type="button" class="ca-hojebtn" id="ca-hojebtn">Hoje</button>
+          </div>
+          <div class="ca-grade" id="ca-grade"></div>
+        </section>
+        <aside class="ca-side"><div class="ca-det" id="ca-det" aria-live="polite"></div></aside>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="script.js?v=1784021868"></script>
+<script src="perfil.js?v=1783860863"></script>
+<script src="sync.js?v=1784058237"></script>
+<script src="progresso.js?v=1783859287"></script>
+<script src="cores.js"></script>
+<script src="estudo-core.js"></script>
+<script src="erros-core.js"></script>
+<script src="revisao-biblioteca.js"></script>
+<script src="calendario-ativo.js"></script>
+<script src="plano-dinamico.js"></script>
+<script src="ativo-core.js"></script>
+<script src="sessao-core.js"></script>
+<script>
+(function () {
+  var S = SESSAO, CAL = CAL_ATIVO, esc = S.esc;
+  var MESES_L = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  var SEM = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  var COR = {
+    'Direito Constitucional': 'const', 'Direito Administrativo': 'const',
+    'Direito Processual Civil': 'civil',
+    'Direito Penal': 'penal', 'Direito Processual Penal': 'penal',
+    'Normas da Corregedoria': 'trab', 'Estatuto da Pessoa com Deficiência': 'trab',
+    'Informática': 'tribut', 'Raciocínio Lógico': 'tribut', 'Matemática': 'tribut', 'Atualidades': 'tribut',
+    'Língua Portuguesa': 'etica'
+  };
+  function vars(d) { var c = COR[d]; return c ? '--c:var(--mat-' + c + '-deep);--cd:var(--mat-' + c + '-deep)' : ''; }
+  function feitos() { try { return JSON.parse(localStorage.getItem('tj_ativo_check_v1')) || {}; } catch (e) { return {}; } }
+  var POR = {}; CAL.dias.forEach(function (x) { POR[x.d] = x; });
+  var HOJE = S.HOJE, sel = POR[HOJE] ? HOJE : CAL.dias[0].d;
+  function dt(iso) { return new Date(iso + 'T12:00:00'); }
+  function dm(iso) { var p = S.partes(iso); return p.d + '/' + String(p.m).padStart(2, '0'); }
+  function temas(x) {
+    if (!x.top) return [];
+    var vist = {}, out = [];
+    x.top.forEach(function (t) { var k = t.d + t.s; if (!vist[k]) { vist[k] = 1; out.push(t); } });
+    return out;
+  }
+  function tipoTxt(x) {
+    if (x.tipo === 'simulado') return 'Simulado completo';
+    if (x.tipo === 'prova') return 'Prova do TJSP: objetiva e redação';
+    if (x.tipo === 'vespera') return 'Véspera: só flashcards leves';
+    if (x.tipo === 'leve') return 'Dia leve: flashcards e 10 questões de Português';
+    if (x.tipo === 'revisao') return (x.extra ? 'Revisão extra de ' : 'Revisão de ') + x.foco.map(S.curto).join(' e ') + (x.sim ? (x.sim.modo === 'completo' ? ', com simulado completo' : ', com simulado de 20 questões') : '');
+    return '';
+  }
+
+  function cabecalho() {
+    var f = feitos(), faltam = Math.max(0, Math.round((dt('2027-03-14') - dt(HOJE)) / 864e5));
+    var est = CAL.dias.filter(function (x) { return f[x.d] && f[x.d].feito; }).length;
+    var pdfs = 0; CAL.dias.forEach(function (x) { if (x.d >= HOJE && x.top) pdfs += temas(x).length; });
+    var fim = window.PLANO ? PLANO.fimDoConteudo() : null;
+    document.getElementById('ca-sub').innerHTML = '<b>' + faltam + (faltam === 1 ? ' dia' : ' dias') + '</b> até 14 de março. ' + (HOJE < CAL.dias[0].d ? 'Começa terça, 20 de outubro. ' : '') +
+      pdfs + ' aulas pela frente' + (fim ? ', o último em ' + dm(fim) : '') + '. ' +
+      (est ? est + (est === 1 ? ' dia marcado como estudado.' : ' dias marcados como estudados.') : '');
+  }
+
+  var MESES_CAL = []; CAL.dias.forEach(function (x) { var k = x.d.slice(0, 7); if (MESES_CAL.indexOf(k) < 0) MESES_CAL.push(k); });
+  var mesAt = sel.slice(0, 7);
+  function chip(d) {
+    var c = COR[d] || 'const';
+    return '<span class="ca-chip" style="--c:var(--mat-' + c + ');--cd:var(--mat-' + c + '-deep)">' + esc(S.curto(d)) + '</span>';
+  }
+  function mes() {
+    var f = feitos(), at = S.atrasados(), k = mesAt, m = +k.slice(5), y = +k.slice(0, 4);
+    var ini = new Date(y, m - 1, 1), ult = new Date(y, m, 0).getDate(), h = '';
+    ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].forEach(function (w) { h += '<span class="ca-sem">' + w + '</span>'; });
+    // semanas inteiras fora do plano (antes de 20/10, depois de 14/03) não aparecem
+    var dPlano = []; for (var j = 1; j <= ult; j++) if (POR[k + '-' + String(j).padStart(2, '0')]) dPlano.push(j);
+    var dow = function (j) { return (new Date(y, m - 1, j).getDay() + 6) % 7; };
+    var d0 = Math.max(1, dPlano[0] - dow(dPlano[0])), dN = Math.min(ult, dPlano[dPlano.length - 1] + 6 - dow(dPlano[dPlano.length - 1]));
+    for (var i = 0; i < dow(d0); i++) h += '<span class="ca-c vazio"></span>';
+    for (var d = d0; d <= dN; d++) {
+      var iso = k + '-' + String(d).padStart(2, '0'), x = POR[iso];
+      if (!x) { h += '<span class="ca-c fora"><span class="ca-n"><b>' + d + '</b></span></span>'; continue; }
+      var ok = f[iso] && f[iso].feito;
+      var cls = 'ca-c' + (iso === HOJE ? ' hoje' : iso < HOJE ? ' passado' : '') + (iso === sel ? ' sel' : '') + (ok ? ' feito' : '') + (at.indexOf(iso) >= 0 ? ' atraso' : '');
+      var corpo = '';
+      if (x.tipo === 'prova') corpo = '<span class="ca-chip prova">Prova</span>';
+      else if (x.top && x.tipo !== 'simulado') {
+        var ds = []; temas(x).forEach(function (t) { if (ds.indexOf(t.d) < 0) ds.push(t.d); });
+        corpo = ds.slice(0, 2).map(function (d) { return chip(d); }).join('');
+      }
+      else if (x.tipo === 'simulado') corpo = '<span class="ca-chip sim">Simulado</span>';
+      else if (x.tipo === 'revisao') corpo = '<span class="ca-chip rev">Revisão</span>';
+      else corpo = '<span class="ca-chip leve">' + (x.tipo === 'vespera' ? 'Véspera' : 'Leve') + '</span>';
+      h += '<button type="button" class="' + cls + '" data-d="' + iso + '" aria-label="' + esc(S.dataLonga(iso) + ': ' + (x.top ? temas(x).map(function (t) { return S.curto(t.d) + ', ' + t.s; }).join('; ') : tipoTxt(x))) + '">' +
+        '<span class="ca-n"><b>' + d + '</b>' + (ok ? '<span class="ok" title="estudado">✓</span>' : at.indexOf(iso) >= 0 ? '<span class="at">atrasado</span>' : '') + '</span><span class="ca-chips">' + corpo + '</span></button>';
+    }
+    document.getElementById('ca-grade').innerHTML = h;
+    document.getElementById('ca-mestit').textContent = MESES_L[m - 1] + ' ' + y;
+    var i2 = MESES_CAL.indexOf(k);
+    document.getElementById('ca-ant').disabled = i2 <= 0;
+    document.getElementById('ca-prox').disabled = i2 >= MESES_CAL.length - 1;
+  }
+
+  function detalhe() {
+    var x = POR[sel], f = feitos(), idx = CAL.dias.indexOf(x) + 1;
+    var tit = S.dataLonga(sel).replace(/^./, function (c) { return c.toUpperCase(); });
+    var fase = x.f === 1 ? (x.ritmo === 'leve' ? 'Ritmo leve (antes das férias)' : 'Férias · 2 a 3 h por dia') : x.f === 3 ? 'Reta final' : 'Dia da prova';
+    var h = '<span class="tag">Dia ' + idx + ' de ' + CAL.dias.length + (sel === HOJE ? ' · hoje' : '') + '</span>' +
+      '<p class="data">' + esc(tit) + '</p><p class="fase">' + fase + (f[sel] && f[sel].feito ? ', estudado ✓' : S.atrasados().indexOf(sel) >= 0 ? ', <span class="atr">atrasado</span>' : '') + '</p>';
+    if (x.adiantado) h += '<p class="ca-adi">Você adiantou conteúdo para este dia.</p>';
+    if (x.top && x.tipo !== 'simulado') h += temas(x).map(function (t) {
+      return '<div class="ca-it">' + chip(t.d) + '<span class="tx">' + esc(t.s) + '</span>' +
+        (t.a ? '<small>' + esc(t.a) + ' · Estratégia</small>' : '') + '</div>';
+    }).join('');
+    else h += '<div class="ca-it"><span class="tx">' + esc(tipoTxt(x)) + '</span></div>';
+    h += '<a class="btn btn-primary" href="hoje.html?data=' + sel + '">Abrir este dia</a>';
+    document.getElementById('ca-det').innerHTML = h;
+  }
+
+  function tudo() { mes(); detalhe(); }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-d]');
+    if (b && POR[b.dataset.d]) {
+      sel = b.dataset.d; tudo();
+      if (window.innerWidth <= 1020) document.getElementById('ca-det').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    var i = MESES_CAL.indexOf(mesAt);
+    if (ev.target.closest('#ca-ant') && i > 0) { mesAt = MESES_CAL[i - 1]; mes(); }
+    else if (ev.target.closest('#ca-prox') && i < MESES_CAL.length - 1) { mesAt = MESES_CAL[i + 1]; mes(); }
+    else if (ev.target.closest('#ca-hojebtn')) { sel = POR[HOJE] ? HOJE : CAL.dias[0].d; mesAt = sel.slice(0, 7); tudo(); }
+  });
+  document.addEventListener('DOMContentLoaded', function () { cabecalho(); tudo(); });
+})();
+</script>
+</body>
+</html>

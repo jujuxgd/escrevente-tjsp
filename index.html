@@ -1,0 +1,1211 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js?v=1783862902"></script>
+<script src="auth-guard.js?v=1784132091"></script>
+<script src="cores-early.js?v=1784060144"></script>
+<script src="page-transition.js?v=1783861010"></script>
+<title>Escrevente TJSP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1784043341">
+<style>
+/* Estilos específicos do dashboard — denso, mas com respiro proporcional a cada elemento */
+main { padding: 2rem 2.5rem 2.25rem; }
+.topbar { margin-bottom: 1.6rem; }
+
+/* Em telas estreitas, o padding do <main> deste dashboard acompanha o
+   padrão responsivo do resto do site em vez de manter o respiro do desktop */
+@media (max-width: 1024px) { main { padding: 1.8rem 1.6rem 2rem; } }
+@media (max-width: 768px)  { main { padding: 1.5rem 1.1rem 1.8rem; } }
+@media (max-width: 640px)  { .topbar { margin-bottom: 1.1rem; flex-wrap: wrap; gap: 0.8rem; } }
+
+.hero {
+  background: var(--blush);
+  border-radius: var(--radius-lg);
+  padding: 1.3rem 1.8rem;
+  margin-bottom: 1.4rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="dark"] .hero {
+  background: var(--blush);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .hero::before {
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 60%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.8rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .hero-content { grid-template-columns: 1fr; }
+  .countdown { justify-self: start; }
+}
+
+.hero h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: 0.45rem;
+  letter-spacing: -0.02em;
+}
+
+.hero h2 em {
+  font-style: italic;
+  color: var(--rose-deep);
+}
+
+.hero .quote {
+  font-family: 'Fraunces', serif;
+  font-size: 1.02rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: 0;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.hero .quote-author {
+  display: inline;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-left: 0.5rem;
+  font-style: normal;
+}
+
+.countdown {
+  text-align: center;
+  background: var(--paper);
+  padding: 0.9rem 1.6rem;
+  border-radius: var(--radius-sm);
+  min-width: 132px;
+  box-shadow: var(--shadow);
+}
+
+.countdown .number {
+  font-family: 'Fraunces', serif;
+  font-size: 2.35rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.countdown .label {
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-top: 0.2rem;
+}
+
+.countdown .date {
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  margin-top: 0.15rem;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+}
+
+/* Ações do topbar — pill de streak e botão de reset com a mesma altura/estilo */
+.topbar-actions .streak-pill {
+  height: 38px;
+  padding: 0 0.9rem;
+  box-sizing: border-box;
+}
+
+.topbar-actions .reset-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  font-size: 1rem;
+  color: var(--ink-faded);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+
+.topbar-actions .reset-btn:hover {
+  color: var(--rose-deep);
+  border-color: var(--rose-soft);
+  background: var(--bg-soft);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+/* GRID DASHBOARD — sistema bento de 12 colunas, dimensionado por hierarquia */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-faded);
+  margin: 0 0 0.7rem 0.1rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.6rem;
+  align-items: stretch;
+}
+
+.bento-grid.progress-row { margin-bottom: 0; }
+
+.span-8 { grid-column: span 8; }
+.span-5 { grid-column: span 5; }
+.span-4 { grid-column: span 4; }
+.span-3 { grid-column: span 3; }
+
+@media (max-width: 1150px) {
+  .bento-grid { grid-template-columns: repeat(6, 1fr); }
+  .span-8, .span-5, .span-4, .span-3 { grid-column: span 6; }
+}
+
+@media (max-width: 640px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .span-8, .span-5, .span-4, .span-3 { grid-column: 1; }
+}
+
+/* HOJE CARD — o card mais denso do painel, por isso o mais generoso */
+.today-card {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.8rem;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition), transform var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.today-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--rose-soft), var(--rose), var(--rose-soft));
+}
+
+.today-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.today-card-footer {
+  margin-top: auto;
+  padding-top: 1.1rem;
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.today-tag {
+  display: inline-block;
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.26rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.7rem;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .today-tag {
+  color: var(--rose-deep);
+}
+
+.today-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+  line-height: 1.2;
+}
+
+.today-card h3 em {
+  font-style: italic;
+  color: var(--rose-deep);
+}
+
+.today-card .subject {
+  font-size: 0.82rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.today-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin: 0.9rem 0;
+  padding: 0.8rem 0;
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.today-stat {
+  text-align: center;
+  padding: 0.2rem 0.5rem;
+  border-right: 1px solid var(--line-soft);
+}
+
+.today-stat:last-child {
+  border-right: none;
+}
+
+.today-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.today-stat .lbl {
+  font-size: 0.55rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+.progress-section {
+  margin-top: 0.2rem;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--line-soft);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0.4rem 0 0.25rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose-soft) 0%, var(--rose) 50%, var(--rose-deep) 100%);
+  border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.02em;
+}
+
+/* SIDEBAR DASHBOARD */
+.side-card {
+  background: var(--paper);
+  border-radius: var(--radius);
+  padding: 1.15rem 1.3rem;
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--line-soft);
+  margin-bottom: 0;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition), transform var(--transition), border-top-color var(--transition);
+}
+
+.side-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+  border-top-color: var(--rose-soft);
+}
+
+.side-card h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.side-card h4 .icon {
+  font-size: 0.82rem;
+  color: var(--rose-deep);
+  opacity: 0.7;
+}
+
+/* Wrapper da coluna direita: widget de humor fica compacto (altura natural),
+   o card de questões preenche o espaço restante para igualar o today-card */
+.side-cards-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+}
+
+.side-cards-col .mood-widget {
+  flex: 0 0 auto;
+}
+
+.side-cards-col #questoes-summary {
+  flex: 1;
+}
+
+/* Links no rodapé dos cards alinham ao fundo */
+.side-card > a[href] {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-size: 0.74rem;
+}
+
+/* Animação de entrada escalonada */
+@keyframes dashIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.today-card               { animation: dashIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.05s both; }
+.side-cards-col .side-card:nth-child(1) { animation: dashIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.10s both; }
+.side-cards-col .side-card:nth-child(2) { animation: dashIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
+.progress-row .side-card:nth-child(1) { animation: dashIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.15s both; }
+.progress-row .side-card:nth-child(2) { animation: dashIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.22s both; }
+.progress-row .side-card:nth-child(3) { animation: dashIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.29s both; }
+
+/* MOOD TRACKER — widget compacto (pouco conteúdo), mas com conforto mínimo */
+.mood-widget {
+  padding: 0.95rem 1.1rem;
+}
+
+.mood-widget h4 {
+  margin-bottom: 0.55rem;
+}
+
+.mood-options {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: space-between;
+}
+
+.mood-btn {
+  flex: 1;
+  aspect-ratio: 1;
+  background: var(--bg-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1.15rem;
+  transition: all var(--transition);
+}
+
+.mood-btn:hover {
+  background: var(--blush);
+  transform: translateY(-2px);
+}
+
+.mood-btn.selected {
+  background: var(--rose-soft);
+  border-color: var(--rose);
+}
+
+.mood-label {
+  font-size: 0.68rem;
+  color: var(--ink-faded);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* HEATMAP */
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 4px;
+  margin-top: 0.45rem;
+}
+
+.heat-cell {
+  aspect-ratio: 1;
+  background: var(--line-soft);
+  border-radius: 2px;
+  transition: transform var(--transition);
+}
+
+.heat-cell:hover { transform: scale(1.3); }
+.heat-cell.l1 { background: var(--blush); }
+.heat-cell.l2 { background: var(--rose-soft); }
+.heat-cell.l3 { background: var(--rose); }
+.heat-cell.l4 { background: var(--rose-deep); }
+
+/* MATÉRIAS BAR CHART — o card com mais itens (6), por isso o mais respirado dos três */
+.materia-bar {
+  margin-bottom: 0.62rem;
+}
+
+.materia-bar .top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  margin-bottom: 0.22rem;
+  letter-spacing: -0.005em;
+}
+
+.materia-bar .name { color: var(--ink); }
+.materia-bar .pct { color: var(--rose-deep); font-weight: 600; font-family: 'Fraunces', serif; }
+
+.materia-bar .bar {
+  height: 3px;
+  background: var(--line-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.materia-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose-soft), var(--rose));
+  border-radius: 3px;
+}
+
+/* REVISÃO PREVIEW — card mais leve (até 3 itens), fica compacto por natureza */
+.revisao-preview-item {
+  padding: 0.55rem 0;
+  border-bottom: 1px dotted var(--line);
+  cursor: pointer;
+  transition: padding var(--transition);
+}
+
+.revisao-preview-item:hover { padding-left: 0.3rem; }
+.revisao-preview-item:last-child { border-bottom: none; }
+
+.revisao-preview-item .when {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+  margin-bottom: 0.12rem;
+}
+
+.revisao-preview-item .topic {
+  font-size: 0.83rem;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.revisao-preview-item .materia {
+  font-size: 0.7rem;
+  color: var(--ink-faded);
+  margin-top: 0.08rem;
+}
+
+/* FATO HISTÓRICO */
+.fact-card {
+  background: linear-gradient(135deg, var(--champagne) 0%, var(--blush) 100%);
+  padding: 1.3rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .fact-card {
+  background: linear-gradient(135deg, var(--champagne) 0%, var(--blush) 100%);
+}
+
+.fact-card .eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-bottom: 0.5rem;
+}
+
+.fact-card .fact {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.fact-card .year {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--rose-deep);
+  margin-bottom: 0.3rem;
+}
+
+/* PLAYLIST */
+.playlist-card {
+  background: linear-gradient(135deg, var(--lavender) 0%, var(--rose-soft) 100%);
+  padding: 1.3rem;
+  border-radius: var(--radius);
+}
+
+.playlist-card .icon-music {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.playlist-card .pl-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.playlist-card .pl-sub {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.8rem;
+}
+/* blocos vindos do Início novo: revisões do dia, próximos dias e PDFs do VDE */
+.in-fatos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem;margin-bottom:2rem}
+.in-fato{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:1.1rem 1.3rem;text-decoration:none;color:var(--ink)}
+.in-fato:hover{border-color:var(--rose)}
+.in-fato span{font-size:.88rem;color:var(--ink-soft);line-height:1.35}
+.in-fato small{display:block;font-size:.74rem;color:var(--ink-faded)}
+.in-fato b{font-family:'Fraunces',serif;font-weight:400;font-size:1.8rem;line-height:1;color:var(--ink)}
+.in-prox{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem;margin-bottom:2rem}
+.in-dia{display:block;background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:1rem 1.2rem;text-decoration:none;color:var(--ink)}
+.in-dia:hover{border-color:var(--rose)}
+.in-dia em{display:block;font-style:normal;font-size:.78rem;color:var(--ink-faded);margin-bottom:.4rem}
+.in-dia p{margin:0;font-size:.85rem;color:var(--ink-soft);line-height:1.4}
+.in-tema{border-left:3px solid var(--cd,var(--rose));padding-left:.6rem;margin-top:.35rem}
+.in-tema span{display:block;font-size:.72rem;font-weight:600;color:var(--cd,var(--rose-deep))}
+.in-tema strong{display:block;font-weight:400;font-size:.86rem;line-height:1.35;color:var(--ink)}
+.in-prog{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-bottom:2rem}
+.in-prog p{margin:0 0 .7rem;font-size:.9rem;color:var(--ink-soft);line-height:1.5}
+.in-prog p b{color:var(--ink);font-weight:600}
+.in-barra{display:flex;gap:2px;height:14px}
+.in-barra i{flex:1;border-radius:2px;background:var(--line)}
+.in-barra i.ok{background:var(--cd)}
+@media (max-width:900px){ .in-fatos,.in-prox{grid-template-columns:1fr} }
+</style>
+<link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script><link rel="stylesheet" href="home.css?v=1791163406"><link rel="stylesheet" href="leitor-pdf.css"></head>
+<body>
+
+<div class="aurora-bg" aria-hidden="true">
+  <div class="aurora-blob ab1"></div>
+  <div class="aurora-blob ab2"></div>
+  <div class="aurora-blob ab3"></div>
+  <div class="aurora-blob ab4"></div>
+</div>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()" title="Menu">☰</button>
+<button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Esconder menu">‹</button>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="mark"><svg class="seal" viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><circle cx="32" cy="32" r="23" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="32" y="33" font-size="15" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-weight="700" fill="currentColor">TJSP</text></svg></div>
+      <h1>Escrevente TJSP</h1>
+      <div class="subtitle">Escrevente Técnico Judiciário</div>
+    </div>
+
+    <div class="nav-section-label">Principal</div>
+    <a href="index.html" class="nav-link active">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>
+      <span>Início</span>
+    </a>
+    <a href="hoje.html" class="nav-link">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></span>
+      <span>Hoje</span>
+    </a>
+    <a href="calendario.html" class="nav-link">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+      <span>Calendário</span>
+    </a>
+    <a href="revisar.html" class="nav-link">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg></span>
+      <span>Revisar</span>
+    </a>
+    <div class="nav-section-label">Estudo</div>
+    <a href="materias.html" class="nav-link">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span>
+      <span>Matérias</span>
+    </a>
+    <a href="banco-questoes.html" class="nav-link">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+      <span>Questões</span>
+    </a>
+    <a href="erros.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.9.85a.5.5 0 0 1-.62-.62l.85-2.9a2 2 0 0 1 .5-.85z"/></svg></span><span>Caderno de Erros</span></a>
+    <a href="caderno-legislativo.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><span>Caderno Legislativo</span></a>
+
+    <div class="nav-section-label">Análise</div>
+    <a href="estatisticas.html" class="nav-link">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16v-3"/><path d="M12 16V8"/><path d="M17 16v-5"/></svg></span>
+      <span>Estatísticas</span>
+    </a>
+    <a href="estatisticas.html#simulados" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12l2 2 4-4"/></svg></span><span>Simulados</span></a>
+
+    <div class="nav-section-label">Extra</div>
+    <a href="reta-final.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V4"/></svg></span><span>Reta Final</span></a>
+
+    <div class="sidebar-footer">
+      <div class="profile-card">
+        <div class="profile-avatar">
+          <img src="foto-perfil.jpg" alt="Julia" onerror="this.style.display='none'; if (this.parentElement) this.parentElement.textContent='J';">
+        </div>
+        <div class="profile-info">
+          <div class="name">Julia</div>
+          <div class="meta">Estudante de Direito</div>
+        </div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-label">Modo escuro</span>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="page-title">
+        <div class="breadcrumb">Painel · <span data-month-year>—</span></div>
+        <h1>Bom dia, <em>Julia</em></h1>
+      </div>
+      <div class="topbar-actions">
+        <div class="streak-pill">
+          <span class="flame">✨</span>
+          <span class="count" id="streak-count">0</span>
+          <span class="label">dias</span>
+        </div>
+        <button onclick="resetarTudo()" class="reset-btn" title="Resetar todo o progresso e preferências">↺</button>
+      </div>
+    </div>
+
+    <div class="focus-dashboard-scroll">
+    <div class="hero">
+      <div class="hero-content">
+        <div>
+          <h2 id="hero-title">Hoje: <em id="hero-materias">—</em></h2>
+          <p class="quote" id="hero-quote">
+            "A advocacia não é profissão de covardes. Quem tem medo de perder a banca, de cair do cartaz, de comprometer o sucesso, que se faça funcionário, guarda-livros, ou que vá vender picolés à porta das escolas."
+            <span class="quote-author" id="hero-quote-author">— Sobral Pinto</span>
+          </p>
+        </div>
+        <div class="countdown">
+          <div class="number" data-countdown>—</div>
+          <div class="label">dias</div>
+          <div class="date">restantes · TJSP · 14 mar</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Foco de hoje</div>
+    <div class="bento-grid">
+
+      <div class="today-card span-8">
+        <span class="today-tag" id="today-tag-dynamic">○ carregando…</span>
+        <h3 id="today-title">—</h3>
+        <div class="subject" id="today-subject">—</div>
+
+        <div class="today-stats">
+          <div class="today-stat">
+            <div class="num" id="stat-horas">—</div>
+            <div class="lbl">PDFs do dia</div>
+          </div>
+          <div class="today-stat">
+            <div class="num" id="stat-materias">—</div>
+            <div class="lbl">Matérias</div>
+          </div>
+          <div class="today-stat">
+            <div class="num" id="stat-questoes">—</div>
+            <div class="lbl">Questões feitas</div>
+          </div>
+          <div class="today-stat">
+            <div class="num" id="stat-acertos">—</div>
+            <div class="lbl">Taxa de acerto</div>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-label">
+            <span id="progress-days-text">0 dias concluídos</span>
+            <span id="progress-pct-text">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill-main" style="width:0%"></div></div>
+        </div>
+
+        <div class="today-card-footer">
+          <a href="hoje.html" class="btn btn-primary">Abrir conteúdo do dia →</a>
+          <a href="revisar.html" class="btn btn-ghost">Revisar</a>
+          <a href="calendario.html" class="btn btn-ghost">☷ Calendário</a>
+          <button onclick="abrirApostilaModal()" class="btn btn-ghost" title="Abrir a apostila completa do preparatório">📖 Apostila teórica NEAF</button>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA: humor (widget compacto) + questões -->
+      <div class="span-4 side-cards-col">
+
+        <div class="side-card mood-widget">
+          <h4>Como você tá hoje? <span class="icon">♡</span></h4>
+          <div class="mood-options">
+            <button class="mood-btn" data-mood="Cansada" title="Cansada">🌙</button>
+            <button class="mood-btn" data-mood="Perdida" title="Perdida">🌀</button>
+            <button class="mood-btn selected" data-mood="Focada" title="Focada">✨</button>
+            <button class="mood-btn" data-mood="Confiante" title="Confiante">⚡</button>
+            <button class="mood-btn" data-mood="Empolgada" title="Empolgada">🎉</button>
+          </div>
+          <div class="mood-label">Selecionado: <em id="mood-text">focada</em></div>
+        </div>
+
+        <div class="side-card" id="questoes-summary">
+          <h4>Questões <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span></h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.7rem">
+            <div style="text-align:center;padding:0.6rem;background:var(--bg-soft);border-radius:var(--radius-sm)">
+              <div style="font-family:'Fraunces',serif;font-size:1.55rem;font-weight:500;color:var(--ink)" id="q-total">0</div>
+              <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faded)">Total feitas</div>
+            </div>
+            <div style="text-align:center;padding:0.6rem;background:var(--bg-soft);border-radius:var(--radius-sm)">
+              <div style="font-family:'Fraunces',serif;font-size:1.55rem;font-weight:500;color:var(--rose-deep)" id="q-pct">—</div>
+              <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faded)">Taxa de acerto</div>
+            </div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--ink-soft);display:flex;justify-content:space-between;padding:0.4rem 0;border-top:1px solid var(--line)">
+            <span>Acertos</span>
+            <span style="font-weight:600;color:var(--ink)" id="q-acertos">0</span>
+          </div>
+          <a href="estatisticas.html" style="font-size:0.74rem;color:var(--rose-deep);text-decoration:none;margin-top:auto;padding-top:0.6rem;display:inline-block">Ver estatísticas →</a>
+        </div>
+
+      </div>
+    </div><!-- /bento-grid foco de hoje -->
+
+    <div class="section-label">Para revisar hoje</div>
+    <div class="in-fatos" id="in-fatos"></div>
+
+    <div class="section-label">Próximos dias</div>
+    <div class="in-prox" id="in-prox"></div>
+
+    <div class="section-label">Aulas do plano</div>
+    <section class="in-prog">
+      <p id="in-prog-txt"></p>
+      <div class="in-barra" id="in-barra" role="img"></div>
+    </section>
+
+    <div class="section-label">Seu progresso</div>
+    <div class="bento-grid progress-row">
+
+      <div class="side-card span-5">
+        <h4>Progresso por matéria <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span></h4>
+        <div id="materias-bars">
+          <div style="font-size:0.82rem;color:var(--ink-faded);font-style:italic">Carregando…</div>
+        </div>
+        <a href="materias.html" style="font-size:0.74rem;color:var(--rose-deep);text-decoration:none;margin-top:auto;padding-top:0.6rem;display:inline-block">Ver todas →</a>
+      </div>
+
+      <div class="side-card span-4">
+        <h4>Mapa de estudos <span class="icon">⛛</span></h4>
+        <div style="font-size:0.7rem;color:var(--ink-faded);margin-bottom:0.4rem">Últimos 28 dias</div>
+        <div class="heatmap" id="heatmap-container"></div>
+        <div style="margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid var(--line);font-size:0.8rem;color:var(--ink-soft)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.2rem">
+            <span>Dias concluídos</span>
+            <strong style="font-family:'Fraunces',serif;color:var(--rose-deep)" id="heatmap-concluidos">0</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span>Streak atual</span>
+            <strong style="font-family:'Fraunces',serif;color:var(--rose-deep)" id="heatmap-streak">0 dias</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card span-3">
+        <h4>Dias concluídos <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg></span></h4>
+        <div style="font-size:0.68rem;color:var(--ink-faded);margin-bottom:0.35rem">Últimos estudados</div>
+        <div id="revisao-preview-container">
+          <div style="font-size:0.8rem;color:var(--ink-faded);font-style:italic;padding:0.35rem 0">Nenhum dia concluído ainda.</div>
+        </div>
+        <a href="calendario.html" style="font-size:0.73rem;color:var(--rose-deep);text-decoration:none;margin-top:auto;padding-top:0.55rem;display:inline-block">Ver calendário →</a>
+      </div>
+
+    </div>
+    </div><!-- /focus-dashboard-scroll -->
+  </main>
+</div>
+
+<!-- Modal: Apostila completa (PDF embutido do Drive) -->
+<div class="ju-modal-overlay" id="apostila-modal-overlay">
+  <div class="ju-modal-panel ju-modal-lg" style="max-width:1200px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.3rem;border-bottom:1px solid var(--line);flex-shrink:0">
+      <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:500;color:var(--ink)">📖 Apostila teórica NEAF</div>
+      <div style="display:flex;gap:0.5rem">
+        <a href="https://drive.google.com/file/d/1E9eMGN-iE_9koLoJpd-IGK0NEx8O8y9y/view?usp=sharing" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:0.78rem">↗ Abrir no Drive</a>
+        <button onclick="fecharApostilaModal()" class="btn" style="font-size:0.78rem">Fechar</button>
+      </div>
+    </div>
+    <div id="apostila-modal-leitor" class="lp-rola"></div>
+  </div>
+</div>
+
+<script src="cards.js"></script>
+<script src="progresso.js?v=1783859287"></script>
+<script src="humor.js"></script>
+<script src="script.js?v=1784021868"></script>
+<script src="cores.js?v=1784060144"></script>
+<script src="perfil.js?v=1783860863"></script>
+<script src="sync.js?v=1784058237"></script>
+<script src="erros-core.js"></script>
+<script src="revisao-biblioteca.js"></script>
+<script src="calendario-ativo.js"></script>
+<script src="plano-dinamico.js"></script>
+<script src="aulas-dias.js"></script>
+<script src="ativo-core.js"></script>
+<script src="sessao-core.js"></script>
+<script src="leitor-pdf.js"></script>
+<script>
+const QUOTES_OAB = [
+  { text: "Todos são iguais perante a lei, sem distinção de qualquer natureza.", author: "Constituição Federal, art. 5º" },
+  { text: "A administração pública obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade e eficiência.", author: "Constituição Federal, art. 37" },
+  { text: "Direito é a arte do bem e do justo.", author: "Celso · Digesto, D.1.1.1" },
+  { text: "Não há liberdade onde não há lei. Não há lei onde não há liberdade.", author: "Rui Barbosa" },
+  { text: "Ninguém ignora tudo, ninguém sabe tudo. Por isso aprendemos sempre.", author: "Paulo Freire" },
+  { text: "A justiça é a constante e perpétua vontade de dar a cada um o que é seu.", author: "Ulpiano" },
+  { text: "O sucesso é a soma de pequenos esforços repetidos dia após dia.", author: "Robert Collier" },
+  { text: "Nenhuma grande obra foi alcançada sem entusiasmo.", author: "Ralph Waldo Emerson" },
+  { text: "Cada questão resolvida é um passo em direção à posse.", author: "Escrevente TJSP · Ju" },
+  { text: "Um pouco por dia agora vale mais do que muito na última semana.", author: "Escrevente TJSP · Ju" },
+  { text: "Lei seca lida hoje é ponto garantido em março.", author: "Escrevente TJSP · Ju" },
+  { text: "A dignidade da pessoa humana é o fundamento de todo o ordenamento jurídico.", author: "CF/88, art. 1º, III" },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Citação rotativa diária
+  const quoteEl  = document.getElementById('hero-quote');
+  const authorEl = document.getElementById('hero-quote-author');
+  if (quoteEl && authorEl) {
+    const today = getCurrentDate ? getCurrentDate() : new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 864e5);
+    const q = QUOTES_OAB[dayOfYear % QUOTES_OAB.length];
+    quoteEl.childNodes[0].textContent = `"${q.text}" `;
+    authorEl.textContent = `— ${q.author}`;
+  }
+
+  // Countdown para o exame
+  const countdownEl = document.querySelector('[data-countdown]');
+  if (countdownEl) countdownEl.textContent = getDaysUntilExam();
+
+  // Saudação dinâmica
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  const nomeUsuario = (window._perfilOAB && window._perfilOAB.getNome()) || 'Estudante';
+  const greetEl = document.querySelector('.topbar h1');
+  if (greetEl) greetEl.innerHTML = `${greeting}, <em>${nomeUsuario}</em>`;
+
+  // Dados do calendário dinâmico (CAL_ATIVO já reorganizado pelo plano-dinamico.js)
+  const S = window.SESSAO, CAL = window.CAL_ATIVO;
+  const CK = (() => { try { return JSON.parse(localStorage.getItem('tj_ativo_check_v1')) || {}; } catch (e) { return {}; } })();
+  const HOJE = S ? S.HOJE : dataLocalHoje();
+  const DIA = S ? S.DIA : null;
+  const feito = iso => !!(CK[iso] && CK[iso].feito);
+  const isoDe = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const curto = d => S ? S.curto(d) : d;
+  const temasDe = x => {
+    const vist = {}, out = [];
+    (x && x.top || []).forEach(t => { const k = t.d + t.s; if (!vist[k]) { vist[k] = 1; out.push(t); } });
+    return out;
+  };
+  const discsDe = x => temasDe(x).map(t => t.d).filter((d, i, a) => a.indexOf(d) === i);
+  const tipoTxt = x => {
+    if (!x) return '';
+    if (x.tipo === 'simulado') return 'Simulado completo';
+    if (x.tipo === 'prova') return 'Prova do TJSP · objetiva e redação';
+    if (x.tipo === 'vespera') return 'Véspera: só flashcards leves';
+    if (x.tipo === 'leve') return 'Dia leve: flashcards e 10 questões de Português';
+    if (x.tipo === 'revisao') return (x.extra ? 'Revisão extra de ' : 'Revisão de ') + x.foco.map(curto).join(' e ');
+    return '';
+  };
+  const EMOJI = {};
+  if (typeof PLANO_VDE !== 'undefined') PLANO_VDE.forEach(d => (d.materias || []).forEach(m => { if (m.nome && m.emoji && !EMOJI[m.nome]) EMOJI[m.nome] = m.emoji; }));
+
+  // Streak = dias seguidos marcados como estudados (hoje conta se já marcou)
+  const streak = streakOAB();
+  const streakCount = document.getElementById('streak-count');
+  if (streakCount) streakCount.textContent = streak;
+
+  // Tag e card de hoje
+  const tag = document.getElementById('today-tag-dynamic');
+  if (tag && CAL && DIA) {
+    const n = S.indice() + 1, total = CAL.dias.length;
+    if (HOJE < CAL.dias[0].d) tag.textContent = '○ Começa em 20 out';
+    else if (DIA.tipo === 'prova') tag.textContent = '🏛️ Dia da Prova — TJSP Escrevente';
+    else if (DIA.tipo === 'revisao') tag.textContent = `↻ Revisão · Dia ${n} de ${total}`;
+    else if (DIA.tipo === 'simulado') tag.textContent = `○ Simulado · Dia ${n} de ${total}`;
+    else tag.textContent = `○ Dia ${n} de ${total}`;
+  }
+  if (DIA) {
+    const ts = temasDe(DIA), ds = discsDe(DIA);
+    const heroMaterias = document.getElementById('hero-materias');
+    if (heroMaterias) heroMaterias.textContent = ds.length ? ds.map(curto).join(' · ') : tipoTxt(DIA);
+    const todayTitle = document.getElementById('today-title');
+    if (todayTitle) {
+      if (ts.length && DIA.tipo !== 'simulado') {
+        todayTitle.textContent = curto(ts[0].d) + ' · ' + ts[0].s;
+        if (ts[1]) todayTitle.innerHTML += ' <em>·</em> ' + S.esc(curto(ts[1].d) + ' · ' + ts[1].s);
+      } else todayTitle.textContent = tipoTxt(DIA);
+    }
+    const todaySubject = document.getElementById('today-subject');
+    if (todaySubject) todaySubject.textContent = ds.length ? ds.map(d => `${EMOJI[d] || ''} ${d}`.trim()).join('  ·  ') : (DIA.tipo === 'revisao' ? 'Caderno de erros, flashcards e questões' : '');
+    const statHoras = document.getElementById('stat-horas');
+    if (statHoras) statHoras.textContent = S.pdfsDoDia().length || '—';
+    const statMaterias = document.getElementById('stat-materias');
+    if (statMaterias) statMaterias.textContent = ds.length || (DIA.foco ? DIA.foco.length : '—');
+  }
+
+  // Questões: banco (inclui Hoje e simulados) + sessões registradas no Tracker
+  const resp = (() => { try { return JSON.parse(localStorage.getItem('tj_bq_respostas')) || {}; } catch (e) { return {}; } })();
+  const qb = Object.keys(resp), qbOk = qb.filter(k => resp[k].ultima_correta).length;
+  const qt = typeof getTotaisQuestoes === 'function' ? getTotaisQuestoes() : { total: 0, acertos: 0 };
+  const q = { total: qb.length + qt.total, acertos: qbOk + qt.acertos };
+  q.pct = q.total ? Math.round(q.acertos / q.total * 100) : 0;
+  const statQ = document.getElementById('stat-questoes');
+  const statA = document.getElementById('stat-acertos');
+  if (statQ) statQ.textContent = q.total > 0 ? q.total : '—';
+  if (statA) statA.textContent = q.total > 0 ? `${q.pct}%` : '—';
+  const qTotal = document.getElementById('q-total');
+  const qPct   = document.getElementById('q-pct');
+  const qAcertos = document.getElementById('q-acertos');
+  if (qTotal)   qTotal.textContent   = q.total;
+  if (qPct)     qPct.textContent     = q.total > 0 ? `${q.pct}%` : '—';
+  if (qAcertos) qAcertos.textContent = q.acertos;
+
+  // Progresso geral = dias do calendário marcados como estudados
+  const totalDias = CAL ? CAL.dias.length : 0;
+  const concluidos = CAL ? CAL.dias.filter(x => feito(x.d)).length : 0;
+  const pct = totalDias ? Math.round(concluidos / totalDias * 100) : 0;
+  const fillEl = document.getElementById('progress-fill-main');
+  const pctText = document.getElementById('progress-pct-text');
+  const daysText = document.getElementById('progress-days-text');
+  if (fillEl)   fillEl.style.width   = `${pct}%`;
+  if (pctText)  pctText.textContent  = `${pct}%`;
+  if (daysText) daysText.textContent = `${concluidos} de ${totalDias} dias concluídos`;
+
+  // Heatmap e streak card
+  const heatContainer = document.getElementById('heatmap-container');
+  const hConcluidos = document.getElementById('heatmap-concluidos');
+  const hStreak = document.getElementById('heatmap-streak');
+  if (heatContainer) {
+    const cells = [];
+    for (let i = 27; i >= 0; i--) {
+      const d = new Date(HOJE + 'T12:00:00');
+      d.setDate(d.getDate() - i);
+      const ds = isoDe(d);
+      cells.push(`<div class="heat-cell ${feito(ds) ? 'l4' : ''}" title="${ds}"></div>`);
+    }
+    heatContainer.innerHTML = cells.join('');
+  }
+  if (hConcluidos) hConcluidos.textContent = concluidos;
+  if (hStreak) hStreak.textContent = `${streak} dia${streak !== 1 ? 's' : ''}`;
+
+  // Progresso por matéria = aulas estudadas (item do checklist ou dia marcado)
+  const unidades = {};
+  if (CAL) CAL.dias.forEach(x => {
+    if (x.f !== 1 || !x.top) return;
+    x.top.forEach(t => { if (t.n != null && !unidades[t.n]) unidades[t.n] = { d: t.d, ok: false }; });
+  });
+  Object.keys(CK).forEach(data => {
+    const c = CK[data], x = CAL ? CAL.dias.find(y => y.d === data) : null;
+    Object.keys(c).forEach(k => { const m = /^p(\d+)$/.exec(k); if (m && c[k] && unidades[m[1]]) unidades[m[1]].ok = true; });
+    if (c.feito && x && x.top) x.top.forEach(t => { if (unidades[t.n]) unidades[t.n].ok = true; });
+  });
+  const MATERIAS_TOP = [
+    {d:'Língua Portuguesa',        nome:'Português'},
+    {d:'Direito Processual Civil', nome:'Processo Civil'},
+    {d:'Direito Processual Penal', nome:'Processo Penal'},
+    {d:'Direito Penal',            nome:'Direito Penal'},
+    {d:'Direito Constitucional',   nome:'Constitucional'},
+    {d:'Direito Administrativo',   nome:'Administrativo'},
+    {d:'Normas da Corregedoria',   nome:'Normas da Corregedoria'},
+    {d:'Informática',              nome:'Informática'},
+    {d:'Raciocínio Lógico',        nome:'Raciocínio Lógico'},
+    {d:'Matemática',               nome:'Matemática'},
+  ];
+  const materiasContainer = document.getElementById('materias-bars');
+  if (materiasContainer) {
+    materiasContainer.innerHTML = MATERIAS_TOP.map(m => {
+      const us = Object.values(unidades).filter(u => u.d === m.d);
+      const pm = us.length ? Math.round(us.filter(u => u.ok).length / us.length * 100) : 0;
+      return `<div class="materia-bar">
+        <div class="top"><span class="name">${m.nome}</span><span class="pct">${pm}%</span></div>
+        <div class="bar"><div class="fill" style="width:${pm}%"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Últimos dias estudados
+  const revisaoContainer = document.getElementById('revisao-preview-container');
+  if (revisaoContainer) {
+    const ultimos = (CAL ? CAL.dias : []).filter(x => feito(x.d) && x.d <= HOJE).slice(-3).reverse();
+    if (ultimos.length > 0) {
+      revisaoContainer.innerHTML = ultimos.map(x => {
+        const diff = Math.round((new Date(HOJE + 'T12:00:00') - new Date(x.d + 'T12:00:00')) / 864e5);
+        const quando = diff === 0 ? 'hoje' : diff === 1 ? 'ontem' : `há ${diff} dias`;
+        const nomesM = discsDe(x).map(curto).join(', ') || tipoTxt(x);
+        return `<div class="revisao-preview-item" onclick="location.href='hoje.html?data=${x.d}'">
+          <div class="when">${quando}</div>
+          <div class="topic">Dia ${CAL.dias.indexOf(x) + 1}</div>
+          <div class="materia">${S.esc(nomesM)}</div>
+        </div>`;
+      }).join('');
+    } else {
+      revisaoContainer.innerHTML = `<div style="font-size:0.82rem;color:var(--ink-faded);font-style:italic;padding:0.5rem 0">Nenhum dia concluído ainda.</div>`;
+    }
+  }
+
+  // Blocos do Início novo
+  const COR = {
+    'Direito Constitucional': 'const', 'Direito Administrativo': 'const',
+    'Direito Processual Civil': 'civil',
+    'Direito Penal': 'penal', 'Direito Processual Penal': 'penal',
+    'Normas da Corregedoria': 'trab', 'Estatuto da Pessoa com Deficiência': 'trab',
+    'Informática': 'tribut', 'Raciocínio Lógico': 'tribut', 'Matemática': 'tribut', 'Atualidades': 'tribut',
+    'Língua Portuguesa': 'etica'
+  };
+  const cor = d => '--cd:var(--mat-' + (COR[d] || 'const') + '-deep)';
+  const esc = S ? S.esc : (x => x);
+  const fato = (href, n, txt, sub) => `<a class="in-fato" href="${href}"><span>${txt}${sub ? '<small>' + sub + '</small>' : ''}</span><b>${n}</b></a>`;
+  const errosHoje = typeof erros_total_devidas === 'function' ? erros_total_devidas() : 0;
+  const fatos = venc => {
+    const el = document.getElementById('in-fatos'); if (!el) return;
+    el.innerHTML = fato('revisar.html', venc == null ? '…' : venc, 'Flashcards para revisar', 'vencidos hoje') +
+      fato('erros.html', errosHoje, 'Erros para refazer', 'Caderno de erros') +
+      fato('hoje.html?aba=checklist', S ? S.progressoChecklist().feitos + '/' + S.progressoChecklist().total : '—', 'Checklist de hoje', S && S.feito() ? 'dia marcado como estudado ✓' : 'itens feitos');
+  };
+  fatos(null);
+  if (window.ATIVO) ATIVO.carregarCartoes().then(() => fatos(ATIVO.vencidos().length));
+
+  const prox = document.getElementById('in-prox');
+  if (prox && CAL) {
+    const i = CAL.dias.indexOf(DIA);
+    prox.innerHTML = CAL.dias.slice(i + 1, i + 4).map(x => {
+      const dl = S.dataLonga(x.d);
+      return `<a class="in-dia" href="hoje.html?data=${x.d}"><em>${esc(dl.charAt(0).toUpperCase() + dl.slice(1))}</em>` +
+        (x.top && x.tipo !== 'simulado' ? temasDe(x).map(t => `<div class="in-tema" style="${cor(t.d)}"><span>${esc(curto(t.d))}</span><strong>${esc(t.s)}</strong></div>`).join('') : `<p>${esc(tipoTxt(x))}</p>`) + '</a>';
+    }).join('');
+  }
+
+  const ulist = Object.keys(unidades).sort((a, b) => a - b).map(n => unidades[n]);
+  const okN = ulist.filter(u => u.ok).length;
+  const fim = window.PLANO ? PLANO.fimDoConteudo() : null;
+  const progTxt = document.getElementById('in-prog-txt');
+  if (progTxt) progTxt.innerHTML = `<b>${okN} de ${ulist.length}</b> aulas estudadas.` + (fim ? ` A última está prevista para ${fim.slice(8, 10)}/${fim.slice(5, 7)}; depois vem a revisão até a prova.` : '');
+  const barra = document.getElementById('in-barra');
+  if (barra) {
+    barra.setAttribute('aria-label', `${okN} de ${ulist.length} aulas estudadas`);
+    barra.innerHTML = ulist.map(u => `<i class="${u.ok ? 'ok' : ''}" style="${cor(u.d)}"></i>`).join('');
+  }
+
+  // Mood tracker
+  const moodBtns = document.querySelectorAll('.mood-btn');
+  const moodText = document.getElementById('mood-text');
+  const fmtGenero = (t) => (window._perfilOAB && window._perfilOAB.formatarGenero) ? window._perfilOAB.formatarGenero(t) : t;
+  // Tooltip/rótulo visível respeita a preferência de gênero do perfil;
+  // o data-mood (usado pra salvar/comparar) permanece sempre estável.
+  moodBtns.forEach(btn => { btn.title = fmtGenero(btn.dataset.mood); });
+  const todayStr = dataLocalHoje();
+  const savedMood = localStorage.getItem(`mood_${todayStr}`);
+  if (savedMood) {
+    moodBtns.forEach(btn => btn.classList.remove('selected'));
+    const activeBtn = Array.from(moodBtns).find(btn => btn.dataset.mood === savedMood);
+    if (activeBtn) {
+      activeBtn.classList.add('selected');
+      if (moodText) moodText.innerText = fmtGenero(savedMood).toLowerCase();
+    }
+  }
+  moodBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      moodBtns.forEach(b => b.classList.remove('selected'));
+      e.currentTarget.classList.add('selected');
+      const moodName = e.currentTarget.getAttribute('data-mood');
+      if (typeof HumorOAB !== 'undefined') HumorOAB.registrarHumor(moodName);
+      else localStorage.setItem(`mood_${todayStr}`, moodName); // fallback se humor.js não carregou
+      if (moodText) moodText.innerText = fmtGenero(moodName).toLowerCase();
+    });
+  });
+});
+
+function abrirApostilaModal() {
+  const overlay = document.getElementById('apostila-modal-overlay');
+  const box = document.getElementById('apostila-modal-leitor');
+  box.innerHTML = '';
+  box.innerHTML = '<iframe src="https://drive.google.com/file/d/1E9eMGN-iE_9koLoJpd-IGK0NEx8O8y9y/preview" title="Apostila completa" style="width:100%;height:100%;border:0" allow="autoplay"></iframe>';
+  overlay.classList.add('active');
+}
+
+function fecharApostilaModal() {
+  document.getElementById('apostila-modal-overlay').classList.remove('active');
+  document.getElementById('apostila-modal-leitor').innerHTML = '';
+}
+
+document.getElementById('apostila-modal-overlay').addEventListener('click', e => {
+  if (e.target.id === 'apostila-modal-overlay') fecharApostilaModal();
+});
+</script>
+<script>function resetarTudo(){if(!confirm("Apagar TODO o progresso?\nEsta acao nao pode ser desfeita."))return;var t=localStorage.getItem("theme");localStorage.clear();if(t)localStorage.setItem("theme",t);localStorage.setItem("tj_local_rev",String(Date.now()));var uid=window._syncOAB&&window._syncOAB._uid;if(uid&&window._syncOAB.enviarSnapshotCompleto){window._syncOAB.enviarSnapshotCompleto(uid).then(function(){location.reload();}).catch(function(){location.reload();});}else{location.reload();}}</script>
+<script src="home.js?v=1791163406"></script></body>
+</html>
+
+
+
+
+
+

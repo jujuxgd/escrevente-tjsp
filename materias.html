@@ -1,0 +1,663 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js?v=1783862902"></script>
+<script src="auth-guard.js?v=1784132091"></script>
+<script src="cores-early.js?v=1784060144"></script>
+<script src="page-transition.js?v=1783861010"></script>
+<title>Escrevente TJSP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1784043341">
+<style>
+.mat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.2rem;
+}
+
+.mat-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+.mat-card:hover { box-shadow: var(--shadow); }
+
+.mat-header {
+  padding: 1rem 1.2rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mat-emoji { font-size: 1.4rem; flex-shrink: 0; }
+
+.mat-info { flex: 1; min-width: 0; }
+
+.mat-nome {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.mat-sub {
+  font-size: 0.7rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.08em;
+  margin-top: 0.15rem;
+}
+
+.mat-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.mat-pct {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+  line-height: 1;
+}
+
+.mat-pbar {
+  width: 60px;
+  height: 4px;
+  background: var(--line-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mat-pbar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.mat-chevron {
+  font-size: 0.7rem;
+  color: var(--ink-faded);
+  margin-left: 0.2rem;
+  transition: transform 0.2s;
+}
+.mat-card.open .mat-chevron { transform: rotate(90deg); }
+
+.mat-body {
+  display: none;
+  padding: 0 1.2rem 1rem;
+  border-top: 1px solid var(--line);
+}
+.mat-card.open .mat-body { display: block; }
+
+/* Questões stats dentro da card */
+.mat-q-stats {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 0 0.8rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  border-bottom: 1px dotted var(--line);
+  margin-bottom: 0.6rem;
+}
+.mat-q-num { font-family:'Fraunces',serif; font-size:1.1rem; color:var(--rose-deep); font-weight:500; }
+
+/* Dias/tópicos */
+.dia-bloco {
+  margin-bottom: 0.5rem;
+}
+
+.dia-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-bottom: 0.3rem;
+}
+
+.dia-badge {
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.65rem;
+}
+
+.dia-badge.done {
+  background: rgba(90, 152, 80, 0.15);
+  color: #4a8840;
+}
+
+.topico-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.topico-item:hover { background: var(--bg-soft); }
+
+.topico-check {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--ink-ghost);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem;
+  color: var(--paper);
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.15s;
+}
+.topico-item.checked .topico-check {
+  background: linear-gradient(135deg, #6ab870, #4a9850);
+  border-color: #4a9850;
+}
+.topico-item.checked .topico-check::after { content: '✓'; }
+.topico-item.checked { color: var(--ink-faded); text-decoration: line-through; text-decoration-color: rgba(80,160,80,0.4); }
+
+/* Filtros */
+.filter-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.fchip {
+  padding: 0.35rem 0.85rem;
+  background: var(--bg-soft);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fchip:hover { background: var(--blush); }
+.fchip.active {
+  background: var(--rose-deep); color: #fff;
+  color: var(--paper);
+}
+
+/* Totais */
+.totais-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.totais-item {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  text-align: center;
+}
+.totais-num {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--rose-deep);
+}
+.totais-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faded); margin-top: 0.2rem; }
+</style>
+<link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script></head>
+<body>
+
+<div class="aurora-bg" aria-hidden="true">
+  <div class="aurora-blob ab1"></div><div class="aurora-blob ab2"></div>
+  <div class="aurora-blob ab3"></div><div class="aurora-blob ab4"></div>
+</div>
+<button class="mobile-menu-btn" onclick="toggleSidebar()" title="Menu">☰</button>
+<button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Esconder menu">‹</button>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="mark"><svg class="seal" viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><circle cx="32" cy="32" r="23" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="32" y="33" font-size="15" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-weight="700" fill="currentColor">TJSP</text></svg></div>
+      <h1>Escrevente TJSP</h1>
+      <div class="subtitle">Escrevente Técnico Judiciário</div>
+    </div>
+    <div class="nav-section-label">Principal</div>
+    <a href="index.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span><span>Início</span></a>
+    <a href="hoje.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></span><span>Hoje</span></a>
+    <a href="calendario.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span>Calendário</span></a>
+    <a href="revisar.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg></span><span>Revisar</span></a>
+    <div class="nav-section-label">Estudo</div>
+    <a href="materias.html" class="nav-link active"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span>Matérias</span></a>
+    <a href="banco-questoes.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span><span>Questões</span></a>
+    <a href="erros.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.9.85a.5.5 0 0 1-.62-.62l.85-2.9a2 2 0 0 1 .5-.85z"/></svg></span><span>Caderno de Erros</span></a>
+    <a href="caderno-legislativo.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><span>Caderno Legislativo</span></a>
+    <div class="nav-section-label">Análise</div>
+    <a href="estatisticas.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16v-3"/><path d="M12 16V8"/><path d="M17 16v-5"/></svg></span><span>Estatísticas</span></a>
+    <a href="estatisticas.html#simulados" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12l2 2 4-4"/></svg></span><span>Simulados</span></a>
+
+    <div class="nav-section-label">Extra</div>
+    <a href="reta-final.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V4"/></svg></span><span>Reta Final</span></a>
+    <div class="sidebar-footer">
+      <div class="profile-card">
+        <div class="profile-avatar">
+          <img src="foto-perfil.jpg" alt="Julia" onerror="this.style.display='none'; if (this.parentElement) this.parentElement.textContent='J';">
+        </div>
+        <div class="profile-info">
+          <div class="name">Julia</div>
+          <div class="meta">Estudante de Direito</div>
+        </div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-label">Modo escuro</span>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="page-title">
+        <div class="breadcrumb">Estudo · <span data-month-year>—</span></div>
+        <h1>Suas <em>matérias</em></h1>
+      </div>
+      <div class="topbar-actions"></div>
+    </div>
+
+    <!-- Totais gerais -->
+    <div class="totais-bar" id="totais-bar"></div>
+
+    <!-- Filtros -->
+    <div class="filter-row">
+      <span class="fchip active" data-filter="todas" onclick="setFilter('todas',this)">Todas</span>
+      <span class="fchip" data-filter="em_andamento" onclick="setFilter('em_andamento',this)">Em andamento</span>
+      <span class="fchip" data-filter="concluida" onclick="setFilter('concluida',this)">Concluídas</span>
+      <span class="fchip" data-filter="pendente" onclick="setFilter('pendente',this)">Não iniciadas</span>
+    </div>
+
+    <!-- Grid de matérias -->
+    <div class="mat-grid" id="mat-grid"></div>
+  </main>
+</div>
+
+<script src="script.js?v=1784021868"></script>
+<script src="perfil.js?v=1783860863"></script>
+<script src="sync.js?v=1784058237"></script>
+<script src="progresso.js?v=1783859287"></script>
+<script src="cards.js"></script>
+<script src="cores.js"></script>
+<script src="calendario-ativo.js"></script>
+<script src="plano-dinamico.js"></script>
+<script>
+const MATERIAS_CATALOG = [
+  { id:"portugues",      nome:"Língua Portuguesa",            emoji:"✍️", prova:"16 questões · eliminatória" },
+  { id:"proc_civil",     nome:"Direito Processual Civil",     emoji:"⚖️", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"proc_penal",     nome:"Direito Processual Penal",     emoji:"📋", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"penal",          nome:"Direito Penal",                emoji:"⚔️", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"constitucional", nome:"Direito Constitucional",       emoji:"🏛️", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"administrativo", nome:"Direito Administrativo",       emoji:"🏢", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"normas",         nome:"Normas da Corregedoria",       emoji:"📚", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"interna",        nome:"Legislação interna do TJSP",   emoji:"🏛️", prova:"bloco Direito: 30 questões (divisão não divulgada)" },
+  { id:"informatica",    nome:"Informática",                  emoji:"💻", prova:"9 questões" },
+  { id:"rlm",            nome:"Raciocínio Lógico",            emoji:"🧩", prova:"7 questões" },
+  { id:"matematica",     nome:"Matemática",                   emoji:"➗", prova:"4 questões" },
+  { id:"atualidades",    nome:"Atualidades",                  emoji:"📰", prova:"4 questões com o Estatuto PcD" },
+  { id:"pcd",            nome:"Estatuto da Pessoa com Deficiência", emoji:"♿", prova:"4 questões com Atualidades" },
+];
+
+// Edital verticalizado — itens do "EDITAL ESQUEMATIZADO" de Julia (edital de 2025). Conferir com o edital 02/2026.
+const TOPICOS_CURRICULO = {
+  portugues: ['Análise, compreensão e interpretação de textos verbais, não verbais, literários e não literários','Informações literais e inferências possíveis','Ponto de vista do autor','Estruturação do texto: relações entre ideias, coesão e coerência','Significação contextual: sinônimos e antônimos','Sentido próprio e figurado; figuras de linguagem','Classes de palavras: substantivo, adjetivo, artigo e numeral','Pronome','Verbo: modos, formas nominais, transitividade, auxiliares e de ligação','Verbos regulares, irregulares, defectivos, abundantes, unipessoais e pronominais','Vozes verbais (ativa e passiva)','Advérbio, preposição e conjunção','Concordância verbal e nominal','Regência verbal e nominal','Colocação pronominal','Crase','Pontuação'],
+  administrativo: ['Lei 10.261/68 — arts. 1º a 12: disposições preliminares, provimento, exercício e vacância','Arts. 13 a 22: formas de nomeação, concurso e provas de habilitação','Arts. 23 a 45: substituições, transferência, reintegração, acesso, reversão, aproveitamento, readmissão, readaptação e remoção','Arts. 46 a 86: posse, exercício, contagem de tempo de serviço e vacância','Arts. 171 a 175: acumulações remuneradas','Arts. 239 e 240: direito de petição','Arts. 241 a 250: deveres, proibições e responsabilidades','Arts. 251 a 263: penalidades e extinção da punibilidade','Arts. 264 a 267-P: preliminares, práticas autocompositivas, TAC e suspensão condicional da sindicância','Arts. 268 a 311: procedimento disciplinar','Arts. 312 a 323: recursos e disposições finais','Lei 8.429/92 — arts. 1º a 8º-A: disposições iniciais','Art. 9º: enriquecimento ilícito','Art. 10: prejuízo ao erário','Art. 11: atentado aos princípios','Arts. 12 e 13: penas e declaração de bens','Arts. 14 a 22: procedimento administrativo, processo judicial e disposições penais','Arts. 23 a 23-C: prescrição'],
+  constitucional: ['Direitos e deveres individuais e coletivos (art. 5º)','Direitos sociais (arts. 6º a 11)','Nacionalidade (arts. 12 e 13)','Administração pública (arts. 37 e 38)','Servidores públicos (arts. 39 a 41)','Poder Judiciário (art. 92)'],
+  proc_penal: ['Arts. 251 a 258, 261 a 267 e 274: sujeitos processuais','Arts. 351 a 372: citação e intimação','Arts. 394 a 405: procedimento comum ordinário','Arts. 406 a 497: Tribunal do Júri','Arts. 531 a 538: procedimento sumário','Arts. 541 a 548: restauração de autos','Arts. 574 a 592: recursos em geral e RESE','Arts. 593 a 603: apelação','Arts. 609 a 618: processo e julgamento do RESE e da apelação','Arts. 619 e 620: embargos','Arts. 621 a 630: revisão','Arts. 637 e 638: recurso extraordinário','Arts. 639 a 646: carta testemunhável','Arts. 647 a 667: habeas corpus','Lei 9.099/95 — arts. 60 a 68: JECRIM, competência e atos processuais','Arts. 69 a 76: fase preliminar','Arts. 77 a 83: procedimento sumaríssimo','Arts. 88 e 89: disposições finais'],
+  proc_civil: ['Arts. 144 a 148: impedimento e suspeição','Arts. 149 a 155: auxiliares da justiça','Arts. 188 a 202: atos processuais e negócio jurídico processual','Arts. 203 a 211: atos dos juízes e dos servidores','Arts. 212 a 235: tempo, lugar e prazos','Arts. 236 a 275: citação, cartas e intimações','Arts. 294 a 311: tutela provisória','Arts. 318 a 334: petição inicial, improcedência liminar e audiência de conciliação','Arts. 335 a 356: respostas do réu, providências preliminares, saneamento e julgamento antecipado','Arts. 358 a 368: audiência de instrução e julgamento','Arts. 369 a 484: provas','Arts. 485 a 508: sentença, remessa necessária e coisa julgada','Arts. 509 a 538: liquidação e cumprimento de sentença','Arts. 994 a 1.026: recursos (apelação, agravos e embargos de declaração)','Lei 9.099/95 — arts. 3º a 19 (Juizado Especial Cível)','Lei 12.153/09 (Juizado Especial da Fazenda Pública)'],
+  penal: ['Arts. 293 a 295: falsidade de títulos e papéis públicos','Arts. 299 a 305 e 307: falsidade documental','Art. 308: outras falsidades','Art. 311-A: fraudes em certames de interesse público','Arts. 312 a 317 e 319 a 327: crimes de funcionário público contra a Administração','Arts. 328 a 333, 336 e 337: crimes de particular contra a Administração','Arts. 339 a 347, 357 e 359: crimes contra a administração da Justiça'],
+  normas: ['Arts. 5º a 18: Corregedoria Permanente, correições e apurações preliminares','Arts. 26 a 27-A: ofícios de justiça em geral','Arts. 46 a 62: sistema informatizado oficial','Arts. 63 a 79: livros e classificadores obrigatórios','Arts. 80 a 99: escrituração, autuação, juntada e movimentação dos autos','Arts. 103 a 131: papéis, certidões, mandados, ofícios e comunicações eletrônicas','Arts. 132 a 156-A: intimações, audiências e gravação','Arts. 157 a 175: consulta, carga e desentranhamento','Arts. 176 a 189-G: arquivamento, desarquivamento e pesquisa histórica','Arts. 1.189 a 1.208: processo e peticionamento eletrônico','Arts. 1.209 a 1.262: distribuição, tramitação, prazos e expedientes eletrônicos','Arts. 1.263 a 1.301: sistemas conveniados, mandados de levantamento, cumprimento de sentença e precatórios'],
+  interna: ['Resolução TJSP nº 850/2021 (teletrabalho)','Resolução TJSP nº 963/2025','Lei Complementar estadual nº 1.111/2010','Regimento Interno do TJSP'],
+  informatica: ['MS-Windows 10 (e 11)','MS-Office 365: Word','MS-Excel 365','Correio eletrônico','Internet: navegação, URL, links, busca e impressão','OneDrive','MS-Teams'],
+  rlm: ['Proposições e conectivos','Tabelas-verdade e número de linhas','Negação e negação de proposições categóricas','Equivalências lógicas','Tautologia, contradição e contingência','Lógica de argumentação e diagramas lógicos','Condição necessária e suficiente','Sequências lógicas','Associação lógica','Verdades e mentiras','Calendários','Princípio da casa dos pombos'],
+  matematica: ['Operações com números reais','MMC e MDC','Razão e proporção','Porcentagem','Regra de três simples e composta','Média aritmética simples e ponderada','Juros simples','Equações do 1º e 2º graus','Sistema de equações do 1º grau','Relação entre grandezas: tabelas e gráficos','Sistemas de medidas usuais','Geometria: forma, perímetro, área, volume, ângulo e teorema de Pitágoras','Resolução de situações-problema'],
+  atualidades: ['Fatos políticos, econômicos, sociais e culturais, nacionais e internacionais, divulgados na mídia (conferir o período no edital 02/2026)'],
+  pcd: ['Lei 13.146/2015 — arts. 1º a 13','Arts. 34 a 38'],
+};
+
+let currentFilter = 'todas';
+
+// ── Progresso pelo calendário dinâmico: cada matéria = as aulas dela no plano ──
+const NOME_BANCO = {
+  portugues:'Língua Portuguesa', proc_civil:'Direito Processual Civil', proc_penal:'Direito Processual Penal', penal:'Direito Penal',
+  constitucional:'Direito Constitucional', administrativo:'Direito Administrativo', normas:'Normas da Corregedoria',
+  interna:'Legislação Interna', informatica:'Informática', rlm:'Raciocínio Lógico', matematica:'Matemática',
+  atualidades:'Atualidades', pcd:'Estatuto da Pessoa com Deficiência'
+};
+const K_CHECK = 'tj_ativo_check_v1';
+function lerJSON(k, p) { try { return JSON.parse(localStorage.getItem(k)) || p; } catch (e) { return p; } }
+function unidadesDoPlano() {
+  // um item por aula e matéria; "estudado" vale pela aula
+  const cal = window.CAL_ATIVO, ck = lerJSON(K_CHECK, {}), por = {}, ok = {}, lista = [];
+  if (!cal) return lista;
+  cal.dias.forEach(x => {
+    if (x.f !== 1 || !x.top) return;
+    x.top.forEach(t => {
+      if (t.n == null) return;
+      const k = t.n + '|' + t.d;
+      let u = por[k];
+      if (!u) { u = por[k] = { n: t.n, d: t.d, data: x.d, temas: [] }; lista.push(u); }
+      if (u.temas.indexOf(t.s) < 0) u.temas.push(t.s);
+    });
+  });
+  Object.keys(ck).forEach(data => {
+    const c = ck[data], x = cal.dias.find(y => y.d === data);
+    Object.keys(c).forEach(k => { const m = /^p(\d+)$/.exec(k); if (m && c[k]) ok[m[1]] = true; });
+    if (c.feito && x && x.top) x.top.forEach(t => { if (t.n != null) ok[t.n] = true; });
+  });
+  lista.forEach(u => { u.ok = !!ok[u.n]; });
+  return lista;
+}
+let UNIDADES = unidadesDoPlano();
+function progPlano(matId) {
+  const us = UNIDADES.filter(u => u.d === NOME_BANCO[matId]);
+  const feitos = us.filter(u => u.ok).length;
+  return { total: us.length, feitos, pct: us.length ? Math.round(feitos / us.length * 100) : 0, unidades: us };
+}
+// Questões: sessões do Tracker + questões do banco/Hoje/simulados (tj_bq_respostas), por disciplina
+let Q_BANCO = null;
+function questoesBanco() {
+  if (Q_BANCO) return Q_BANCO;
+  const resp = lerJSON('tj_bq_respostas', {}), ids = Object.keys(resp), out = { _total: { total: ids.length, acertos: 0 } };
+  ids.forEach(id => { if (resp[id].ultima_correta) out._total.acertos++; });
+  if (window.BANCO_QUESTOES) {
+    const disc = {}; BANCO_QUESTOES.forEach(q => { disc[q.id] = q.discipline; });
+    ids.forEach(id => { const d = disc[id]; if (!d) return; const o = out[d] || (out[d] = { total: 0, acertos: 0 }); o.total++; if (resp[id].ultima_correta) o.acertos++; });
+    Q_BANCO = out;
+  }
+  return out;
+}
+function questoesMat(matId) {
+  const t = getQuestoesPorMateria(matId), b = questoesBanco()[NOME_BANCO[matId]] || { total: 0, acertos: 0 };
+  return { total: t.total + b.total, acertos: t.acertos + b.acertos };
+}
+function totaisQuestoes() {
+  const t = getTotaisQuestoes(), b = questoesBanco()._total;
+  const total = t.total + b.total, acertos = t.acertos + b.acertos;
+  return { total, acertos, pct: total ? Math.round(acertos / total * 100) : 0 };
+}
+function togglePdf(n, data, el) {
+  const ck = lerJSON(K_CHECK, {}), d = ck[data] || (ck[data] = {}), novo = !d['p' + n];
+  if (novo) d['p' + n] = 1; else delete d['p' + n];
+  localStorage.setItem(K_CHECK, JSON.stringify(ck));
+  try { localStorage.setItem('tj_local_rev', String(Date.now())); } catch (e) {}
+  if (window._syncOAB && window._syncOAB.notificarAlteracaoLocal) { try { window._syncOAB.notificarAlteracaoLocal(K_CHECK); } catch (e) {} }
+  UNIDADES = unidadesDoPlano();
+  const card = el.closest('.mat-card'), aberto = card && card.classList.contains('open');
+  buildTotais(); renderGrid();
+  if (aberto) document.getElementById(card.id).classList.add('open');
+}
+
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid();
+}
+
+function buildTotais() {
+  const totaisQ  = totaisQuestoes();
+  let topTotal = 0, topFeitos = 0;
+  MATERIAS_CATALOG.forEach(m => {
+    const p = progPlano(m.id);
+    topTotal  += p.total;
+    topFeitos += p.feitos;
+  });
+  const topPct = topTotal > 0 ? Math.round((topFeitos/topTotal)*100) : 0;
+
+  document.getElementById('totais-bar').innerHTML = `
+    <div class="totais-item">
+      <div class="totais-num">${topPct}%</div>
+      <div class="totais-label">Aulas estudadas</div>
+    </div>
+    <div class="totais-item">
+      <div class="totais-num">${totaisQ.total}</div>
+      <div class="totais-label">Questões feitas</div>
+    </div>
+    <div class="totais-item">
+      <div class="totais-num" style="color:${totaisQ.pct>=70?'#4a9850':totaisQ.pct>=50?'#c9960a':'#c05050'}">${totaisQ.pct}%</div>
+      <div class="totais-label">Acertos médios</div>
+    </div>`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('mat-grid');
+  let html = '';
+
+  MATERIAS_CATALOG.forEach(mat => {
+    const prog   = progPlano(mat.id);
+    const qStats = questoesMat(mat.id);
+    const qPct   = qStats.total > 0 ? Math.round((qStats.acertos/qStats.total)*100) : null;
+    const pct    = prog.pct;
+
+    const estado = pct === 0 ? 'pendente' : pct === 100 ? 'concluida' : 'em_andamento';
+    if (currentFilter !== 'todas' && currentFilter !== estado) return;
+
+    // Corpo dos dias/tópicos
+    let diasHtml = '';
+    prog.unidades.forEach(u => {
+      const [ano, mes, dd] = u.data.split('-');
+      diasHtml += `<div class="dia-bloco">
+        <div class="dia-label">
+          <span class="dia-badge ${u.ok?'done':''}">Aula ${u.n} do plano</span>
+          <a href="hoje.html?data=${u.data}" style="color:inherit">${dd}/${mes}</a>
+        </div>
+        <div class="topico-item ${u.ok?'checked':''}" onclick="togglePdf(${u.n},'${u.data}',this)">
+          <span class="topico-check"></span>
+          <span>${u.temas.join('; ')}</span>
+        </div>
+      </div>`;
+    });
+
+    {
+      // Edital verticalizado da matéria, com checkboxes persistidos
+      const curriculo = TOPICOS_CURRICULO[mat.id] || [];
+      if (curriculo.length) {
+        const savedKey = 'curric_' + mat.id;
+        const saved = JSON.parse(localStorage.getItem(savedKey) || '{}');
+        const checkedCount = Object.values(saved).filter(Boolean).length;
+        diasHtml += `<div class="curric-block" id="curric-${mat.id}" style="margin-top:.8rem">
+          <div style="font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-faded);margin-bottom:0.5rem">Edital verticalizado · ${checkedCount}/${curriculo.length} estudados</div>
+          ${curriculo.map((t, tIdx) => {
+            const checked = !!saved[tIdx];
+            return `<div class="topico-item ${checked ? 'checked' : ''}" onclick="toggleCurricTopico('${mat.id}',${tIdx},this)" style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.4rem 0;border-bottom:1px dotted var(--line);cursor:pointer;transition:opacity 0.15s">
+              <span class="topico-check" style="width:16px;height:16px;flex-shrink:0;border:1.5px solid ${checked ? 'var(--rose)' : 'var(--ink-ghost)'};border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:white;margin-top:2px;background:${checked ? 'linear-gradient(135deg,var(--rose),var(--rose-deep))' : 'transparent'};transition:all .15s">${checked ? '✓' : ''}</span>
+              <span style="font-size:0.83rem;color:${checked ? 'var(--ink-ghost)' : 'var(--ink-soft)'};text-decoration:${checked ? 'line-through' : 'none'};line-height:1.4">${t}</span>
+            </div>`;
+          }).join('')}
+        </div>`;
+      } else if (!diasHtml) {
+        diasHtml = `<div style="color:var(--ink-faded);font-size:0.8rem;padding:0.5rem 0;font-style:italic">Tópicos serão exibidos conforme os PDFs forem extraídos.</div>`;
+      }
+    }
+
+    const qBar = qStats.total > 0 ? `
+      <div class="mat-q-stats">
+        <div><div class="mat-q-num">${qStats.total}</div><div style="font-size:0.65rem;color:var(--ink-faded)">QUESTÕES</div></div>
+        <div><div class="mat-q-num">${qStats.acertos}</div><div style="font-size:0.65rem;color:var(--ink-faded)">ACERTOS</div></div>
+        <div><div class="mat-q-num" style="color:${qPct>=70?'#4a9850':qPct>=50?'#c9960a':'#c05050'}">${qPct}%</div><div style="font-size:0.65rem;color:var(--ink-faded)">TAXA</div></div>
+        <div style="margin-left:auto;font-size:0.7rem;color:var(--ink-faded)">${mat.prova}</div>
+      </div>` : `<div style="font-size:0.72rem;color:var(--ink-faded);padding:0.5rem 0 0.3rem;border-bottom:1px dotted var(--line);margin-bottom:0.3rem">Na prova: ${mat.prova}</div>`;
+
+    html += `<div class="mat-card" id="matcard-${mat.id}">
+      <div class="mat-header" onclick="toggleCard('${mat.id}')">
+        <span class="mat-emoji">${mat.emoji}</span>
+        <div class="mat-info">
+          <div class="mat-nome">${mat.nome}</div>
+          <div class="mat-sub" id="matsub-${mat.id}">${prog.total > 0 ? prog.feitos+'/'+prog.total+(prog.total===1?' PDF':' PDFs') : (TOPICOS_CURRICULO[mat.id]||[]).length + ' tópicos para estudar por fora'}${qStats.total>0?' · '+qStats.total+' questões':''}</div>
+        </div>
+        <div class="mat-stats">
+          <div class="mat-pct" id="matpct-${mat.id}">${pct}%</div>
+          <div class="mat-pbar"><div class="mat-pbar-fill" id="matbar-${mat.id}" style="width:${pct}%"></div></div>
+        </div>
+        <span class="mat-chevron">›</span>
+      </div>
+      <div class="mat-body">
+        ${qBar}
+        ${diasHtml}
+        <div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px dotted var(--line)">
+          <div style="font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faded);margin-bottom:0.4rem">◎ Registrar questões desta matéria</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.4rem;align-items:center">
+            <input type="number" placeholder="Total" min="1" id="qinput-t-${mat.id}"
+              style="background:var(--bg-soft);border:1px solid var(--line);padding:0.4rem 0.6rem;border-radius:var(--radius-sm);font-size:1rem;color:var(--ink);font-family:inherit">
+            <input type="number" placeholder="Acertos" min="0" id="qinput-a-${mat.id}"
+              style="background:var(--bg-soft);border:1px solid var(--line);padding:0.4rem 0.6rem;border-radius:var(--radius-sm);font-size:1rem;color:var(--ink);font-family:inherit">
+            <button class="btn btn-primary" style="font-size:0.72rem;padding:0.4rem 0.8rem;white-space:nowrap" onclick="registrarQuestoesMat('${mat.id}')">Registrar</button>
+          </div>
+          <div id="qfb-${mat.id}" style="font-size:0.75rem;margin-top:0.3rem;min-height:1em;color:var(--ink-soft)"></div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  grid.innerHTML = html || '<div style="color:var(--ink-faded);text-align:center;padding:2rem">Nenhuma matéria neste filtro.</div>';
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('matcard-' + id);
+  if (card) card.classList.toggle('open');
+}
+
+function toggleCurricTopico(matId, tIdx, rowEl) {
+  const savedKey = 'curric_' + matId;
+  const saved = JSON.parse(localStorage.getItem(savedKey) || '{}');
+  saved[tIdx] = !saved[tIdx];
+  localStorage.setItem(savedKey, JSON.stringify(saved));
+  try { localStorage.setItem('tj_local_rev', String(Date.now())); } catch (e) {}
+  if (window._syncOAB && window._syncOAB.notificarAlteracaoLocal) {
+    try { window._syncOAB.notificarAlteracaoLocal(savedKey); } catch (e) {}
+  }
+
+  const checked = saved[tIdx];
+  rowEl.classList.toggle('checked', checked);
+  const checkEl = rowEl.querySelector('.topico-check');
+  const textEl  = rowEl.querySelector('span:last-child');
+  if (checkEl) {
+    checkEl.textContent = checked ? '✓' : '';
+    checkEl.style.background = checked ? 'linear-gradient(135deg,var(--rose),var(--rose-deep))' : 'transparent';
+    checkEl.style.borderColor = checked ? 'var(--rose)' : 'var(--ink-ghost)';
+  }
+  if (textEl) {
+    textEl.style.color = checked ? 'var(--ink-ghost)' : 'var(--ink-soft)';
+    textEl.style.textDecoration = checked ? 'line-through' : 'none';
+  }
+
+  // Actualiza header
+  const block = document.getElementById('curric-' + matId);
+  if (block) {
+    const curriculo = TOPICOS_CURRICULO[matId] || [];
+    const checkedCount = Object.values(saved).filter(Boolean).length;
+    const label = block.querySelector('div:first-child');
+    if (label) label.textContent = `Edital verticalizado · ${checkedCount}/${curriculo.length} estudados`;
+    // Update card pct display
+    const card = document.getElementById('matcard-' + matId);
+    if (card && curriculo.length) {
+      const pct = Math.round((checkedCount / curriculo.length) * 100);
+      const pctEl = card.querySelector('.mat-pct');
+      const barEl = card.querySelector('.mat-pbar-fill');
+      const subEl = document.getElementById('matsub-' + matId);
+      if (pctEl) pctEl.textContent = pct + '%';
+      if (barEl) barEl.style.width = pct + '%';
+      if (subEl) subEl.textContent = `${checkedCount}/${curriculo.length} tópicos`;
+    }
+  }
+}
+
+function toggleTopico(dia, mIdx, tIdx, el) {
+  const novo = toggleTopicoManual(dia, mIdx, tIdx);
+  el.classList.toggle('checked', novo);
+  // Actualiza pct no header
+  const mat = PLANO_OAB[dia-1]?.materias[mIdx];
+  if (mat) {
+    const matId = getMateriaId(mat.nome);
+    const card  = document.getElementById('matcard-' + matId);
+    if (card) {
+      const prog = getProgressoMateria(matId);
+      const pctEl = card.querySelector('.mat-pct');
+      const barEl = card.querySelector('.mat-pbar-fill');
+      const subEl = card.querySelector('.mat-sub');
+      if (pctEl) pctEl.textContent = prog.pct + '%';
+      if (barEl) barEl.style.width = prog.pct + '%';
+      if (subEl) subEl.textContent = `${prog.feitos}/${prog.total} tópicos`;
+    }
+  }
+  buildTotais();
+}
+
+function registrarQuestoesMat(matId) {
+  const total   = parseInt(document.getElementById(`qinput-t-${matId}`)?.value) || 0;
+  const acertos = parseInt(document.getElementById(`qinput-a-${matId}`)?.value);
+  const fb      = document.getElementById(`qfb-${matId}`);
+
+  if (total <= 0) { if (fb) { fb.textContent = '⚠ Informe o total'; fb.style.color='var(--rose-deep)'; } return; }
+  if (isNaN(acertos) || acertos < 0 || acertos > total) { if (fb) { fb.textContent = '⚠ Acertos inválido'; fb.style.color='var(--rose-deep)'; } return; }
+
+  registrarQuestoes(matId, total, acertos);
+
+  document.getElementById(`qinput-t-${matId}`).value = '';
+  document.getElementById(`qinput-a-${matId}`).value = '';
+
+  const pct = Math.round((acertos / total) * 100);
+  if (fb) {
+    fb.textContent = `✓ ${acertos}/${total} (${pct}%) — registrado`;
+    fb.style.color = pct >= 70 ? '#4a9850' : 'var(--ink-soft)';
+    setTimeout(() => { if (fb) fb.textContent = ''; }, 3000);
+  }
+
+  // Atualiza o sub-header do card sem re-renderizar tudo
+  const qStats = questoesMat(matId);
+  const prog   = progPlano(matId);
+  const subEl  = document.getElementById(`matsub-${matId}`);
+  if (subEl && prog.total) subEl.textContent = `${prog.feitos}/${prog.total} ${prog.total === 1 ? 'PDF' : 'PDFs'} · ${qStats.total} questões`;
+
+  buildTotais();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildTotais();
+  renderGrid();
+  // questões do banco por matéria: o banco é grande, carrega depois e redesenha
+  if (Object.keys(lerJSON('tj_bq_respostas', {})).length && !window.BANCO_QUESTOES) {
+    const sc = document.createElement('script');
+    sc.src = 'questoes-banco.js';
+    sc.onload = () => { Q_BANCO = null; const abertos = [...document.querySelectorAll('.mat-card.open')].map(c => c.id); buildTotais(); renderGrid(); abertos.forEach(id => { const c = document.getElementById(id); if (c) c.classList.add('open'); }); };
+    document.head.appendChild(sc);
+  }
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

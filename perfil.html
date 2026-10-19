@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-init.js?v=1783862902"></script>
+<script src="auth-guard.js?v=1784132091"></script>
+<script src="cores-early.js?v=1784060144"></script>
+<script src="page-transition.js?v=1783861010"></script>
+<title>Perfil · TJSP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:opsz,wght@14..32,400..700&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1784043341">
+<style>
+/* ════════════════════════════════════════════
+   PERFIL — diário de evolução pessoal
+════════════════════════════════════════════ */
+
+/* Cabeçalho de identidade + backup */
+.perfil-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--blush) 0%, var(--rose-soft) 100%);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.8rem;
+  margin-bottom: 1.6rem;
+  box-shadow: var(--shadow);
+}
+
+.perfil-header-id {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.perfil-header-id .profile-avatar {
+  width: 60px;
+  height: 60px;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow);
+}
+
+.perfil-header-nome {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.perfil-header-tag {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-top: 0.15rem;
+}
+
+.perfil-header-backup {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .perfil-header { padding: 1.1rem 1.3rem; }
+  .perfil-header-backup { width: 100%; }
+  .perfil-header-backup .btn { flex: 1; justify-content: center; }
+}
+
+/* Resumo — grid de estatísticas compactas */
+.resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.8rem;
+}
+
+@media (max-width: 1200px) { .resumo-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 640px)  { .resumo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.resumo-tile {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.resumo-tile:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+
+.resumo-tile .icon { font-size: 1.1rem; margin-bottom: 0.35rem; }
+.resumo-tile .num {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--rose-deep);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.resumo-tile .lbl {
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faded);
+  margin-top: 0.35rem;
+  line-height: 1.3;
+}
+
+/* Insights — cards curtos, gerados automaticamente */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+@media (max-width: 1150px) { .insights-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px)  { .insights-grid { grid-template-columns: 1fr; } }
+
+.insight-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--rose-soft);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.insight-card .ic-emoji { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+.insight-card .ic-title {
+  font-family: 'Fraunces', serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.insight-card .ic-text { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.45; }
+.insight-card .ic-text strong { color: var(--rose-deep); font-weight: 600; }
+
+.insights-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--ink-faded);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Histórico — calendário de humor + timeline */
+.historico-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.8rem;
+  align-items: stretch;
+}
+@media (max-width: 1000px) { .historico-layout { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.7rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@media (max-width: 640px) { .chart-card { padding: 1.1rem 1.2rem; } }
+
+.chart-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.2rem; }
+.chart-title { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 500; letter-spacing: -0.01em; }
+.chart-title em { font-style: italic; color: var(--rose-deep); }
+.chart-sub { font-size: 0.7rem; color: var(--ink-faded); letter-spacing: 0.03em; }
+
+/* Mapa de humor — heatmap estilo "contribuições", intensidade = humor médio do dia */
+.mood-calendar {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 4px;
+}
+@media (max-width: 480px) {
+  .mood-calendar { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+.mc-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--line-soft);
+  transition: transform var(--transition);
+}
+.mc-cell:hover { transform: scale(1.25); }
+.mc-cell.v1 { background: var(--rose-100); }
+.mc-cell.v2 { background: var(--rose-300); }
+.mc-cell.v3 { background: var(--rose-500); }
+.mc-cell.v4 { background: var(--rose-600); }
+.mc-cell.v5 { background: var(--rose-700); }
+
+.mood-cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 1rem;
+  font-size: 0.64rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.04em;
+}
+.mood-cal-legend .sw { width: 10px; height: 10px; border-radius: 2px; }
+
+/* Timeline de registros */
+.mood-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+.mt-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px dotted var(--line);
+}
+.mt-item:last-child { border-bottom: none; }
+.mt-emoji { font-size: 1.25rem; flex-shrink: 0; }
+.mt-date { font-family: 'Fraunces', serif; font-size: 0.85rem; color: var(--ink); font-weight: 500; min-width: 78px; }
+.mt-info { flex: 1; }
+.mt-humor { font-size: 0.82rem; color: var(--ink-soft); }
+.mt-hora { font-size: 0.66rem; color: var(--ink-faded); letter-spacing: 0.06em; }
+
+/* Gráfico de linhas (barras) — reaproveita o padrão de estatisticas.html */
+.line-chart {
+  height: 140px;
+  position: relative;
+  padding: 0.6rem 0;
+  display: flex;
+  align-items: end;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--line);
+  flex: 1;
+}
+.line-day { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: end; }
+.line-bar { width: 62%; background: linear-gradient(180deg, var(--rose) 0%, var(--rose-deep) 100%); border-radius: 4px 4px 0 0; transition: opacity var(--transition); }
+.line-bar:hover { opacity: 0.8; }
+.line-day .lbl { font-size: 0.6rem; color: var(--ink-faded); margin-top: 0.35rem; letter-spacing: 0.02em; }
+
+/* Em telas estreitas, barras demais ficariam ilegíveis espremidas — rola
+   horizontalmente em vez de encolher cada barra abaixo do tocável/legível */
+@media (max-width: 640px) {
+  /* As colunas encolhem para caber na largura do cartão. Com largura fixa
+     o gráfico virava uma tira rolável sem barra visível e os últimos dias
+     ficavam cortados fora da tela. */
+  .line-chart { overflow-x: visible; justify-content: space-between; gap: 0.2rem; }
+  .line-day { flex: 1 1 0; min-width: 0; }
+}
+
+/* Distribuição de emoções — lista de barras horizontais coloridas por categoria */
+.ranking-list { list-style: none; }
+.rank-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.55rem 0; border-bottom: 1px dotted var(--line); }
+.rank-item:last-child { border-bottom: none; }
+.rank-emoji { font-size: 1.05rem; width: 22px; text-align: center; flex-shrink: 0; }
+.rank-name { width: 82px; font-size: 0.8rem; color: var(--ink); flex-shrink: 0; }
+.rank-bar { flex: 1; height: 8px; background: var(--bg-soft); border-radius: 4px; overflow: hidden; }
+.rank-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.rank-val { font-family: 'Fraunces', serif; font-weight: 600; color: var(--rose-deep); font-size: 0.85rem; min-width: 38px; text-align: right; flex-shrink: 0; }
+
+.graficos-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 1000px) { .graficos-grid { grid-template-columns: 1fr; } }
+
+.graficos-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+@media (max-width: 1000px) { .graficos-grid-3 { grid-template-columns: 1fr; } }
+
+.empty-hint {
+  font-size: 0.8rem;
+  color: var(--ink-faded);
+  font-style: italic;
+  padding: 0.8rem 0;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-faded);
+  margin: 0 0 0.6rem 0.1rem;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+/* ── Jornada (linha narrativa no cabeçalho) ── */
+.perfil-header-jornada {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.9rem;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  margin-top: 0.45rem;
+}
+.perfil-header-jornada span { white-space: nowrap; }
+.perfil-header-jornada strong { color: var(--rose-deep); font-weight: 700; }
+
+/* ── Conquistas (badges) ── */
+.conquistas-wrap { margin-bottom: 1.8rem; }
+.conquistas-sub {
+  font-size: 0.8rem;
+  color: var(--ink-faded);
+  margin: 0 0 0.9rem;
+}
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.8rem;
+}
+.badge-tile {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 0.8rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+}
+.badge-tile .b-icon {
+  font-size: 1.7rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.badge-tile .b-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.badge-tile .b-sub {
+  font-size: 0.68rem;
+  color: var(--ink-faded);
+}
+.badge-tile.locked {
+  opacity: 0.42;
+  filter: grayscale(0.6);
+}
+.badge-tile.locked .b-icon { filter: grayscale(1); }
+.badge-tile.unlocked {
+  border-color: var(--rose-300);
+  background: linear-gradient(160deg, var(--paper) 60%, var(--blush) 140%);
+}
+
+/* ── Configurações ── */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+@media (max-width: 900px) { .config-grid { grid-template-columns: 1fr; } }
+.config-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+}
+.config-card-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-faded);
+  margin-bottom: 0.8rem;
+}
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--ink);
+  padding: 0.5rem 0;
+  border-bottom: 1px dotted var(--line);
+}
+.config-row:last-child { border-bottom: none; }
+.config-mini-btn {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.config-mini-btn.active { background: var(--rose-deep); border-color: var(--rose-deep); color: #fff; }
+
+.config-hint {
+  font-size: 0.78rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.config-hint strong { color: var(--ink); }
+
+.config-backup-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.4rem 0.7rem;
+  border-radius: 20px;
+  margin-top: 0.8rem;
+}
+.config-backup-status.ok    { background: rgba(94, 140, 106, 0.14); color: var(--success); }
+.config-backup-status.warn  { background: rgba(184, 137, 62, 0.14); color: var(--gold); }
+.config-backup-status.late  { background: rgba(192, 82, 75, 0.14); color: var(--error); }
+
+.admin-req-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+}
+.admin-req-email { font-size: 0.86rem; color: var(--ink); font-weight: 600; flex: 1; min-width: 160px; }
+.admin-req-data { font-size: 0.7rem; color: var(--ink-faded); }
+.admin-req-actions { display: flex; gap: 0.5rem; }
+.admin-req-aprovar, .admin-req-recusar {
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.admin-req-aprovar { background: var(--success); color: #fff; }
+.admin-req-aprovar:hover { filter: brightness(1.08); }
+.admin-req-recusar { background: none; border-color: var(--line); color: var(--ink-faded); }
+.admin-req-recusar:hover { border-color: var(--error); color: var(--error); }
+</style>
+<link rel="stylesheet" href="topnav.css?v=1791163406"><script src="topnav.js?v=1791163406"></script><link rel="stylesheet" href="perfil-ui.css?v=1791163406"></head>
+<body>
+
+<div class="aurora-bg" aria-hidden="true">
+  <div class="aurora-blob ab1"></div>
+  <div class="aurora-blob ab2"></div>
+  <div class="aurora-blob ab3"></div>
+  <div class="aurora-blob ab4"></div>
+</div>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()" title="Menu">☰</button>
+<button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Esconder menu">‹</button>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="mark"><svg class="seal" viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><circle cx="32" cy="32" r="23" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="32" y="33" font-size="15" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-weight="700" fill="currentColor">TJSP</text></svg></div>
+      <h1>Escrevente TJSP</h1>
+      <div class="subtitle">Escrevente Técnico Judiciário</div>
+    </div>
+    <div class="nav-section-label">Principal</div>
+    <a href="index.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span><span>Início</span></a>
+    <a href="hoje.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></span><span>Hoje</span></a>
+    <a href="calendario.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span>Calendário</span></a>
+    <a href="revisar.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg></span><span>Revisar</span></a>
+    <div class="nav-section-label">Estudo</div>
+    <a href="materias.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span>Matérias</span></a>
+    <a href="banco-questoes.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span><span>Questões</span></a>
+    <a href="erros.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.9.85a.5.5 0 0 1-.62-.62l.85-2.9a2 2 0 0 1 .5-.85z"/></svg></span><span>Caderno de Erros</span></a>
+    <a href="caderno-legislativo.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><span>Caderno Legislativo</span></a>
+
+    <div class="nav-section-label">Análise</div>
+    <a href="estatisticas.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16v-3"/><path d="M12 16V8"/><path d="M17 16v-5"/></svg></span><span>Estatísticas</span></a>
+    <a href="estatisticas.html#simulados" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12l2 2 4-4"/></svg></span><span>Simulados</span></a>
+
+    <div class="nav-section-label">Extra</div>
+    <a href="reta-final.html" class="nav-link"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V4"/></svg></span><span>Reta Final</span></a>
+
+    <div class="sidebar-footer">
+      <div class="profile-card">
+        <div class="profile-avatar">
+          <img src="foto-perfil.jpg" alt="Julia" onerror="this.style.display='none'; if (this.parentElement) this.parentElement.textContent='J';">
+        </div>
+        <div class="profile-info">
+          <div class="name">Julia</div>
+          <div class="meta">Estudante de Direito</div>
+        </div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-label">Modo escuro</span>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="page-title">
+        <div class="breadcrumb">Perfil · <span data-month-year>—</span></div>
+        <h1>Seu <em>diário</em> de evolução</h1>
+      </div>
+      <div class="topbar-actions"></div>
+    </div>
+
+    <!-- CABEÇALHO DE IDENTIDADE -->
+    <div class="perfil-header">
+      <div class="perfil-header-id">
+        <div class="profile-avatar"></div>
+        <div>
+          <div class="perfil-header-nome" data-user-name>—</div>
+          <div class="perfil-header-tag">Estudante de Direito · Escrevente TJSP 2027</div>
+          <div class="perfil-header-jornada" id="perfil-jornada"></div>
+        </div>
+      </div>
+      <div class="perfil-header-backup">
+        <button class="btn btn-ghost" onclick="window._perfilOAB.abrirModal()">✎ Editar perfil</button>
+        <button class="btn btn-ghost" id="ph-logout-topo" style="color:var(--error)">⏻ Sair</button>
+      </div>
+    </div>
+
+    <!-- RESUMO -->
+    <div class="section-label">Resumo</div>
+    <div class="resumo-grid" id="resumo-grid"></div>
+
+    <!-- CONQUISTAS -->
+    <div class="section-label">Conquistas</div>
+    <div class="conquistas-wrap">
+      <p class="conquistas-sub" id="conquistas-sub-txt"></p>
+      <div class="badge-grid" id="badge-grid"></div>
+    </div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div class="section-label">Configurações</div>
+    <div class="config-grid">
+      <div class="config-card">
+        <div class="config-card-label">Aparência</div>
+        <div class="config-row">
+          <span>Modo escuro</span>
+          <button class="theme-toggle" id="perfil-theme-toggle" onclick="toggleTheme()">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </button>
+        </div>
+        <div class="config-row" style="align-items:center;flex-direction:column;gap:0.5rem;align-items:stretch">
+          <span>Cor personalizada</span>
+          <div style="display:flex;align-items:center;gap:0.6rem">
+            <input type="color" id="perfil-cor-picker" style="width:38px;height:38px;padding:0;border:1px solid var(--line);border-radius:var(--radius-sm);cursor:pointer;background:none;flex-shrink:0">
+            <input type="text" id="perfil-cor-hex" placeholder="#RRGGBB" maxlength="7" style="flex:1;min-width:0;padding:0.5rem 0.7rem;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:0.82rem;font-family:inherit;background:var(--paper-tint);color:var(--ink)">
+          </div>
+        </div>
+      </div>
+      <div class="config-card">
+        <div class="config-card-label">Sua conta</div>
+        <p class="config-hint">
+          <span id="perfil-conta-genero">Logada</span> como <strong id="perfil-email-logado">—</strong>. Seus dados sincronizam com a
+          nuvem automaticamente — em outro celular ou computador, entrando com essa mesma conta,
+          o progresso aparece lá também.
+        </p>
+        <div id="perfil-sync-status" class="config-backup-status"></div>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.7rem">
+          <button class="btn btn-primary" id="ph-sync-enviar" style="font-size:0.78rem">☁ Sincronizar agora</button>
+          <button class="btn btn-ghost" id="ph-sync-baixar" style="font-size:0.78rem">⬇ Baixar da nuvem</button>
+        </div>
+      </div>
+      <div class="config-card">
+        <div class="config-card-label">Backup em arquivo</div>
+        <p class="config-hint">
+          A sincronização com a nuvem já protege o essencial, mas um arquivo baixado é uma cópia
+          extra que não depende de internet nem da sua conta — útil pra guardar de vez em quando
+          num e-mail, Google Drive ou iCloud.
+        </p>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.7rem">
+          <button class="btn btn-ghost" id="ph-exportar" style="font-size:0.78rem">⬇ Exportar backup</button>
+          <button class="btn btn-ghost" id="ph-importar-btn" style="font-size:0.78rem">⬆ Importar backup</button>
+          <input type="file" id="ph-importar-file" accept="application/json" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLICITAÇÕES DE ACESSO (só aparece pra administradora) -->
+    <div id="admin-solicitacoes-wrap" style="display:none">
+      <div class="section-label">Solicitações de acesso</div>
+      <div class="conquistas-wrap">
+        <p class="conquistas-sub" id="admin-solicitacoes-sub">Carregando…</p>
+        <div id="admin-solicitacoes-lista" style="display:flex;flex-direction:column;gap:0.6rem"></div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="section-label">Insights</div>
+    <div class="insights-grid" id="insights-grid"></div>
+
+    <!-- PROGRESSO DE ESTUDO (antes vinha depois do humor — trazido pra cima
+         pra dar mais peso visual ao progresso real, não só ao humor) -->
+    <div class="section-label">Progresso de estudo</div>
+    <div class="graficos-grid-3">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Produtividade</div>
+            <div class="chart-sub">Últimas 8 semanas</div>
+          </div>
+        </div>
+        <div class="line-chart" id="prod-chart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Horas estudadas</div>
+            <div class="chart-sub">Últimas 8 semanas</div>
+          </div>
+        </div>
+        <div class="line-chart" id="horas-chart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Tarefas concluídas</div>
+            <div class="chart-sub">Últimas 8 semanas</div>
+          </div>
+        </div>
+        <div class="line-chart" id="tarefas-chart"></div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="section-label">Histórico de humor</div>
+    <div class="historico-layout">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Mapa de <em>humor</em></div>
+            <div class="chart-sub">Últimos 98 dias</div>
+          </div>
+        </div>
+        <div class="mood-calendar" id="mood-calendar"></div>
+        <div class="mood-cal-legend">
+          menos
+          <span class="sw" style="background:var(--rose-100)"></span>
+          <span class="sw" style="background:var(--rose-300)"></span>
+          <span class="sw" style="background:var(--rose-500)"></span>
+          <span class="sw" style="background:var(--rose-600)"></span>
+          <span class="sw" style="background:var(--rose-700)"></span>
+          mais
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Linha do <em>tempo</em></div>
+            <div class="chart-sub">Registros mais recentes</div>
+          </div>
+        </div>
+        <div class="mood-timeline" id="mood-timeline"></div>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS DE HUMOR -->
+    <div class="section-label">Gráficos de humor</div>
+    <div class="graficos-grid">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Evolução do <em>humor</em></div>
+            <div class="chart-sub">Últimos 14 dias</div>
+          </div>
+        </div>
+        <div class="line-chart" id="mood-evo-chart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Distribuição das <em>emoções</em></div>
+            <div class="chart-sub">Todo o período registrado</div>
+          </div>
+        </div>
+        <ul class="ranking-list" id="mood-dist-list"></ul>
+      </div>
+    </div>
+
+  <section class="perfil-stats"></section></main>
+</div>
+
+<script src="cards.js"></script>
+<script src="progresso.js?v=1783861348"></script>
+<script src="humor.js"></script>
+<script src="script.js?v=1784021868"></script>
+<script src="cores.js"></script>
+<script src="perfil.js?v=1783861604"></script>
+<script src="sync.js?v=1784058237"></script>
+<script>
+// ── Helpers de agregação semanal (produtividade / horas / tarefas) ──
+function _segundaDe(dataStr) {
+  const d = new Date(dataStr + 'T12:00:00');
+  const dow = d.getDay();
+  const diff = (dow === 0 ? -6 : 1) - dow;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().split('T')[0];
+}
+
+function _rotuloSemana(mondayStr) {
+  const d = new Date(mondayStr + 'T12:00:00');
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function _ultimasSemanas(n) {
+  const hoje = typeof getCurrentDate === 'function' ? getCurrentDate() : new Date();
+  const seg = _segundaDe(dataLocalDe(hoje));
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(seg + 'T12:00:00');
+    d.setDate(d.getDate() - i * 7);
+    out.push(d.toISOString().split('T')[0]);
+  }
+  return out;
+}
+
+function getSessoesPomodoro() {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.indexOf('pomo_sessions_') === 0) {
+      const data = k.replace('pomo_sessions_', '');
+      const count = parseInt(localStorage.getItem(k) || '0', 10);
+      if (count > 0) out.push({ data, count });
+    }
+  }
+  return out;
+}
+
+function renderLineChart(containerId, pontos, formatador) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const max = Math.max(1, ...pontos.map(p => p.valor));
+  el.innerHTML = pontos.map(p => {
+    const pct = Math.max(3, Math.round((p.valor / max) * 100));
+    const titulo = formatador ? formatador(p) : p.valor;
+    return `<div class="line-day" title="${titulo}">
+      ${p.valor > 0 ? `<div class="line-bar" style="height:${pct}%"></div>` : `<div style="width:62%;height:3px;background:var(--line-soft);border-radius:2px;margin-bottom:1px"></div>`}
+      <div class="lbl">${p.rotulo}</div>
+    </div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const p = carregarProgresso();
+  if (typeof streakOAB === 'function') p.streak = streakOAB();
+  const stats = calcularStats();
+  const insightsHumor = HumorOAB.getInsights();
+  const sessoes = getSessoesPomodoro();
+  const totalSessoes = sessoes.reduce((s, x) => s + x.count, 0);
+  const fmtG = (t) => (window._perfilOAB && window._perfilOAB.formatarGenero) ? window._perfilOAB.formatarGenero(t) : t;
+
+  // ── JORNADA (linha narrativa no cabeçalho) ──
+  (function renderJornada() {
+    const el = document.getElementById('perfil-jornada');
+    if (!el) return;
+    const datasConclusao = Object.values(p.dias || {})
+      .filter(d => d.concluido && d.data_conclusao)
+      .map(d => d.data_conclusao)
+      .sort();
+    const partes = [];
+    if (datasConclusao.length) {
+      const inicio = new Date(datasConclusao[0] + 'T12:00:00');
+      partes.push(`<span>📅 Estudando desde <strong>${inicio.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}</strong></span>`);
+    }
+    partes.push(`<span>✨ Sequência atual: <strong>${p.streak || 0} dia${(p.streak||0) !== 1 ? 's' : ''}</strong></span>`);
+    partes.push(`<span>📈 <strong>${stats.pct}%</strong> do plano concluído</span>`);
+    el.innerHTML = partes.join('');
+  })();
+
+  // ── CONQUISTAS (badges) ──
+  (function renderConquistas() {
+    const grid = document.getElementById('badge-grid');
+    const sub = document.getElementById('conquistas-sub-txt');
+    if (!grid) return;
+    const q = (typeof getTotaisQuestoes === 'function') ? getTotaisQuestoes() : { total: 0, pct: 0 };
+    const streak = p.streak || 0;
+
+    const badges = [
+      { icon: '🌸', title: 'Primeiro passo', sub: 'Conclua seu 1º dia', ok: stats.concluidos >= 1 },
+      { icon: '✦', title: 'Primeira semana', sub: '7 dias concluídos', ok: stats.concluidos >= 7 },
+      { icon: '🏆', title: 'Metade do caminho', sub: '30 dias concluídos', ok: stats.concluidos >= 30 },
+      { icon: '👑', title: 'Reta final', sub: '60 dias concluídos', ok: stats.concluidos >= 60 },
+      { icon: '✨', title: 'Constância', sub: '7 dias seguidos', ok: streak >= 7 },
+      { icon: '🔥', title: 'Disciplina', sub: '15 dias seguidos', ok: streak >= 15 },
+      { icon: '📚', title: 'Primeiras questões', sub: '50 questões resolvidas', ok: q.total >= 50 },
+      { icon: '📖', title: 'Maratonista', sub: '100 questões resolvidas', ok: q.total >= 100 },
+      { icon: '🎯', title: 'Dedicação', sub: '500 questões resolvidas', ok: q.total >= 500 },
+      { icon: '⚖️', title: 'Acima do corte', sub: '70%+ de acerto (10+ questões)', ok: q.pct >= 70 && q.total >= 10 },
+      { icon: '🌱', title: 'Autoconhecimento', sub: 'Registre seu humor 7 vezes', ok: (insightsHumor && insightsHumor.totalDias >= 7) },
+      { icon: '🌟', title: 'Rotina firme', sub: 'Registre seu humor 30 vezes', ok: (insightsHumor && insightsHumor.totalDias >= 30) },
+    ];
+
+    const desbloqueadas = badges.filter(b => b.ok).length;
+    if (sub) sub.textContent = `${desbloqueadas} de ${badges.length} desbloqueadas`;
+    grid.innerHTML = badges.map(b => `
+      <div class="badge-tile ${b.ok ? 'unlocked' : 'locked'}">
+        <span class="b-icon">${b.icon}</span>
+        <div class="b-title">${b.title}</div>
+        <div class="b-sub">${b.sub}</div>
+      </div>`).join('');
+  })();
+
+  // ── CONFIGURAÇÕES ──
+  (function renderConfiguracoes() {
+    // Cor personalizada (reaproveita a API global de cores.js)
+    const picker = document.getElementById('perfil-cor-picker');
+    const hexField = document.getElementById('perfil-cor-hex');
+    if (picker && hexField) {
+      const corAtual = getComputedStyle(document.documentElement).getPropertyValue('--rose-600').trim() || '#C8336F';
+      picker.value = corAtual;
+      hexField.value = corAtual;
+      picker.addEventListener('input', () => {
+        if (window._coresOAB) window._coresOAB.applyCustom(picker.value);
+        hexField.value = picker.value;
+      });
+      hexField.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const ok = window._coresOAB && window._coresOAB.applyCustom(hexField.value);
+        if (ok) picker.value = hexField.value;
+        else hexField.style.borderColor = '#c0392b';
+      });
+      hexField.addEventListener('input', () => { hexField.style.borderColor = 'var(--line)'; });
+      hexField.addEventListener('blur', () => {
+        if (!hexField.value) return;
+        const ok = window._coresOAB && window._coresOAB.applyCustom(hexField.value);
+        if (ok) picker.value = hexField.value;
+        else hexField.style.borderColor = '#c0392b';
+      });
+    }
+
+    // Gênero do texto ("Logada"/"Logado", conforme a preferência salva)
+    const generoEl = document.getElementById('perfil-conta-genero');
+    if (generoEl) generoEl.textContent = fmtG('Logada');
+
+    // E-mail logado — via onAuthStateChanged (não um único check aqui: no
+    // momento em que DOMContentLoaded dispara, o Firebase Auth costuma
+    // ainda não ter confirmado a sessão, então currentUser vinha null e o
+    // e-mail nunca aparecia, ficando preso no "—" pra sempre).
+    const emailEl = document.getElementById('perfil-email-logado');
+    if (emailEl && window._fbAuth) {
+      window._fbAuth.onAuthStateChanged(user => {
+        emailEl.textContent = (user && user.email) || '—';
+      });
+    }
+
+    // Status de sincronização (última vez que enviou pra nuvem OU
+    // exportou um arquivo — o que for mais recente)
+    const statusEl = document.getElementById('perfil-sync-status');
+    if (statusEl) {
+      const ultimo = (window._perfilOAB && window._perfilOAB.getUltimoBackup) ? window._perfilOAB.getUltimoBackup() : null;
+      if (!ultimo) {
+        statusEl.className = 'config-backup-status warn';
+        statusEl.textContent = '⏳ Ainda sincronizando pela primeira vez...';
+      } else {
+        const dias = Math.floor((Date.now() - new Date(ultimo).getTime()) / 864e5);
+        const dataFmt = new Date(ultimo).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
+        if (dias <= 1) {
+          statusEl.className = 'config-backup-status ok';
+          statusEl.textContent = `✓ Sincronizado recentemente (${dataFmt})`;
+        } else if (dias <= 7) {
+          statusEl.className = 'config-backup-status ok';
+          statusEl.textContent = `✓ Última sincronização: ${dias} dias atrás`;
+        } else {
+          statusEl.className = 'config-backup-status warn';
+          statusEl.textContent = `⏰ Última sincronização: ${dias} dias atrás — clique em "Sincronizar agora"`;
+        }
+      }
+    }
+
+    // Botões de sincronização manual
+    const btnEnviar = document.getElementById('ph-sync-enviar');
+    const btnBaixar = document.getElementById('ph-sync-baixar');
+    const uid = window._fbAuth && window._fbAuth.currentUser ? window._fbAuth.currentUser.uid : null;
+    if (btnEnviar && uid) {
+      btnEnviar.addEventListener('click', () => {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = 'Enviando…';
+        window._syncOAB.enviarParaNuvem(uid).then(ok => {
+          btnEnviar.disabled = false;
+          btnEnviar.textContent = ok ? '✓ Sincronizado!' : '✕ Falhou, tente de novo';
+          setTimeout(() => { btnEnviar.textContent = '☁ Sincronizar agora'; }, 2000);
+        });
+      });
+    }
+    if (btnBaixar && uid) {
+      btnBaixar.addEventListener('click', () => {
+        const ok = confirm('Isso vai substituir o progresso deste aparelho pelo que estiver salvo na nuvem. Continuar?');
+        if (!ok) return;
+        btnBaixar.disabled = true;
+        btnBaixar.textContent = 'Baixando…';
+        window._syncOAB.baixarDaNuvem(uid).then(data => {
+          if (data) { alert('Dados restaurados! A página vai recarregar.'); location.reload(); }
+          else { btnBaixar.disabled = false; btnBaixar.textContent = '⬇ Baixar da nuvem'; alert('Nenhum dado encontrado na nuvem ainda.'); }
+        });
+      });
+    }
+
+    // Sair da conta
+    const fazerLogout = () => {
+      const ok = confirm('Sair da conta? Você vai precisar entrar de novo pra acessar o site.');
+      if (!ok) return;
+      try { localStorage.removeItem('tj_auth_ok'); } catch (e) {}
+      if (window._fbAuth) window._fbAuth.signOut().then(() => location.reload());
+    };
+    const btnLogoutTopo = document.getElementById('ph-logout-topo');
+    if (btnLogoutTopo) btnLogoutTopo.addEventListener('click', fazerLogout);
+  })();
+
+  // ── SOLICITAÇÕES DE ACESSO (só visível/funcional pra administradora —
+  // a proteção de verdade é a regra do Firestore, isso aqui é só UI) ──
+  const ADMIN_EMAIL = 'juliagabriellems@icloud.com';
+  (function renderSolicitacoesAcesso(tentativa) {
+    tentativa = tentativa || 0;
+    const wrap = document.getElementById('admin-solicitacoes-wrap');
+    if (!wrap) return;
+    if (!window._fbAuth || !window._fbDb) {
+      // Firebase pode ainda não ter terminado de carregar (conexão lenta) --
+      // tenta de novo por alguns segundos antes de desistir de vez, em vez
+      // de falhar silenciosamente e deixar 'Carregando...' preso pra sempre.
+      if (tentativa < 20) { setTimeout(() => renderSolicitacoesAcesso(tentativa + 1), 250); return; }
+      wrap.style.display = 'block';
+      const subErro = document.getElementById('admin-solicitacoes-sub');
+      if (subErro) subErro.textContent = 'Não foi possível carregar (Firebase não respondeu). Recarregue a página.';
+      return;
+    }
+
+    // window._fbAuth.currentUser pode ainda estar vazio nesse momento --
+    // o app libera a tela antes do Firebase confirmar de verdade quem
+    // está logada (pra não travar a navegação). Por isso espera o
+    // onAuthStateChanged em vez de checar currentUser direto aqui.
+    window._fbAuth.onAuthStateChanged(function (usuarioAtual) {
+      if (!usuarioAtual || usuarioAtual.email !== ADMIN_EMAIL) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      if (wrap.dataset.iniciado === '1') return; // já montou o listener antes
+      wrap.dataset.iniciado = '1';
+
+      const lista = document.getElementById('admin-solicitacoes-lista');
+      const sub = document.getElementById('admin-solicitacoes-sub');
+
+      function render(snap) {
+        if (snap.empty) {
+          sub.textContent = 'Nenhuma solicitação pendente no momento.';
+          lista.innerHTML = '';
+          return;
+        }
+        sub.textContent = `${snap.size} pedido${snap.size > 1 ? 's' : ''} aguardando aprovação`;
+        lista.innerHTML = snap.docs.map(doc => {
+          const d = doc.data();
+          const dataFmt = d.criado_em && d.criado_em.toDate ? d.criado_em.toDate().toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+          return `<div class="admin-req-item" data-uid="${doc.id}">
+            <div>
+              <div class="admin-req-email">${(d.email || 'sem e-mail').replace(/</g,'&lt;')}</div>
+              <div class="admin-req-data">${dataFmt}</div>
+            </div>
+            <div class="admin-req-actions">
+              <button class="admin-req-aprovar" data-uid="${doc.id}">✓ Aprovar</button>
+              <button class="admin-req-recusar" data-uid="${doc.id}">Recusar</button>
+            </div>
+          </div>`;
+        }).join('');
+
+        lista.querySelectorAll('.admin-req-aprovar').forEach(btn => {
+          btn.addEventListener('click', () => {
+            btn.disabled = true; btn.textContent = 'Aprovando…';
+            window._fbDb.collection('usuarios_autorizados').doc(btn.dataset.uid)
+              .update({ aprovado: true, aprovado_em: firebase.firestore.FieldValue.serverTimestamp() })
+              .catch(() => { btn.disabled = false; btn.textContent = '✓ Aprovar'; alert('Não foi possível aprovar. Tenta de novo.'); });
+          });
+        });
+        lista.querySelectorAll('.admin-req-recusar').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('Recusar e remover esse pedido de acesso?')) return;
+            window._fbDb.collection('usuarios_autorizados').doc(btn.dataset.uid).delete()
+              .catch(() => alert('Não foi possível recusar. Tenta de novo.'));
+          });
+        });
+      }
+
+      // Tempo real: some da lista sozinho assim que aprovar/recusar
+      window._fbDb.collection('usuarios_autorizados').where('aprovado', '==', false)
+        .onSnapshot(render, (err) => { sub.textContent = 'Não foi possível carregar as solicitações (' + (err && err.message ? err.message : 'erro') + ').'; });
+    });
+  })();
+
+  // ── RESUMO ──
+  let tarefasConcluidas = 0;
+  Object.values(p.dias || {}).forEach(d => {
+    if (d.checklist) Object.values(d.checklist).forEach(v => { if (v) tarefasConcluidas++; });
+  });
+  let habitosConcluidos = 0;
+  if (p.topicos) Object.values(p.topicos).forEach(v => { if (v) habitosConcluidos++; });
+
+  const horasEstudadasTotal = Math.round((totalSessoes * 25 / 60) * 10) / 10;
+
+  const resumoItens = [
+    { icon: '✨', num: p.streak || 0, lbl: 'Sequência de dias' },
+    { icon: '📅', num: stats.concluidos, lbl: 'Dias ativos' },
+    { icon: '✅', num: tarefasConcluidas, lbl: 'Tarefas concluídas' },
+    { icon: '🌱', num: habitosConcluidos, lbl: 'Hábitos concluídos' },
+    { icon: '🎯', num: totalSessoes, lbl: 'Sessões de foco' },
+    { icon: '⏱️', num: horasEstudadasTotal + 'h', lbl: 'Tempo estudado' },
+    { icon: '📈', num: stats.pct + '%', lbl: 'Produtividade geral' },
+  ];
+  document.getElementById('resumo-grid').innerHTML = resumoItens.map(i => `
+    <div class="resumo-tile">
+      <div class="icon">${i.icon}</div>
+      <div class="num">${i.num}</div>
+      <div class="lbl">${i.lbl}</div>
+    </div>`).join('');
+
+  // ── INSIGHTS ──
+  const insightsGrid = document.getElementById('insights-grid');
+  if (!insightsHumor) {
+    insightsGrid.innerHTML = `<div class="insights-empty">Registre seu humor na tela Início para começar a ver insights aqui. ✨</div>`;
+  } else {
+    const cards = [];
+    if (insightsHumor.maisFrequente) {
+      cards.push({ e: insightsHumor.maisFrequente.emoji, t: 'Humor mais frequente',
+        x: `Você esteve <strong>${fmtG(insightsHumor.maisFrequente.humor).toLowerCase()}</strong> em ${insightsHumor.maisFrequente.pct}% dos dias registrados.` });
+    }
+    if (insightsHumor.melhorDia) {
+      cards.push({ e: '🌟', t: 'Melhor dia da semana',
+        x: `Seus melhores registros costumam cair numa <strong>${insightsHumor.melhorDia}</strong>.` });
+    }
+    if (insightsHumor.piorDia) {
+      cards.push({ e: '🌧️', t: 'Dia mais difícil',
+        x: `<strong>${insightsHumor.piorDia}</strong> costuma ser mais pesado — vale reservar algo mais leve.` });
+    }
+    cards.push({ e: '🔥', t: 'Sequência positiva',
+      x: insightsHumor.maxSequenciaFeliz > 0
+        ? `Sua maior sequência foi de <strong>${insightsHumor.maxSequenciaFeliz} dia${insightsHumor.maxSequenciaFeliz !== 1 ? 's' : ''}</strong> seguidos numa boa fase.`
+        : `Ainda sem uma sequência de dias positivos — o próximo pode ser o primeiro.` });
+    cards.push({ e: '🌀', t: 'Dias mais cansativos',
+      x: `<strong>${insightsHumor.diasEstressantes}</strong> dia${insightsHumor.diasEstressantes !== 1 ? 's' : ''} registrado${insightsHumor.diasEstressantes !== 1 ? 's' : ''} como cansativo${insightsHumor.diasEstressantes !== 1 ? 's' : ''} ou perdido${insightsHumor.diasEstressantes !== 1 ? 's' : ''}.` });
+    if (insightsHumor.tendencia) {
+      const seta = insightsHumor.tendencia === 'subindo' ? '📈' : insightsHumor.tendencia === 'caindo' ? '📉' : '➖';
+      cards.push({ e: seta, t: 'Evolução recente',
+        x: `Sua média semanal está <strong>${insightsHumor.tendencia}</strong> em relação à semana anterior.` });
+    }
+    if (insightsHumor.mediaSemana !== null) {
+      cards.push({ e: '⚖️', t: 'Média semanal do humor',
+        x: `Média desta semana: <strong>${insightsHumor.mediaSemana.toFixed(1)} / 5</strong>.` });
+    }
+    insightsGrid.innerHTML = cards.map(c => `
+      <div class="insight-card">
+        <div class="ic-emoji">${c.e}</div>
+        <div>
+          <div class="ic-title">${c.t}</div>
+          <div class="ic-text">${c.x}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── MAPA DE HUMOR (calendário 14×7) ──
+  const porDiaHumor = HumorOAB.getHumorPorDia();
+  const hoje = typeof getCurrentDate === 'function' ? getCurrentDate() : new Date();
+  const diasCal = [];
+  for (let i = 97; i >= 0; i--) {
+    const d = new Date(hoje);
+    d.setDate(d.getDate() - i);
+    diasCal.push(dataLocalDe(d));
+  }
+  document.getElementById('mood-calendar').innerHTML = diasCal.map(ds => {
+    const reg = porDiaHumor[ds];
+    const cls = reg ? `v${reg.valor}` : '';
+    const titulo = reg ? `${ds} — ${reg.emoji} ${fmtG(reg.humor)}` : ds;
+    return `<div class="mc-cell ${cls}" title="${titulo}"></div>`;
+  }).join('');
+
+  // ── TIMELINE ──
+  const log = HumorOAB.getLog().slice().reverse().slice(0, 40);
+  const timelineEl = document.getElementById('mood-timeline');
+  if (!log.length) {
+    timelineEl.innerHTML = `<div class="empty-hint">Nenhum registro de humor ainda.</div>`;
+  } else {
+    timelineEl.innerHTML = log.map(e => {
+      const d = new Date(e.data + 'T12:00:00');
+      const dataFmt = String(d.getDate()).padStart(2, '0') + ' ' + d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      return `<div class="mt-item">
+        <div class="mt-emoji">${e.emoji}</div>
+        <div class="mt-date">${dataFmt}</div>
+        <div class="mt-info">
+          <div class="mt-humor">${fmtG(e.humor)}</div>
+          <div class="mt-hora">${e.hora}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── EVOLUÇÃO DO HUMOR (14 dias) ──
+  const evo = HumorOAB.getEvolucao(14);
+  renderLineChart('mood-evo-chart', evo.map(e => ({
+    valor: e.registro ? e.registro.valor : 0,
+    rotulo: new Date(e.data + 'T12:00:00').getDate(),
+    _data: e.data,
+    _registro: e.registro,
+  })), p => p._registro ? `${p._data} — ${p._registro.emoji} ${fmtG(p._registro.humor)}` : `${p._data} — sem registro`);
+
+  // ── DISTRIBUIÇÃO DAS EMOÇÕES ──
+  const distEl = document.getElementById('mood-dist-list');
+  const CORES_HUMOR = {
+    Cansada:   'var(--mat-tribut-deep)',
+    Perdida:   'var(--mat-penal-deep)',
+    Focada:    'var(--mat-const-deep)',
+    Confiante: 'var(--mat-etica-deep)',
+    Empolgada: 'var(--rose-deep)',
+  };
+  if (!insightsHumor) {
+    distEl.innerHTML = `<div class="empty-hint">Sem dados suficientes ainda.</div>`;
+  } else {
+    distEl.innerHTML = insightsHumor.distribuicao.map(d => `
+      <li class="rank-item">
+        <span class="rank-emoji">${d.emoji}</span>
+        <span class="rank-name">${fmtG(d.label)}</span>
+        <span class="rank-bar"><span class="rank-fill" style="width:${d.pct}%;background:${CORES_HUMOR[d.label]}"></span></span>
+        <span class="rank-val">${d.pct}%</span>
+      </li>`).join('');
+  }
+
+  // ── PRODUTIVIDADE / HORAS / TAREFAS POR SEMANA (8 semanas) ──
+  const semanas = _ultimasSemanas(8);
+  const concluidosPorSemana = {};
+  const tarefasPorSemana = {};
+  Object.values(p.dias || {}).forEach(d => {
+    if (!d.concluido || !d.data_conclusao) return;
+    const seg = _segundaDe(d.data_conclusao);
+    concluidosPorSemana[seg] = (concluidosPorSemana[seg] || 0) + 1;
+    if (d.checklist) {
+      const feitas = Object.values(d.checklist).filter(Boolean).length;
+      tarefasPorSemana[seg] = (tarefasPorSemana[seg] || 0) + feitas;
+    }
+  });
+  const horasPorSemana = {};
+  sessoes.forEach(s => {
+    const seg = _segundaDe(s.data);
+    horasPorSemana[seg] = (horasPorSemana[seg] || 0) + s.count * 25 / 60;
+  });
+
+  renderLineChart('prod-chart', semanas.map(seg => ({
+    valor: Math.min(100, Math.round(((concluidosPorSemana[seg] || 0) / 5) * 100)),
+    rotulo: _rotuloSemana(seg),
+  })), p2 => `Semana de ${p2.rotulo} — ${p2.valor}%`);
+
+  renderLineChart('horas-chart', semanas.map(seg => ({
+    valor: Math.round((horasPorSemana[seg] || 0) * 10) / 10,
+    rotulo: _rotuloSemana(seg),
+  })), p2 => `Semana de ${p2.rotulo} — ${p2.valor}h`);
+
+  renderLineChart('tarefas-chart', semanas.map(seg => ({
+    valor: tarefasPorSemana[seg] || 0,
+    rotulo: _rotuloSemana(seg),
+  })), p2 => `Semana de ${p2.rotulo} — ${p2.valor} tarefa${p2.valor !== 1 ? 's' : ''}`);
+
+  // ── BACKUP ──
+  document.getElementById('ph-exportar').addEventListener('click', () => window._perfilOAB.exportarBackupCompleto());
+  const fileInput = document.getElementById('ph-importar-file');
+  document.getElementById('ph-importar-btn').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const ok = confirm('Importar este backup vai substituir todo o progresso e configurações salvos neste navegador. Deseja continuar?');
+    if (!ok) { fileInput.value = ''; return; }
+    window._perfilOAB.importarBackupCompleto(file).then(() => {
+      alert('Backup importado com sucesso! A página será recarregada.');
+      location.reload();
+    }).catch(() => {
+      alert('Não foi possível importar este arquivo. Verifique se é um backup válido.');
+      fileInput.value = '';
+    });
+  });
+});
+</script>
+<script src="perfil-ui.js?v=1791163406"></script></body>
+</html>
