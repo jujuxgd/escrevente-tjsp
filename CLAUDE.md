@@ -58,8 +58,11 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
 
 **A alimentar (aos poucos):**
 1. `topic` das questões (hoje null; o Hoje usa `q: ["*"]`, a matéria inteira) — classificar pelo edital.
-2. Flashcards (`fc-*.js` + `ARQUIVOS` em `ativo-core.js`) — vazio. Fonte sugerida: Memorex 01–06 e Tabelas NEAF.
-   Texto reescrito, nunca copiado.
+2. Flashcards (`fc-*.js` + `ARQUIVOS` em `ativo-core.js`; cartão `{id, d, t: tema da aula, r, f, v, b, p}`).
+   976 cartões: matérias de Direito das Tabelas NEAF (`r: "1"`); Português, Informática, Matemática + RLM
+   (`fc-mat.js`) dos Bizus (`r: "2"`). Texto reescrito, nunca copiado; artigos revogados ou superados e erros da
+   fonte ficaram fora. Sem cartões (a fonte não cobre): Poder Judiciário (art. 92), ferramentas de busca,
+   Windows 11, Teams/OneDrive, juros simples, equações, geometria espacial, gráficos, sequências lógicas.
 3. Cadernos legislativos (`cl-*.js`, lista em `caderno-legislativo.html` com `jsFile: null`) — fonte:
    "1. Lei seca/LEI SECA.pdf" (apostila de legislação 2025). Texto dos artigos **literal**.
 4. Videoaulas: aba removida do Hoje (não há lista do TJSP).
