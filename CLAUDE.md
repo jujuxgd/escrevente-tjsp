@@ -14,7 +14,7 @@ preparatório da OAB de Julia (`jujuxgd/preparatorio-oab`): HTML estático + JS 
   Gerais 24 (Atualidades + PcD 4, Matemática 4, Informática 9, RLM 7). Habilitação: nota ≥ 5 de 10 no total
   (35 acertos) e os mínimos dos blocos I e II. A divisão interna do Bloco II não é divulgada.
 - **Legislação Interna (Bloco II):** Res. TJSP 850/2021 (teletrabalho), Res. TJSP 963/2025 (eproc), LC 1.111/2010
-  e Regimento Interno do TJSP — lei seca pronta (menos o Regimento); sem aula no calendário nem flashcards.
+  e Regimento Interno do TJSP — lei seca pronta; sem aula no calendário nem flashcards.
 - Julia estuda a OAB ao mesmo tempo: 1ª fase em 10/01/2027 e 2ª fase em 28/02/2027.
 
 ## 2. Calendário (`calendario-ativo.js` + `aulas-dias.js`)
@@ -67,9 +67,9 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
 3. Cadernos legislativos (`cl-*.js`, `window.CL_*` = HTML com `h2.cl-part`, `h3.cl-section`, `p.cl-artigo|cl-paragrafo|
    cl-inciso|cl-alinea`): 8 cadernos. Penal, CPP, CPC, CF, LIA, Normas e PcD gerados de "1. Lei seca/LEI SECA.pdf"
    (apostila 2025, sem as marcas "2025"); Estatuto de SP (arts. 1–86, 171–175, 239–323) e Legislação Interna (Res.
-   850 compilada, Res. 963, LC 1.111 sem anexos) do texto compilado oficial da Alesp/TJSP enviado por Julia — sem as
-   notas de compilação e sem o texto riscado (revogado). Artigos conferidos com o Anexo VIII. **Falta**: Regimento
-   Interno do TJSP.
+   850 compilada, Res. 963, LC 1.111 sem anexos, Regimento Interno atualizado em 30/04/2026, sem o índice) do texto
+   compilado oficial da Alesp/TJSP enviado por Julia — sem as notas de compilação da Alesp e sem o texto riscado
+   (revogado). Artigos conferidos com o Anexo VIII.
 4. Videoaulas: aba removida do Hoje (não há lista do TJSP).
 
 ## 4. Sincronização e login
@@ -87,7 +87,8 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
 Diferente do site da OAB de propósito. Tudo em `tema.css` (carregado por `cores-early.js`, que põe
 `data-skin="palacio"` no `<html>`). **Cor:** padrão **preto**, trocável no Perfil → Aparência → Cor personalizada,
 igual à OAB (`cores-early.js`/`cores.js`, chaves `tj_rose_intensity` e `tj_rose_custom_hex`). A barra do topo e a
-faixa usam `--rose-900` (a cor escolhida escurecida); botões e números usam `--rose`. **Não fixar cor de destaque
+faixa usam `--faixa` (a cor escolhida, escurecida só se for clara demais para texto branco); botões e números
+usam `--rose`. **Não fixar cor de destaque
 no `tema.css`** (Julia não gostou do verde). Fundo neutro `#F2F3F5`, detalhes em bronze `#A77B2F`/`#E9D9B5`;
 títulos em **Gloock**, texto em **Instrument Sans**. Cada página abre com a faixa escura e título grande, e o
 primeiro bloco sobe sobre ela; cartões brancos com topo em arco e fio de bronze; botões em pílula. No Hoje, o título

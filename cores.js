@@ -47,6 +47,13 @@
   }
   // Gera a escala completa (50…900) a partir de uma única cor-base (nível 600),
   // para que blush, soft, deep etc. sempre acompanhem a cor escolhida.
+  // Faixa e barra do topo usam a cor escolhida; só escurecem o necessário para o texto branco continuar legível.
+  function corFaixa(hex) {
+    function lum(h) { const c = hexToRgb(h); const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); }
+    let h = hex, i = 0;
+    while (lum(h) > 0.3 && i++ < 20) h = darken(h, 0.06);
+    return h;
+  }
   function buildRamp(base) {
     return {
       '--rose-50':  lighten(base, 0.95),
@@ -56,6 +63,7 @@
       '--rose-600': base,
       '--rose-700': darken(base, 0.18),
       '--rose-900': darken(base, 0.55),
+      '--faixa':    corFaixa(base),
     };
   }
   function normalizeHex(v) {
