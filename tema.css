@@ -313,9 +313,9 @@ html[data-skin] .hub-card { border-radius: 120px 120px 14px 14px !important; pad
 html[data-skin] .hub-card .hub-ico { margin-left: auto; margin-right: auto; }
 html[data-skin] .day-hero { border-radius: 160px 160px 14px 14px !important; padding-top: 2.6rem !important; }
 
-/* botões principais em pílula verde */
+/* botões principais em pílula, na mesma cor da faixa do topo */
 html[data-skin] .btn-primary, html[data-skin] .btn-estudei, html[data-skin] .btn.btn-primary {
-  background: var(--rose) !important; border-color: var(--rose) !important; color: #fff !important; border-radius: 999px !important;
+  background: var(--faixa, var(--rose)) !important; border-color: var(--faixa, var(--rose)) !important; color: #fff !important; border-radius: 999px !important;
 }
 html[data-skin] .btn { border-radius: 999px; }
 
@@ -368,8 +368,8 @@ html[data-skin] main > .bq-cab .breadcrumb { color: rgba(255,255,255,.6) !import
 html[data-skin] .ca-sub, html[data-skin] .rv-sub { color: rgba(255,255,255,.78) !important; }
 html[data-skin] .ca-sub b, html[data-skin] .rv-sub b { color: #fff !important; }
 html[data-skin] body.home main > .topbar { margin-bottom: 0 !important; }
-html[data-skin] body.home .tl + .section-label { color: rgba(255,255,255,.6) !important; }
-html[data-skin] body.home .tl + .section-label::after { background: rgba(255,255,255,.18) !important; }
+html[data-skin] body.home :is(.tl, .hero) + .section-label { color: rgba(255,255,255,.72) !important; }
+html[data-skin] body.home :is(.tl, .hero) + .section-label::after { background: rgba(255,255,255,.22) !important; }
 @media (max-width: 700px) {
   .pl-cont { display: flex; align-items: baseline; gap: .5rem; margin-top: .6rem; }
   .pl-cont b { font-size: 1.9rem; }
