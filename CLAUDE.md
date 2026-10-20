@@ -88,7 +88,8 @@ Diferente do site da OAB de propósito. Tudo em `tema.css` (carregado por `cores
 `data-skin="palacio"` no `<html>`). **Cor:** padrão **preto**, trocável no Perfil → Aparência → Cor personalizada,
 igual à OAB (`cores-early.js`/`cores.js`, chaves `tj_rose_intensity` e `tj_rose_custom_hex`). A barra do topo e a
 faixa usam `--faixa` (a cor escolhida, escurecida só se for clara demais para texto branco); botões e números
-usam `--rose`. **Não fixar cor de destaque
+usam `--rose`. Detalhes claros da faixa (nome, aba ativa, progresso, logo) usam `--bronze-claro` = `--faixa-claro`:
+bronze com preto/cinza, tom claro da própria cor nas cores vivas. **Não fixar cor de destaque
 no `tema.css`** (Julia não gostou do verde). Fundo neutro `#F2F3F5`, detalhes em bronze `#A77B2F`/`#E9D9B5`;
 títulos em **Gloock**, texto em **Instrument Sans**. Cada página abre com a faixa escura e título grande, e o
 primeiro bloco sobe sobre ela; cartões brancos com topo em arco e fio de bronze; botões em pílula. No Hoje, o título

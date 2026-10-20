@@ -72,8 +72,8 @@
     bar.className = 'tn';
     bar.innerHTML =
       '<a class="tn-brand" href="index.html" aria-label="Início">' +
-      '<svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 60V30a24 24 0 0 1 48 0v30z" fill="none" stroke="#E9D9B5" stroke-width="3"/>' +
-      '<path d="M18 56V34M27 56V31M37 56V31M46 56V34" stroke="#E9D9B5" stroke-width="3.5" stroke-linecap="round"/><rect x="8" y="56" width="48" height="4" fill="#C9A55A"/></svg>' +
+      '<svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 60V30a24 24 0 0 1 48 0v30z" fill="none" stroke="var(--bronze-claro, #E9D9B5)" stroke-width="3"/>' +
+      '<path d="M18 56V34M27 56V31M37 56V31M46 56V34" stroke="var(--bronze-claro, #E9D9B5)" stroke-width="3.5" stroke-linecap="round"/><rect x="8" y="56" width="48" height="4" fill="var(--bronze-claro, #C9A55A)" opacity=".8"/></svg>' +
       '<span class="tn-word">Escrevente TJSP</span></a>' +
       '<div class="tn-rule" aria-hidden="true"></div>' +
       '<nav class="tn-links" aria-label="Principal">' + links + '<span class="tn-ink" aria-hidden="true"></span></nav>' +

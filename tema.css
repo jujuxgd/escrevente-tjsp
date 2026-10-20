@@ -265,7 +265,7 @@ html[data-skin] body { background: var(--bg) !important; }
 
 /* ═══ Estrutura Palácio ═══ */
 /* faixa e barra do topo na cor escolhida no Perfil, escurecida (preto por padrão) */
-html[data-skin="palacio"] { --verde-noite: var(--faixa, var(--rose-900, #111214)); --bronze-claro: #E9D9B5; }
+html[data-skin="palacio"] { --verde-noite: var(--faixa, var(--rose-900, #111214)); --bronze-claro: var(--faixa-claro, #E9D9B5); }
 
 /* barra do topo verde */
 html[data-skin] .tn, html[data-skin] .tn.scrolled { background: var(--verde-noite) !important; border-bottom: 0 !important; box-shadow: none !important; }
