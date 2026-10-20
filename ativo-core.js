@@ -31,7 +31,7 @@
   }
 
   // Um arquivo de flashcards por matéria; carregados sob demanda.
-  var ARQUIVOS = ['fc-const.js', 'fc-penal.js', 'fc-cpp.js', 'fc-cpc.js', 'fc-adm.js', 'fc-normas.js', 'fc-pt.js', 'fc-info.js', 'fc-mat.js'];
+  var ARQUIVOS = ['fc-const.js', 'fc-penal.js', 'fc-cpp.js', 'fc-cpc.js', 'fc-adm.js', 'fc-normas.js', 'fc-pt.js', 'fc-info.js', 'fc-mat.js', 'fc-estatuto.js', 'fc-regimento.js', 'fc-interna.js'];
   var _carga = null;
   function carregarCartoes() {
     if (_carga) return _carga;

@@ -4,7 +4,7 @@
   "description": "Plano de estudos, revisão, banco de questões e simulados para Escrevente Técnico Judiciário do TJSP.",
   "start_url": "hoje.html",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#111214",
   "theme_color": "#111214",
   "lang": "pt-BR",

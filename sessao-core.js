@@ -327,8 +327,8 @@
       var c = st.fila[st.idx], e = ATIVO.estados()[c.id], origem = linkRevisao(c.d, c.r);
       var h = '<div class="fc-player"><div class="topo"><span>' + (st.idx + 1) + ' de ' + st.fila.length + (e ? ' · revisão' : ' · novo') + '</span></div>' +
         '<div class="ss-bar"><i style="width:' + Math.round(st.idx / st.fila.length * 100) + '%"></i></div>' +
-        '<div class="fc-meta">' + esc(curto(c.d)) + ' · ' + esc(c.t) + ' · ' +
-          (origem ? '<a href="' + origem + '" target="_blank" rel="noopener" style="color:inherit">Revisão ' + c.r + ' ↗</a>' : (c.r ? 'Revisão ' + c.r : '')) + '</div>' +
+        '<div class="fc-meta">' + esc(curto(c.d)) + ' · ' + esc(c.t) +
+          (origem ? ' · <a href="' + origem + '" target="_blank" rel="noopener" style="color:inherit">Revisão ' + c.r + ' ↗</a>' : (c.r ? ' · Revisão ' + c.r : '')) + '</div>' +
         '<div class="fc-frente">' + esc(c.f) + '</div>';
       if (!st.verso) h += '<div class="fc-bts"><button class="btn btn-primary" data-fc="mostrar">Mostrar resposta</button></div>';
       else h += '<div class="fc-verso">' + esc(c.v) +
