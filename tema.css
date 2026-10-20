@@ -285,7 +285,8 @@ html[data-skin] .tn-av { background: var(--bronze-claro) !important; color: var(
 
 /* faixa verde com o título de cada página; o conteúdo sobe sobre ela */
 html[data-skin] main { position: relative; isolation: isolate; padding-top: 0 !important; }
-html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { position: relative; padding: 2.4rem 0 6.5rem; margin-bottom: 0; align-items: flex-end; }
+html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { position: relative; padding: 2.4rem 0 6.5rem; margin-bottom: 0; align-items: flex-start; }
+/* o título fica sempre na mesma altura; o que está à direita não empurra o texto para baixo */
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar)::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) + * { position: relative; margin-top: -4.5rem; }
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) .page-title h1, html[data-skin] .hub h1 { color: #fff !important; font-family: 'Gloock', serif !important; font-weight: 400; font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1.05; letter-spacing: -.01em; max-width: 22ch; }
@@ -297,9 +298,10 @@ html[data-skin] .hub > .topbar + p.lead { color: rgba(255,255,255,.78); margin-t
 html[data-skin] .hub-grid { position: relative; }
 
 /* contagem grande no canto da faixa (Início e Hoje) */
-.pl-cont { text-align: right; color: var(--bronze-claro); line-height: 1; }
-.pl-cont b { display: block; font: 400 clamp(4rem, 9vw, 7.5rem)/.85 'Gloock', serif; color: #fff; }
-.pl-cont span { font-weight: 600; font-size: .9rem; }
+.pl-cont { align-self: flex-end; text-align: right; color: var(--bronze-claro); line-height: 1; }
+/* mesmo corpo do título da página: a contagem acompanha o título, não compete com ele */
+.pl-cont b { display: block; font: 400 clamp(2.2rem, 4.2vw, 3.6rem)/.9 'Gloock', serif; color: #fff; }
+.pl-cont span { display: block; margin-top: .35rem; font-weight: 600; font-size: .8rem; }
 
 /* cartões: branco, topo em arco, fio de bronze */
 html[data-skin] .ss-bloco, html[data-skin] .side-card, html[data-skin] .today-card, html[data-skin] .hub-card,
@@ -370,7 +372,7 @@ html[data-skin] body.home .tl + .section-label { color: rgba(255,255,255,.6) !im
 html[data-skin] body.home .tl + .section-label::after { background: rgba(255,255,255,.18) !important; }
 @media (max-width: 700px) {
   .pl-cont { display: flex; align-items: baseline; gap: .5rem; margin-top: .6rem; }
-  .pl-cont b { font-size: 2.6rem; }
+  .pl-cont b { font-size: 1.9rem; }
   .pl-faixa { grid-template-columns: repeat(3, 1fr); gap: .5rem; }
   .pl-peca { flex-direction: column; align-items: flex-start; gap: .3rem; padding: .8rem; }
   .pl-peca b { font-size: 1.8rem; } .pl-peca p { display: none; } .pl-peca i { display: none; }
