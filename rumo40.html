@@ -156,15 +156,19 @@
     var respondidas = linhas.reduce(function (a, l) { return a + l.s.n; }, 0);
     var semDados = linhas.filter(function (l) { return l.s.n < 5; }).length;
     var notaR = Math.round(nota);
-    // Referência de metade da prova até o edital 02/2026 ser conferido (a habilitação também exige mínimo por bloco).
+    // Edital 02/2026, cap. X: nota 5 de 10 no total e pelo menos 50% em Português e em Direito.
     var REF = Math.ceil(totalProva / 2);
-    var acima = notaR >= REF;
+    var ESTUDO_B = { pt: ['Língua Portuguesa'], dir: ['Direito Penal', 'Direito Processual Penal', 'Direito Processual Civil', 'Direito Constitucional', 'Direito Administrativo', 'Normas da Corregedoria'] };
+    function noBloco(ds) { return linhas.filter(function (l) { return ds.indexOf(l.d) >= 0; }).reduce(function (a, l) { return [a[0] + l.pontos, a[1] + l.peso]; }, [0, 0]); }
+    var bPt = noBloco(ESTUDO_B.pt), bDir = noBloco(ESTUDO_B.dir);
+    var faltaBloco = [bPt[0] < bPt[1] / 2 ? 'Português' : '', bDir[0] < bDir[1] / 2 ? 'Direito' : ''].filter(Boolean);
+    var acima = notaR >= REF && !faltaBloco.length;
 
     var h = '<div class="r40-hero"><div><div class="r40-eb">Nota provável hoje</div><div class="r40-nota">' + (respondidas ? notaR : '—') + '<small> / ' + Math.round(totalProva) + '</small></div></div>' +
-      '<div><span class="r40-selo ' + (!respondidas ? '' : acima ? 'ok' : 'nao') + '">' + (!respondidas ? 'Ainda sem dados' : notaR === REF ? 'Exatamente na metade' : acima ? 'Acima da metade por ' + (notaR - REF) + (notaR - REF === 1 ? ' ponto' : ' pontos') : 'Falta' + (REF - notaR === 1 ? ' 1 ponto' : 'm ' + (REF - notaR) + ' pontos') + ' para a metade') + '</span>' +
+      '<div><span class="r40-selo ' + (!respondidas ? '' : acima ? 'ok' : 'nao') + '">' + (!respondidas ? 'Ainda sem dados' : faltaBloco.length && notaR >= REF ? 'Abaixo de 50% em ' + faltaBloco.join(' e ') : acima ? (notaR === REF ? 'Exatamente no mínimo' : 'Acima do mínimo por ' + (notaR - REF) + (notaR - REF === 1 ? ' ponto' : ' pontos')) : 'Falta' + (REF - notaR === 1 ? ' 1 ponto' : 'm ' + (REF - notaR) + ' pontos') + ' para o mínimo') + '</span>' +
       '<div class="r40-regua"><i style="width:' + (respondidas ? Math.min(100, nota / totalProva * 100) : 0) + '%"></i><b style="left:' + (REF / totalProva * 100) + '%"></b></div>' +
-      '<div class="r40-regua-leg"><span>0</span><span>metade ' + REF + '</span><span>' + Math.round(totalProva) + '</span></div>' +
-      '<p style="margin-top:.7rem">' + (!respondidas ? 'Resolva questões no Banco, no Hoje ou num Simulado para ver sua nota provável. ' : '') + 'Baseada em <b>' + respondidas + '</b> ' + (respondidas === 1 ? 'questão respondida' : 'questões respondidas') + ' e no peso de cada matéria nas provas de 2021 a 2024, distribuído nos blocos do edital 02/2026 (Português 16, Direito 30, Gerais 24).' +
+      '<div class="r40-regua-leg"><span>0</span><span>mínimo ' + REF + '</span><span>' + Math.round(totalProva) + '</span></div>' +
+      '<p style="margin-top:.7rem">' + (!respondidas ? 'Resolva questões no Banco, no Hoje ou num Simulado para ver sua nota provável. ' : '') + 'Baseada em <b>' + respondidas + '</b> ' + (respondidas === 1 ? 'questão respondida' : 'questões respondidas') + ' e no peso de cada matéria nas provas de 2021 a 2024, distribuído nos blocos do edital 02/2026 (Português 16, Direito 30, Gerais 24). Para habilitar: 35 de 70 no total e pelo menos 50% em Português e em Direito.' +
       (semDados ? ' ' + semDados + ' matérias ainda têm menos de 5 respostas, então contam perto de 50% até você resolver mais.' : '') + '</p></div></div>';
 
     var top = linhas.filter(function (l) { return l.ganho >= 0.25; }).sort(function (a, b) { return b.ganho - a.ganho; }).slice(0, 3);

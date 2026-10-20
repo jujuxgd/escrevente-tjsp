@@ -682,20 +682,20 @@ mark.cl-user-hl[data-color="purple"] { background: rgba(237, 233, 254, 0.9); box
 // ── Dados das matérias ────────────────────────
 // Apenas matérias com lei seca extraída e disponível como texto nativo.
 const CADERNO_MATERIAS = [
-  { id: 'penal', nome: 'Penal', emoji: '⚔️', jsFile: null, jsVar: 'CL_PENAL',
-    sumario: ['Falsidade de títulos e papéis públicos','Falsidade documental','Outras falsidades','Fraudes em certames','Crimes de funcionário público','Crimes de particular','Crimes contra a administração da Justiça'] },
-  { id: 'proc_penal', nome: 'Proc. Penal', emoji: '📋', jsFile: null, jsVar: 'CL_PROC_PENAL',
-    sumario: ['Sujeitos processuais','Citações e intimações','Procedimento comum','Tribunal do Júri','Procedimento sumário','Restauração de autos','Recursos','Habeas corpus','JECRIM (Lei 9.099/95)'] },
-  { id: 'proc_civil', nome: 'Proc. Civil', emoji: '⚖️', jsFile: null, jsVar: 'CL_PROC_CIVIL',
-    sumario: ['Impedimento e suspeição','Auxiliares da justiça','Atos processuais','Prazos','Comunicação dos atos','Tutela provisória','Procedimento comum','Provas','Sentença e coisa julgada','Cumprimento de sentença','Recursos','Juizados (Leis 9.099/95 e 12.153/09)'] },
-  { id: 'constitucional', nome: 'Constitucional', emoji: '🏛️', jsFile: null, jsVar: 'CL_CONSTITUCIONAL',
-    sumario: ['Art. 5º','Direitos sociais','Nacionalidade','Administração pública','Servidores públicos','Poder Judiciário (art. 92)'] },
-  { id: 'administrativo', nome: 'Administrativo', emoji: '🏢', jsFile: null, jsVar: 'CL_ADMINISTRATIVO',
-    sumario: ['Lei 10.261/68 (Estatuto de SP)','Lei 8.429/92 (Improbidade)'] },
-  { id: 'normas', nome: 'Normas CGJ', emoji: '📚', jsFile: null, jsVar: 'CL_NORMAS',
-    sumario: ['Corregedoria e correições','Ofícios de justiça','Livros e classificadores','Autos e juntada','Certidões, mandados e ofícios','Intimações e audiências','Carga e arquivamento','Processo eletrônico'] },
-  { id: 'pcd', nome: 'Estatuto PcD', emoji: '♿', jsFile: null, jsVar: 'CL_PCD',
-    sumario: ['Arts. 1º a 13','Arts. 34 a 38'] },
+  { id: 'penal', nome: 'Penal', emoji: '⚔️', jsFile: 'cl-penal.js', jsVar: 'CL_PENAL',
+    sumario: ['Falsidade de títulos', 'Falsidade documental', 'Outras falsidades', 'Fraudes em certames', 'Praticados por funcionário público', 'Praticados por particular', 'Administração da justiça'] },
+  { id: 'proc_penal', nome: 'Proc. Penal', emoji: '📋', jsFile: 'cl-proc-penal.js', jsVar: 'CL_PROC_PENAL',
+    sumario: ['Do juiz', 'Do ministério público', 'Do acusado', 'Funcionários da justiça', 'Das citações', 'Das intimações', 'Tribunal do júri', 'Processo sumário', 'Restauração de autos', 'Recursos em geral', 'Da apelação', 'Dos embargos', 'Da revisão', 'Habeas corpus', 'Juizados especiais criminais'] },
+  { id: 'proc_civil', nome: 'Proc. Civil', emoji: '⚖️', jsFile: 'cl-proc-civil.js', jsVar: 'CL_PROC_CIVIL',
+    sumario: ['Impedimentos', 'Auxiliares da justiça', 'Tempo e do lugar', 'Dos prazos', 'Da citação', 'Das cartas', 'Das intimações', 'Tutela de urgência', 'Tutela da evidência', 'Petição inicial', 'Contestação', 'Revelia', 'Saneamento', 'Instrução e julgamento', 'Das provas', 'Sentença e da coisa julgada', 'Cumprimento da sentença', 'Dos recursos', 'Agravo de instrumento', 'Embargos de declaração', 'Lei nº 9.099', 'Lei nº 12.153'] },
+  { id: 'constitucional', nome: 'Constitucional', emoji: '🏛️', jsFile: 'cl-constitucional.js', jsVar: 'CL_CONSTITUCIONAL',
+    sumario: ['Direitos e deveres individuais', 'Direitos sociais', 'Nacionalidade', 'Administração pública', 'Servidores públicos', 'Poder Judiciário'] },
+  { id: 'administrativo', nome: 'Administrativo', emoji: '🏢', jsFile: 'cl-administrativo.js', jsVar: 'CL_ADMINISTRATIVO',
+    sumario: ['Dos deveres', 'Das responsabilidades', 'Das penalidades', 'Práticas autocompositivas', 'Procedimento disciplinar', 'Da sindicância', 'Do processo administrativo', 'Da revisão', 'Lei nº 8.429', 'Dos atos de improbidade', 'Das penas', 'Da prescrição'] },
+  { id: 'normas', nome: 'Normas CGJ', emoji: '📚', jsFile: 'cl-normas.js', jsVar: 'CL_NORMAS',
+    sumario: ['Função correcional', 'Ofícios de justiça', 'Sistema informatizado', 'Livros e classificadores', 'Escrituração', 'Autuação', 'Juntada de petições', 'Movimentação dos autos', 'Das certidões', 'Dos mandados', 'Dos ofícios', 'Das intimações', 'Consulta e da carga', 'Desentranhamento', 'Arquivamento', 'Processo eletrônico'] },
+  { id: 'pcd', nome: 'Estatuto PcD', emoji: '♿', jsFile: 'cl-pcd.js', jsVar: 'CL_PCD',
+    sumario: ['Disposições gerais', 'Direitos fundamentais', 'Direito à vida', 'Direito ao trabalho'] },
 ];
 
 let activeId = 'penal';
