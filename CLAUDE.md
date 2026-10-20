@@ -19,8 +19,10 @@ preparatório da OAB de Julia (`jujuxgd/preparatorio-oab`): HTML estático + JS 
 
 ## 2. Calendário (`calendario-ativo.js` + `aulas-dias.js`)
 
-Gerado por script (fora do repo) a partir das aulas do Estratégia (pasta "11. Personalizado/Estratégia
-Concursos/2024 - Organizado" no Drive) e da rotina semanal do cronograma de Julia:
+Gerado por script (fora do repo) a partir das **apostilas teóricas da NEAF** (escolha de Julia em 20/10/2026), divididas
+por tema em 117 trechos de 3 a 8 páginas, e da rotina semanal do cronograma de Julia. O Estratégia (pasta "11.
+Personalizado/Estratégia Concursos/2024 - Organizado") ficou só como material de apoio; Atualidades segue com o simulado
+dele. NEAF e Estratégia são ambos de 2024 (edital anterior):
 
 | Dia | Bloco 1 | Bloco 2 (só nas férias) |
 |-----|---------|-------------------------|
@@ -32,11 +34,12 @@ Concursos/2024 - Organizado" no Drive) e da rotina semanal do cronograma de Juli
 
 - **f: 1 · ritmo leve** (20/10 → 22/11): seg–sex 1 aula; sáb/dom leves.
 - **f: 1 · férias** (23/11 → 28/02): seg–sex 2 aulas (2–3 h); sábado revisão + simulado parcial; domingo leve.
-  As 79 aulas acabam em 12/01; depois, dias de revisão com foco em duas matérias.
+  Os trechos acabam em 08/02; depois, dias de revisão com foco em duas matérias.
 - **Leves fixos:** semana da 1ª fase da OAB (04–10/01), semana da 2ª fase (22–28/02), 24–25/12 e 31/12–01/01.
 - **f: 3 · reta final** (01/03 → 12/03): revisão diária + simulado (completo aos sábados); 13/03 véspera; 14/03 prova.
-- Tópico do dia: `{d: disciplina, s: tema, n: nº da aula na fila, a: "Aula NN", q: ["*"]}`.
-  `aulas-dias.js` define `window.VDE_DIAS = {n: idDrive}` (nome herdado do projeto da OAB).
+- Tópico do dia: `{d: disciplina, s: tema, n: nº do trecho na fila, a: "Págs. X–Y", o: "NEAF", q: ["*"]}`.
+  `aulas-dias.js` define `window.VDE_DIAS = {n: {id, de, ate}}` (nome herdado da OAB); o Hoje abre o leitor só nessas
+  páginas (`LEITOR.montar(..., {de, ate})`). Um valor só com o id ainda funciona (PDF inteiro).
 - `plano-dinamico.js` (Adiantar) funciona igual à OAB.
 - Matéria de reforço nos dias de revisão/leves: **Língua Portuguesa** (no lugar da Ética da OAB).
 
