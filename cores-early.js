@@ -21,6 +21,19 @@
     function lighten(hex, amt) { const c = hexToRgb(hex); return rgbToHex(c.r + (255-c.r)*amt, c.g + (255-c.g)*amt, c.b + (255-c.b)*amt); }
     function darken(hex, amt)  { const c = hexToRgb(hex); return rgbToHex(c.r*(1-amt), c.g*(1-amt), c.b*(1-amt)); }
 
+    // Faixa e barra do topo usam a cor escolhida; só escurecem o necessário para o texto branco continuar legível.
+    // Detalhe claro da faixa (nome, aba ativa, progresso): bronze com preto/cinza, um tom claro da própria cor nas cores vivas.
+    function corDestaque(hex) {
+      const c = hexToRgb(hex), sat = (Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b)) / 255;
+      return sat < 0.15 ? '#E9D9B5' : lighten(hex, 0.78);
+    }
+    function corFaixa(hex) {
+      function lum(h) { const c = hexToRgb(h); const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); }
+      let h = hex, i = 0;
+      while (lum(h) > 0.3 && i++ < 20) h = darken(h, 0.06);
+      return h;
+    }
+
     const BASES = { sutil: '#B14A77', couture: '#C8336F', vibrante: '#E01571' };
     const KEY = 'tj_rose_intensity', CUSTOM_KEY = 'tj_rose_custom_hex';
     const PADRAO_NOVO_USUARIO = '#000000'; // preto — quem nunca configurou nada cai aqui
@@ -45,6 +58,8 @@
       '--rose-600': base,
       '--rose-700': darken(base, 0.18),
       '--rose-900': darken(base, 0.55),
+      '--faixa':    corFaixa(base),
+      '--faixa-claro': corDestaque(base),
     };
     Object.entries(ramp).forEach(([k, v]) => root.style.setProperty(k, v));
 

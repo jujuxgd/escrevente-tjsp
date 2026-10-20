@@ -265,7 +265,7 @@ html[data-skin] body { background: var(--bg) !important; }
 
 /* ═══ Estrutura Palácio ═══ */
 /* faixa e barra do topo na cor escolhida no Perfil, escurecida (preto por padrão) */
-html[data-skin="palacio"] { --verde-noite: var(--rose-900, #111214); --bronze-claro: #E9D9B5; }
+html[data-skin="palacio"] { --verde-noite: var(--faixa, var(--rose-900, #111214)); --bronze-claro: var(--faixa-claro, #E9D9B5); }
 
 /* barra do topo verde */
 html[data-skin] .tn, html[data-skin] .tn.scrolled { background: var(--verde-noite) !important; border-bottom: 0 !important; box-shadow: none !important; }
@@ -346,7 +346,7 @@ html[data-skin] .tabs-bar .tab.active::after, html[data-skin] .tabs-bar .tab.act
 }
 
 /* Início: a linha do tempo fica dentro da faixa verde, o resto sobe sobre ela */
-html[data-skin] body.home main > .topbar { padding-bottom: 1.4rem; }
+html[data-skin] body.home main > .topbar { padding: 2.4rem 0 1.4rem !important; }  /* home.css zera o padding com !important */
 html[data-skin] body.home main > .topbar + * { margin-top: 0; }
 html[data-skin] body.home .tl { position: relative; padding: .4rem 0 6.5rem; margin: 0; }
 html[data-skin] body.home .tl::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
