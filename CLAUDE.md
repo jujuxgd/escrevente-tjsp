@@ -14,7 +14,7 @@ preparatório da OAB de Julia (`jujuxgd/preparatorio-oab`): HTML estático + JS 
   Gerais 24 (Atualidades + PcD 4, Matemática 4, Informática 9, RLM 7). Habilitação: nota ≥ 5 de 10 no total
   (35 acertos) e os mínimos dos blocos I e II. A divisão interna do Bloco II não é divulgada.
 - **Legislação Interna (Bloco II):** Res. TJSP 850/2021 (teletrabalho), Res. TJSP 963/2025 (eproc), LC 1.111/2010
-  e Regimento Interno do TJSP — lei seca pronta; sem aula no calendário nem flashcards.
+  e Regimento Interno do TJSP — lei seca e flashcards prontos; sem aula no calendário.
 - Julia estuda a OAB ao mesmo tempo: 1ª fase em 10/01/2027 e 2ª fase em 28/02/2027.
 
 ## 2. Calendário (`calendario-ativo.js` + `aulas-dias.js`)
@@ -68,6 +68,9 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
    (`fc-mat.js`) dos Bizus (`r: "2"`). Texto reescrito, nunca copiado; artigos revogados ou superados e erros da
    fonte ficaram fora. Sem cartões (a fonte não cobre): Poder Judiciário (art. 92), ferramentas de busca,
    Windows 11, Teams/OneDrive, juros simples, equações, geometria espacial, gráficos, sequências lógicas.
+   Mais 456 cartões sem `r`, escritos do texto compilado oficial: `fc-estatuto.js` (Estatuto de SP, 111, em
+   Direito Administrativo), `fc-interna.js` (Res. 850, 963 e LC 1.111, 169) e `fc-regimento.js` (176), ambos em
+   "Legislação Interna". O baralho Anki do Estratégia 2025 serviu só de guia de incidência (nada copiado).
 3. Cadernos legislativos (`cl-*.js`, `window.CL_*` = HTML com `h2.cl-part`, `h3.cl-section`, `p.cl-artigo|cl-paragrafo|
    cl-inciso|cl-alinea`): 8 cadernos. Penal, CPP, CPC, CF, LIA, Normas e PcD gerados de "1. Lei seca/LEI SECA.pdf"
    (apostila 2025, sem as marcas "2025"); Estatuto de SP (arts. 1–86, 171–175, 239–323) e Legislação Interna (Res.
