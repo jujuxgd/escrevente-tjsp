@@ -180,7 +180,7 @@
     DIA.top.forEach(function (t) {
       if (t.n == null) return;
       var x = ns.filter(function (y) { return y.n === t.n; })[0];
-      if (!x) ns.push(x = { n: t.n, ids: [].concat((window.VDE_DIAS || {})[t.n] || []), temas: [] });
+      if (!x) ns.push(x = { n: t.n, ids: [].concat((window.VDE_DIAS || {})[t.n] || []), temas: [], fonte: t.o || 'Estratégia' });
       x.temas.push(curto(t.d) + (t.a ? ' · ' + t.a : '') + ': ' + t.s);
     });
     return ns;
@@ -233,10 +233,12 @@
     }
     var gabFeito = {};
     return ps.map(function (p) {
-      return '<div class="ss-bloco"><h3><span class="n">Aula do dia · Estratégia</span>' + esc(p.temas.join(' · ')) + '</h3>' +
-        (p.ids.length ? p.ids.map(function (id, i) {
+      return '<div class="ss-bloco"><h3><span class="n">' + (p.fonte === 'NEAF' ? 'Apostila NEAF' : 'Aula do dia · ' + esc(p.fonte)) + '</span>' + esc(p.temas.join(' · ')) + '</h3>' +
+        (p.ids.length ? p.ids.map(function (x, i) {
+          // trecho de apostila: {id, de, ate} abre só as páginas do tema do dia
+          var id = x.id || x, faixa = x.de ? ' data-de="' + x.de + '" data-ate="' + x.ate + '"' : '';
           return (p.ids.length > 1 ? '<div class="lp-parte">Parte ' + (i + 1) + '</div>' : '') +
-            (window.LEITOR ? '<div class="lp-host" data-arq="' + id + '"></div>'
+            (window.LEITOR ? '<div class="lp-host" data-arq="' + id + '"' + faixa + '></div>'
               : '<iframe class="vde-pdf" src="https://drive.google.com/file/d/' + id + '/preview" title="PDF da aula ' + p.n + '" allow="autoplay"></iframe>');
         }).join('')
           : '<p class="ss-vazio">O PDF desta aula ainda não está ligado. Quando estiver, ele aparece aqui.</p>') + '</div>' +
@@ -262,7 +264,9 @@
 
   function montarConteudo(el) {
     el.innerHTML = htmlConteudo();
-    if (window.LEITOR) el.querySelectorAll('.lp-host').forEach(function (h) { LEITOR.montar(h, h.dataset.arq, { caixa: true }); });
+    if (window.LEITOR) el.querySelectorAll('.lp-host').forEach(function (h) {
+      LEITOR.montar(h, h.dataset.arq, h.dataset.de ? { caixa: true, de: +h.dataset.de, ate: +h.dataset.ate } : { caixa: true });
+    });
   }
 
   // ── checklist do dia ──

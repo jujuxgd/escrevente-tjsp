@@ -225,7 +225,7 @@
     if (x.adiantado) h += '<p class="ca-adi">Você adiantou conteúdo para este dia.</p>';
     if (x.top && x.tipo !== 'simulado') h += temas(x).map(function (t) {
       return '<div class="ca-it">' + chip(t.d) + '<span class="tx">' + esc(t.s) + '</span>' +
-        (t.a ? '<small>' + esc(t.a) + ' · Estratégia</small>' : '') + '</div>';
+        (t.a ? '<small>' + esc(t.a) + ' · ' + esc(t.o || 'Estratégia') + '</small>' : '') + '</div>';
     }).join('');
     else h += '<div class="ca-it"><span class="tx">' + esc(tipoTxt(x)) + '</span></div>';
     h += '<a class="btn btn-primary" href="hoje.html?data=' + sel + '">Abrir este dia</a>';
