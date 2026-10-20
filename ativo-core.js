@@ -32,6 +32,32 @@
 
   // Um arquivo de flashcards por matéria; carregados sob demanda.
   var ARQUIVOS = ['fc-const.js', 'fc-penal.js', 'fc-cpp.js', 'fc-cpc.js', 'fc-adm.js', 'fc-normas.js', 'fc-pt.js', 'fc-info.js', 'fc-mat.js', 'fc-estatuto.js', 'fc-regimento.js', 'fc-interna.js'];
+  // Cartões do baralho Anki (amostra TJSP 2025): o texto é de terceiros e o repositório é público, então ficam em
+  // JSON no Drive de Julia e vêm pela API do Drive (mesma chave do leitor de PDF), com cópia local para usar offline.
+  var ANKI = ['1o7sBiEBIbEEd0hdITo9jMj17AB_tu14J', '1CKIScTyCJTGYJBE-25bKg4dBMtSlkhhY', '12vzvMDWrQscNkdTeMNyi_Ddc1vOzSKRD', '1olly1-LFQDD1miQW_kGg8ROOdskPTxuc'];
+  var ANKI_FORA = ['tj_anki_1754335958987']; // a explicação contradiz o gabarito do próprio cartão (Res. 850, art. 24, § 2º)
+  var K_ANKI = 'tj_anki_cache', CHAVE_DRIVE = 'AIzaSyAmSnV2qyIAfzqXuYxsGvYIgaKl45TqIoU';
+  function baixarAnki() {
+    return Promise.all(ANKI.map(function (id) {
+      return fetch('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media&key=' + CHAVE_DRIVE).then(function (r) {
+        if (!r.ok) throw new Error('Drive ' + r.status);
+        return r.json();
+      });
+    })).then(function (partes) {
+      var cs = [].concat.apply([], partes);
+      try { localStorage.setItem(K_ANKI, JSON.stringify({ em: Date.now(), cs: cs })); } catch (e) {}
+      return cs;
+    });
+  }
+  function anki() {
+    var c = null;
+    try { c = JSON.parse(localStorage.getItem(K_ANKI)); } catch (e) {}
+    if (c && c.cs) {
+      if (Date.now() - c.em > 3 * 864e5) baixarAnki().catch(function () {});
+      return Promise.resolve(c.cs);
+    }
+    return baixarAnki().catch(function () { return []; });
+  }
   var _carga = null;
   function carregarCartoes() {
     if (_carga) return _carga;
@@ -41,7 +67,13 @@
         s.src = arq; s.onload = ok; s.onerror = ok;
         document.head.appendChild(s);
       });
-    })).then(cartoes);
+    }).concat(anki().then(function (cs) {
+      var ja = {};
+      (window.FC_VDE || []).forEach(function (c) { ja[c.id] = 1; });
+      window.FC_VDE = (window.FC_VDE || []).concat(cs.filter(function (c) { return !ja[c.id] && ANKI_FORA.indexOf(c.id) < 0; }).map(function (c) {
+        return Object.assign({}, c, { v: c.v.replace(/^(Certo|Errado)\s+\1\b/, '$1') });
+      }));
+    }))).then(cartoes);
     return _carga;
   }
 

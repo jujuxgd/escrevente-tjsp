@@ -70,7 +70,12 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
    Windows 11, Teams/OneDrive, juros simples, equações, geometria espacial, gráficos, sequências lógicas.
    Mais 456 cartões sem `r`, escritos do texto compilado oficial: `fc-estatuto.js` (Estatuto de SP, 111, em
    Direito Administrativo), `fc-interna.js` (Res. 850, 963 e LC 1.111, 169) e `fc-regimento.js` (176), ambos em
-   "Legislação Interna". O baralho Anki do Estratégia 2025 serviu só de guia de incidência (nada copiado).
+   "Legislação Interna". Baralho Anki (amostra "TJSP 2025", pasta do Estratégia 2025 no Drive): 164 cartões (Res. 850,
+   Normas arts. 5–11, CPC 144–148, ids `tj_anki_<id da nota>`) convertidos para JSON e guardados em 4 arquivos no
+   Drive de Julia (`anki-tjsp-1..4.json`); `ativo-core.js` busca pela API do Drive e guarda em `tj_anki_cache` (só
+   local, fora da sincronização). O texto é de terceiros e não entra no repositório. Ficaram fora: Atualidades 2025
+   (o edital cobra a partir de 2026), cartões só com imagem (Word), um repetido, a propaganda/assinatura do autor e um
+   cartão com gabarito trocado (`ANKI_FORA`).
 3. Cadernos legislativos (`cl-*.js`, `window.CL_*` = HTML com `h2.cl-part`, `h3.cl-section`, `p.cl-artigo|cl-paragrafo|
    cl-inciso|cl-alinea`): 8 cadernos. Penal, CPP, CPC, CF, LIA, Normas e PcD gerados de "1. Lei seca/LEI SECA.pdf"
    (apostila 2025, sem as marcas "2025"); Estatuto de SP (arts. 1–86, 171–175, 239–323) e Legislação Interna (Res.
