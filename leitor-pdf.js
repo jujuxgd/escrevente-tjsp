@@ -71,6 +71,11 @@
     return _cache[arq];
   }
 
+  // Sem resposta em 90 s, cai no preview do Drive em vez de ficar carregando para sempre.
+  function comPrazo(p, ms) {
+    return Promise.race([p, new Promise(function (ok, erro) { setTimeout(function () { erro(new Error('tempo esgotado')); }, ms); })]);
+  }
+
   // ── barra de cores que aparece sobre a seleção ──
   var barra = null, pendente = null;
   function montarBarra() {
@@ -165,9 +170,9 @@
       if (b.dataset.a === 'zoom-') mudarZoom(self.zoom - 0.25);
     });
     this.lista();
-    return Promise.all([carregarLib(), baixar(this.arq)]).then(function (r) {
+    return comPrazo(Promise.all([carregarLib(), baixar(this.arq)]).then(function (r) {
       return r[0].getDocument({ data: new Uint8Array(r[1].slice(0)) }).promise;
-    }).then(function (doc) {
+    }), 90000).then(function (doc) {
       self.doc = doc;
       self.de = Math.max(1, self.opts.de || 1); self.ate = Math.min(doc.numPages, self.opts.ate || doc.numPages);
       raiz.querySelector('.lp-info').textContent = (self.opts.de ? 'Páginas ' + self.de + '–' + self.ate + ' de ' + doc.numPages : doc.numPages + (doc.numPages === 1 ? ' página' : ' páginas')) + ' · selecione um trecho para grifar';
