@@ -17,7 +17,7 @@
   var CHAVE   = 'tj_simulado_atual';
   var SIM_KEY = 'tj_simulados_v1';
   var DURACAO = 5 * 60 * 60 * 1000;   // 5 horas, como no caderno da prova
-  var CORTE   = 50;                    // referência: metade das 100 questões das provas anteriores
+  var CORTE   = 50;                    // edital 02/2026: metade da prova (nas anteriores, 50 de 100)
   var TREINO_N  = 20;                  // treino rápido: 20 questões em 1 hora,
   var TREINO_MS = 60 * 60 * 1000;      // o mesmo ritmo das 100 em 5 horas (3 min cada)
 
@@ -515,7 +515,7 @@
         '<div class="res-selo ' + (passou ? 'passou' : 'nao') + '">' +
           (passou ? 'Acima do corte' : 'Abaixo do corte') + '</div>' +
         '<div class="res-linha">' +
-          (S.treino ? 'Corte proporcional: <b>' + corte() + ' de ' + total + '</b> · ' : 'Referência: <b>' + CORTE + ' acertos</b> (metade) · ') +
+          (S.treino ? 'Corte proporcional: <b>' + corte() + ' de ' + total + '</b> · ' : 'Mínimo do edital: <b>' + CORTE + ' acertos</b> (metade) · ') +
           'Aproveitamento: <b>' + Math.round(r.certas / total * 100) + '%</b> · ' +
           'Tempo: <b>' + hhmmss(S.gastoAntes) + '</b>' +
           (brancos ? ' · <b>' + brancos + '</b> em branco' : '') +

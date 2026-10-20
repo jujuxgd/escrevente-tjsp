@@ -9,11 +9,12 @@ preparatório da OAB de Julia (`jujuxgd/preparatorio-oab`): HTML estático + JS 
 
 - **Edital 02/2026:** publicado em 19/10/2026; inscrições 28/10 a 10/12/2026; **prova em 14/03/2027**
   (objetiva + redação). Cadastro de reserva, 2ª a 10ª RAJ.
-- **Prova (edital 02/2026, conferido em sites de concurso):** 70 questões A–E em 5 horas, junto com a redação —
-  Português 16 e Direito 30 (eliminatórios), Conhecimentos Gerais 24 (classificatório). A divisão dentro dos
-  blocos não foi divulgada; o plano usa a do edital esquematizado de 2025 (Informática 9, RLM 7, Matemática 4,
-  Atualidades + PcD 4). **Nota mínima de habilitação ainda não conferida no PDF oficial**: Rumo à vaga e Simulado
-  usam "metade da prova" como referência.
+- **Prova (edital 02/2026 conferido no PDF oficial, Drive "5. Editais"):** 70 questões A–E em 5 horas, junto com a
+  redação (0 a 40). Bloco I Português 16 e Bloco II Direito 30 (eliminatórios: mínimo 50% de cada); Bloco III
+  Gerais 24 (Atualidades + PcD 4, Matemática 4, Informática 9, RLM 7). Habilitação: nota ≥ 5 de 10 no total
+  (35 acertos) e os mínimos dos blocos I e II. A divisão interna do Bloco II não é divulgada.
+- **Legislação Interna (Bloco II):** Res. TJSP 850/2021 (teletrabalho), Res. TJSP 963/2025 (eproc), LC 1.111/2010
+  e Regimento Interno do TJSP — nenhum material do Drive cobre; sem aula no calendário.
 - Julia estuda a OAB ao mesmo tempo: 1ª fase em 10/01/2027 e 2ª fase em 28/02/2027.
 
 ## 2. Calendário (`calendario-ativo.js` + `aulas-dias.js`)
