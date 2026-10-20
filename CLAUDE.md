@@ -76,7 +76,10 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
    (apostila 2025, sem as marcas "2025"); Estatuto de SP (arts. 1–86, 171–175, 239–323) e Legislação Interna (Res.
    850 compilada, Res. 963, LC 1.111 sem anexos, Regimento Interno atualizado em 30/04/2026, sem o índice) do texto
    compilado oficial da Alesp/TJSP enviado por Julia — sem as notas de compilação da Alesp e sem o texto riscado
-   (revogado). Artigos conferidos com o Anexo VIII.
+   (revogado). Normas: o que a apostila não trazia (Cap. III Seç. XIV e XVI; Cap. XI Seç. II, III, VII e parte da VI)
+   veio do Vade-Mécum Estratégico TJSP 2025, sem as notas de redação; incisos que lá são numeração automática do Word
+   (o número não sai no texto) entram com travessão. Artigos conferidos com o Anexo VIII. A página embrulha o HTML em
+   `.cl-native-content` (de onde vem todo o visual, igual à OAB) e abre na primeira matéria de `CADERNO_MATERIAS`.
 4. Videoaulas: aba removida do Hoje (não há lista do TJSP).
 
 ## 4. Sincronização e login

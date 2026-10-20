@@ -693,7 +693,7 @@ const CADERNO_MATERIAS = [
   { id: 'administrativo', nome: 'Administrativo', emoji: '🏢', jsFile: 'cl-administrativo.js', jsVar: 'CL_ADMINISTRATIVO',
     sumario: ['Lei nº 10.261', 'Do provimento', 'Das nomeações', 'Da posse', 'Do exercício', 'Contagem de tempo', 'Da vacância', 'Acumulações remuneradas', 'Direito de petição', 'Dos deveres', 'Das responsabilidades', 'Das penalidades', 'Práticas autocompositivas', 'Procedimento disciplinar', 'Da sindicância', 'Da revisão', 'Lei nº 8.429', 'Dos atos de improbidade', 'Das penas', 'Da prescrição'] },
   { id: 'normas', nome: 'Normas CGJ', emoji: '📚', jsFile: 'cl-normas.js', jsVar: 'CL_NORMAS',
-    sumario: ['Função correcional', 'Ofícios de justiça', 'Sistema informatizado', 'Livros e classificadores', 'Escrituração', 'Autuação', 'Juntada de petições', 'Movimentação dos autos', 'Das certidões', 'Dos mandados', 'Dos ofícios', 'Das intimações', 'Consulta e da carga', 'Desentranhamento', 'Arquivamento', 'Processo eletrônico'] },
+    sumario: ['Função correcional', 'Ofícios de justiça', 'Sistema informatizado', 'Livros e classificadores', 'Escrituração', 'Autuação', 'Juntada de petições', 'Movimentação dos autos', 'Das certidões', 'Dos mandados', 'Dos ofícios', 'Cartas precatórias', 'Das intimações', 'Audiências em geral', 'Consulta e da carga', 'Desentranhamento', 'Arquivamento', 'Processo eletrônico', 'Peticionamento eletrônico', 'Tramitação dos processos eletrônicos', 'Precatórios'] },
   { id: 'interna', nome: 'Legislação Interna', emoji: '📜', jsFile: 'cl-interna.js', jsVar: 'CL_INTERNA',
     sumario: ['Resolução TJSP nº 850', 'Teletrabalho de servidores', 'Teletrabalho de magistrados', 'Com deficiência', 'Resolução TJSP nº 963', 'Governança do sistema', 'Dos usuários', 'Prática de atos processuais', 'Consulta e do sigilo', 'Lei Complementar nº 1.111', 'Do ingresso', 'Estágio probatório', 'Desenvolvimento na carreira', 'Das gratificações', 'Regimento Interno', 'Do Tribunal Pleno', 'Do Órgão Especial', 'Conselho Superior da Magistratura', 'Do Presidente do Tribunal', 'Do Corregedor Geral', 'Dos Juízes', 'Regras de Competência', 'Das Sessões, Reuniões', 'Do Acórdão', 'Da Distribuição', 'Dos Incidentes', 'Dos Recursos em Geral'] },
   { id: 'pcd', nome: 'Estatuto PcD', emoji: '♿', jsFile: 'cl-pcd.js', jsVar: 'CL_PCD',
@@ -792,7 +792,7 @@ function clJumpToSection(sectionName, scrollRootId) {
   for (const el of headings) {
     const txt = el.textContent.trim();
     // Pula cabeçalhos de sumário/TOC (texto muito longo que contém vários nomes)
-    if (txt.length > 120) continue;
+    if (txt.length > 240) continue;
     if (txt.toLowerCase().includes(lq)) {
       const containerTop = scrollEl.getBoundingClientRect().top;
       const elTop = el.getBoundingClientRect().top;
@@ -899,7 +899,8 @@ function _prepareContent(root) {
 
 // ── Render content in scroll body ────────────
 function renderContent(body, html, mat) {
-  body.innerHTML = html;
+  // os cadernos do TJSP vêm sem o invólucro dos da OAB, e todo o estilo dos artigos depende dele
+  body.innerHTML = html.indexOf('cl-native-content') < 0 ? '<div class="cl-native-content">' + html + '</div>' : html;
   // Corrige elementos mal tipados pela extração PDF
   _reclassifyContent(body);
   // Limpa asteriscos soltos após badges (artefato dos PDFs originais)
@@ -1275,7 +1276,7 @@ document.addEventListener('click', e => {
 // ── Init ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   renderTabs();
-  loadMateria('civil');
+  selectTab(CADERNO_MATERIAS[0].id);
 
   _hlBuildToolbar();
   document.getElementById('cl-body').addEventListener('mouseup', _hlOnMouseUp);
