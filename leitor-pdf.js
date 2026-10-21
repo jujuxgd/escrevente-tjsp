@@ -176,7 +176,7 @@
       self.doc = doc;
       self.de = Math.max(1, self.opts.de || 1); self.ate = Math.min(doc.numPages, self.opts.ate || doc.numPages);
       raiz.querySelector('.lp-info').textContent = (self.opts.de ? 'Páginas ' + self.de + '–' + self.ate + ' de ' + doc.numPages : doc.numPages + (doc.numPages === 1 ? ' página' : ' páginas')) + ' · selecione um trecho para grifar';
-      return self.medirMargem().then(function () { self.renderizar(); });
+      return self.medirMargem().then(function () { return self.renderizar(); }).then(function () { self.voltarPosicao(); });
     }).then(function () {
       var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (Math.abs(self._largura - self.largura()) > 40) self.renderizar(); }, 300); });
     }).catch(function (e) {
@@ -231,6 +231,31 @@
       if (self.opts.rolagem) self.opts.rolagem.scrollTop += info.el.getBoundingClientRect().top - self.opts.rolagem.getBoundingClientRect().top - 8;
       else if (!on) window.scrollTo(0, info.el.getBoundingClientRect().top + window.scrollY - 90);
     });
+  };
+  // Página em que o PDF estava (por arquivo e trecho, só neste aparelho): ao trocar de aba no Hoje o leitor é montado
+  // de novo e voltava para a primeira página.
+  var K_POS = 'tj_lp_pos';
+  Leitor.prototype.chavePos = function () { return this.arq + ':' + (this.opts.de || 1); };
+  Leitor.prototype.voltarPosicao = function () {
+    var self = this, rol = this.opts.rolagem, pos = {};
+    try { pos = JSON.parse(localStorage.getItem(K_POS)) || {}; } catch (e) {}
+    var info = this.paginas[pos[this.chavePos()]];
+    if (info && pos[this.chavePos()] > this.de) {
+      if (rol) rol.scrollTop += info.el.getBoundingClientRect().top - rol.getBoundingClientRect().top - 8;
+      else window.scrollTo(0, info.el.getBoundingClientRect().top + window.scrollY - 90);
+    }
+    var t;
+    function guardar() {
+      clearTimeout(t);
+      t = setTimeout(function () {
+        if (!self.raiz.isConnected) return;
+        try { pos = JSON.parse(localStorage.getItem(K_POS)) || {}; } catch (e) { pos = {}; }
+        pos[self.chavePos()] = self.paginaAtual();
+        try { localStorage.setItem(K_POS, JSON.stringify(pos)); } catch (e) {}
+      }, 400);
+    }
+    this.raiz.querySelector('.lp-corpo').addEventListener('scroll', guardar, { passive: true });
+    window.addEventListener('scroll', guardar, { passive: true });
   };
   Leitor.prototype.largura = function () { return this.raiz.querySelector('.lp-paginas').clientWidth - 2; };
   Leitor.prototype.renderizar = function () {

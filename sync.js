@@ -48,7 +48,7 @@
   const SO_LOCAIS = ['theme', 'simulatedDate', 'tj_current_day', 'tj_current_day_date',
     'tj_auth_ok', 'tj_approved_uid', 'tj_uid_ativo', 'tj_ultimo_backup',
     'tj_rose_intensity', 'tj_rose_custom_hex', 'tj_accent_color', 'tj_sidebar_collapsed',
-    'tj_pecas_cron', 'tj_ativo_dia', 'tj_sync_t', 'tj_vde_pasta', 'tj_lp_zoom3', 'tj_anki_cache'];
+    'tj_pecas_cron', 'tj_ativo_dia', 'tj_sync_t', 'tj_vde_pasta', 'tj_lp_zoom3', 'tj_anki_cache', 'tj_lp_pos'];
   function soLocal(k) { return SO_LOCAIS.indexOf(k) >= 0; }
 
   // ── Hora da última alteração de cada chave ──
