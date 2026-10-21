@@ -40,7 +40,8 @@ materiais são de 2024 (edital anterior):
 - **f: 3 · reta final** (01/03 → 12/03): revisão diária + simulado (completo aos sábados); 13/03 véspera; 14/03 prova.
 - Tópico do dia: `{d: disciplina, s: tema, n: nº da aula na fila, a: "Aula NN", q: ["*"]}` (`o` = fonte, opcional).
   `aulas-dias.js` define `window.VDE_DIAS = {n: idDrive}` (nome herdado da OAB); também aceita `{id, de, ate}` para
-  abrir só um trecho de páginas. O leitor cai no preview do Drive se o PDF não abrir em 90 s.
+  abrir só um trecho de páginas. O leitor cai no preview do Drive se o PDF não abrir em 90 s e volta na última página
+  vista de cada PDF (`tj_lp_pos`, por arquivo + página inicial do trecho, só no aparelho).
 - `plano-dinamico.js` (Adiantar) funciona igual à OAB.
 - Matéria de reforço nos dias de revisão/leves: **Língua Portuguesa** (no lugar da Ética da OAB).
 
