@@ -85,6 +85,10 @@ todas as telas. Sem comentário (`explanation: null`) e sem `topic` por enquanto
    veio do Vade-Mécum Estratégico TJSP 2025, sem as notas de redação; incisos que lá são numeração automática do Word
    (o número não sai no texto) entram com travessão. Artigos conferidos com o Anexo VIII. A página embrulha o HTML em
    `.cl-native-content` (de onde vem todo o visual, igual à OAB) e abre na primeira matéria de `CADERNO_MATERIAS`.
+   Depois dos geradores roda um ajuste final (`cl_ajustes.py`, fora do repo): o que sobrava como `p.cl-texto` (a página
+   mostra em destaque) vira continuação do parágrafo anterior, inciso (OCR "Vl"/"Ill", itens "1 -", "2.", "3º"),
+   cabeçalho ou `p.cl-corpo` (texto comum do artigo); linhas só "Revogado" saem. Em Penal, `cl-rubrica` é o nome do
+   crime (título) e a linha "Pena" segue em destaque.
 4. Videoaulas: aba removida do Hoje (não há lista do TJSP).
 
 ## 4. Sincronização e login
@@ -110,6 +114,8 @@ títulos em **Gloock**, texto em **Instrument Sans**. Cada página abre com a fa
 primeiro bloco sobe sobre ela; cartões brancos com topo em arco e fio de bronze; botões em pílula. No Hoje, o título
 é a matéria do dia, a contagem grande fica à direita e há a faixa Flashcards · Questões · Erros.
 Favicon e ícones = arco preto com colunas. Não redesenhar sem perguntar.
+`main` tem `isolation: isolate` (a faixa fica atrás com `z-index: -1`); com tela cheia do leitor (`html.lp-travada`) ou
+modo foco aberto ele vira `auto`, senão a barra do topo cobre essas telas.
 
 ## 6. Regras
 

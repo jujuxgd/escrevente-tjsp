@@ -285,6 +285,8 @@ html[data-skin] .tn-av { background: var(--bronze-claro) !important; color: var(
 
 /* faixa verde com o título de cada página; o conteúdo sobe sobre ela */
 html[data-skin] main { position: relative; isolation: isolate; padding-top: 0 !important; }
+/* o isolate prende as telas cheias (leitor, modo foco: fixed com z-index alto) abaixo da barra do topo */
+html[data-skin].lp-travada main, html[data-skin]:has(.focus-overlay.active) main { isolation: auto; }
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar) { position: relative; padding: 2.4rem 0 6.5rem; margin-bottom: 0; align-items: flex-start; }
 /* o título fica sempre na mesma altura; o que está à direita não empurra o texto para baixo */
 html[data-skin] :where(main > .topbar, main > .ca > .topbar, main > .bq-cab, #tela > .topbar)::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); background: var(--verde-noite); }
