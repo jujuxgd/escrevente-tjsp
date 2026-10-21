@@ -2,7 +2,7 @@
 // Rede primeiro (o conteúdo novo sempre ganha quando há conexão); sem rede, ou com a rede
 // demorando mais de 4s, usa a cópia guardada. O banco de questões e os cadernos legislativos
 // entram no cache na primeira vez que são abertos com internet.
-var VERSAO = 'tjsp-v10';
+var VERSAO = 'tjsp-v12';
 var ESSENCIAIS = ["ativo-core.js", "aulas-dias.js", "auth-guard.js", "banco-questoes.html", "caderno-legislativo.html", "calendario-ativo.js", "calendario.html", "cards.js", "cores-early.js", "cores.js", "erros-core.js", "erros.html", "estatisticas.html", "estudar.html", "estudo-core.js", "firebase-init.js", "hoje-compact.css", "hoje.html", "home.css", "home.js", "humor.js", "index.html", "leitor-pdf.css", "leitor-pdf.js", "materias.html", "page-transition.js", "perfil-ui.css", "perfil-ui.js", "perfil.html", "perfil.js", "plano-dinamico.js", "progresso.js", "reta-final.html", "revisao-biblioteca.js", "revisao.html", "revisar.html", "rumo40.html", "script.js", "sessao-core.js", "sessao.css", "simulado.html", "simulado.js", "style.css", "sync.js", "topnav.css", "topnav.js", "treino.html", "favicon.svg", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "manifest.webmanifest", "fonts/Kathen Font by Situjuh (7NTypes).otf", "fonts/Magical Feather.ttf", "fonts/Muthiara demo version.otf", "fonts/Simple Mandala.otf", "tema.css", "favicon-autos.svg", "favicon-palacio.svg", "favicon-grifo.svg", "fc-const.js", "fc-penal.js", "fc-cpp.js", "fc-cpc.js", "fc-adm.js", "fc-normas.js", "fc-pt.js", "fc-info.js", "fc-mat.js", "fc-estatuto.js", "fc-regimento.js", "fc-interna.js"];
 var FIREBASE = [
   'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js',

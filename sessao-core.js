@@ -40,6 +40,7 @@
   function partes(iso) { var p = iso.split('-').map(Number); return { a: p[0], m: p[1], d: p[2], dt: new Date(p[0], p[1] - 1, p[2]) }; }
   function dataLonga(iso) { var p = partes(iso); return DIAS_SEM[p.dt.getDay()] + ', ' + p.d + ' ' + MESES[p.m - 1]; }
   function drive(id) { return 'https://drive.google.com/file/d/' + id + '/preview'; }
+  var MATERIAL_REV = { 1: 'Tabelas NEAF', 2: 'Bizus', 3: 'Apostila NEAF' };
   function linkRevisao(disc, r) {
     var a = NOME_REV[disc];
     var item = (window.BIBLIOTECA_REVISAO || []).filter(function (x) { return x.g === 'rev' && x.a === a && String(x.b) === String(r); })[0];
@@ -48,7 +49,7 @@
   function linkTopico(t) {
     if (t.k && GABARITACO[t.d]) return { href: drive(GABARITACO[t.d]), txt: 'Gabaritaço · DICAS ' + t.k[0] + '–' + t.k[1] };
     var r = t.rev && linkRevisao(t.d, t.rev);
-    return r ? { href: r, txt: 'Revisão ' + t.rev } : null;
+    return r ? { href: r, txt: MATERIAL_REV[t.rev] || 'Revisão ' + t.rev } : null;
   }
   function banco() { return window.BANCO_QUESTOES || []; }
   var _QPOR = null;
@@ -203,7 +204,7 @@
   }
   function htmlRevisoes() {
     return revisoesDoDia().map(function (r) {
-      return '<div class="ss-bloco"><h3><span class="n">Revisão ' + r.r + '</span>' + esc(curto(r.d)) + '</h3>' +
+      return '<div class="ss-bloco"><h3><span class="n">' + (MATERIAL_REV[r.r] || 'Revisão ' + r.r) + '</span>' + esc(curto(r.d)) + '</h3>' +
         (window.LEITOR ? '<div class="lp-host" data-arq="' + r.id + '"></div>' : '<iframe class="vde-pdf" src="' + drive(r.id) + '"></iframe>') +
         '<div class="ss-acoes" style="margin-top:.8rem">' + (r.feita ? '<span class="ss-vazio">Revisão marcada como feita ✓</span>'
           : '<button type="button" class="btn btn-primary" data-rev-feita="' + r.id + '" data-rev-d="' + esc(r.d) + '">Marcar como feita</button>') + '</div></div>';
@@ -282,7 +283,7 @@
     if (!DIA) return [];
     var it = [], f = fila(), n = f.venc.length + f.novos.length;
     if (DIA.tipo === 'prova') return [{ id: 'prova', t: 'Prova do TJSP · objetiva e redação', s: 'Documento com foto, caneta preta de material transparente. Confira horário e local no cartão de convocação da Vunesp.' }];
-    revisoesDoDia().forEach(function (r) { it.push({ id: 'rv-' + r.d, t: 'Revisão ' + r.r + ' · ' + curto(r.d), s: 'Ler e grifar na aba Conteúdo', aba: 'conteudo' }); });
+    revisoesDoDia().forEach(function (r) { it.push({ id: 'rv-' + r.d, t: (MATERIAL_REV[r.r] || 'Revisão ' + r.r) + ' · ' + curto(r.d), s: 'Ler e grifar na aba Conteúdo', aba: 'conteudo' }); });
     pdfsDoDia().forEach(function (p) { it.push({ id: 'p' + p.n, t: 'Estudar ' + esc(p.temas[0].split(': ')[0]), s: esc(p.temas.join(' · ')) + ' · aba Conteúdo', aba: 'conteudo' }); });
     it.push({ id: 'fc', t: 'Flashcards do dia', s: n ? f.venc.length + ' vencidos + ' + f.novos.length + ' novos · aba Flashcards' : f.feitos.length ? f.feitos.length + ' novos feitos hoje' : 'Nada vence hoje', aba: 'flashcards' });
     if (DIA.top) DIA.top.forEach(function (t, i) {
@@ -328,7 +329,7 @@
       var h = '<div class="fc-player"><div class="topo"><span>' + (st.idx + 1) + ' de ' + st.fila.length + (e ? ' · revisão' : ' · novo') + '</span></div>' +
         '<div class="ss-bar"><i style="width:' + Math.round(st.idx / st.fila.length * 100) + '%"></i></div>' +
         '<div class="fc-meta">' + esc(curto(c.d)) + ' · ' + esc(c.t) +
-          (origem ? ' · <a href="' + origem + '" target="_blank" rel="noopener" style="color:inherit">Revisão ' + c.r + ' ↗</a>' : (c.r ? ' · Revisão ' + c.r : '')) + '</div>' +
+          (origem ? ' · <a href="' + origem + '" target="_blank" rel="noopener" style="color:inherit">' + (MATERIAL_REV[c.r] || 'Revisão ' + c.r) + ' ↗</a>' : (c.r ? ' · ' + (MATERIAL_REV[c.r] || 'Revisão ' + c.r) : '')) + '</div>' +
         '<div class="fc-frente">' + esc(c.f) + '</div>';
       if (!st.verso) h += '<div class="fc-bts"><button class="btn btn-primary" data-fc="mostrar">Mostrar resposta</button></div>';
       else h += '<div class="fc-verso">' + esc(c.v) +

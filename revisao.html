@@ -178,7 +178,7 @@
 .rv-q-nome{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ink);line-height:1.2;display:flex;align-items:center;gap:.55rem;min-width:0}
 .rv-q-nome::before{content:"";flex:none;width:4px;height:1.4em;border-radius:2px;background:var(--cd)}
 .rv-q-nome small{font:400 .72rem Inter,sans-serif;color:var(--ink-faded)}
-.rv-q-c{justify-self:center;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font:600 .8rem Inter,sans-serif;color:var(--ink-faded);cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s,transform .15s}
+.rv-q-c{justify-self:center;min-width:38px;height:34px;border-radius:999px;white-space:nowrap;border:1.5px solid var(--line);background:var(--paper);font:600 .8rem Inter,sans-serif;color:var(--ink-faded);cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s,transform .15s}
 .rv-q-c:hover{transform:scale(1.06)}
 .rv-q-c:hover{border-color:var(--cd);color:var(--ink)}
 .rv-q-c.lendo{background:linear-gradient(90deg,var(--c) 50%,var(--paper) 50%);border-color:var(--cd);color:var(--ink)}
@@ -191,12 +191,14 @@
 .rv-q-fc a{color:var(--rose-deep);text-decoration:none;font-weight:500}
 .rv-q-fc a:hover{text-decoration:underline}
 .rv-q-c .curto{display:none}
+.rv-q-c:not(.falta){padding:0 .8rem}
 @media (max-width:700px){
   .rv-quadro{padding:.2rem .85rem .5rem}
   .rv-q-cab{display:none}
   .rv-q-lin{grid-template-columns:repeat(3,minmax(0,1fr));padding:.75rem 0}
   .rv-q-nome,.rv-q-fc{grid-column:1/-1}
-  .rv-q-lin{grid-template-columns:repeat(3,auto);justify-content:start;column-gap:1rem}
+  .rv-q-lin{grid-template-columns:repeat(3,auto);justify-content:start;column-gap:.5rem}
+  .rv-q-c.falta{display:none}
 }
 </style>
 
@@ -344,6 +346,7 @@ const GRUPOS_PECA = [
   ['Trilha Estratégica 2025', ['Trilha 2025 · como usar', 'Trilha 00', 'Trilha 01', 'Trilha 02', 'Trilha 03', 'Trilha 04', 'Trilha 05', 'Trilha 06', 'Trilha 07', 'Trilha 08', 'Trilha 09', 'Trilha 10', 'Trilha 11', 'Trilha 12', 'Trilha 13', 'Trilha 14', 'Trilha 15', 'Trilha 16', 'Trilha 17']],
   ['Administrativo · material alternativo', ['Improbidade · Herbert Almeida','Estatuto de SP, arts. 239 a 323 · Herbert Almeida','Resumo: improbidade e Estatuto de SP']]
 ];
+const NOME_CURTO = {1:'Tabelas', 2:'Bizus', 3:'Apostila'};
 const PASSO_CURTO = {teoria:'Teoria', pratica:'Praticar', oficina:'Oficina', material:'Abrir', resumo:'Resumo', caderno:'Caderno Legislativo'};
 
 function chip(i, texto) {
@@ -384,7 +387,7 @@ function renderRev(lib) {
       const s = estado(i.id);
       const txt = s === 'feito' ? 'feita' : s === 'lendo' ? 'lendo' : 'não lida';
       return '<button class="rv-q-c ' + s + (i.id === proxId ? ' prox' : '') + '" data-abrir="' + esc(i.id) + '" aria-label="' + esc(m) + ', ' + ROTULO[r] + ': ' + txt + '">' +
-        (s === 'feito' ? '✓' : r) + '</button>';
+        (s === 'feito' ? '✓ ' : '') + NOME_CURTO[r] + '</button>';
     }).join('');
     let fc = '';
     const disc = DISC_REV[m];
@@ -611,7 +614,7 @@ function subtitulo(lib) {
   const el = document.getElementById('rv-sub'); if (!el) return;
   const revs = lib.filter(i => i.g === 'rev'), feitas = revs.filter(i => estado(i.id) === 'feito').length;
   const prox = proximaRevisao(lib);
-  el.innerHTML = '<b>' + feitas + ' de ' + revs.length + '</b> revisões lidas.' + (prox ? ' Próxima: ' + esc(prox.a) + ', Revisão ' + esc(prox.b) + '.' : ' Todas lidas.');
+  el.innerHTML = '<b>' + feitas + ' de ' + revs.length + '</b> revisões lidas.' + (prox ? ' Próxima: ' + esc(prox.a) + ', ' + ROTULO[prox.b] + '.' : ' Todas lidas.');
 }
 
 function renderContinuar(lib) {
